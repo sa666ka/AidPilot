@@ -223,61 +223,6 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             }
             break;
 
-#if MODE_AUTO_ENABLED
-        case AUX_FUNC::SAVE_WP:
-            // save waypoint when switch is brought high
-            if (ch_flag == RC_Channel::AuxSwitchPos::HIGH) {
-
-                // do not allow saving new waypoints while we're in auto or disarmed
-                if (copter.flightmode == &copter.mode_auto || !copter.motors->armed()) {
-                    break;
-                }
-
-                // do not allow saving the first waypoint with zero throttle
-                if (!copter.mode_auto.mission.present() && (copter.channel_throttle->get_control_in() == 0)) {
-                    break;
-                }
-
-                // create new mission command
-                AP_Mission::Mission_Command cmd  = {};
-
-                // if the mission is empty save a takeoff command
-                if (!copter.mode_auto.mission.present()) {
-                    // set our location ID to 16, MAV_CMD_NAV_WAYPOINT
-                    cmd.id = MAV_CMD_NAV_TAKEOFF;
-                    cmd.content.location.alt = MAX(copter.current_loc.alt,100);
-
-                    // use the current altitude for the target alt for takeoff.
-                    // only altitude will matter to the AP mission script for takeoff.
-                    if (copter.mode_auto.mission.add_cmd(cmd)) {
-                        // log event
-                        LOGGER_WRITE_EVENT(LogEvent::SAVEWP_ADD_WP);
-                    }
-                }
-
-                // set new waypoint to current location
-                cmd.content.location = copter.current_loc;
-
-                // if throttle is above zero, create waypoint command
-                if (copter.channel_throttle->get_control_in() > 0) {
-                    cmd.id = MAV_CMD_NAV_WAYPOINT;
-                } else {
-                    // with zero throttle, create LAND command
-                    cmd.id = MAV_CMD_NAV_LAND;
-                }
-
-                // save command
-                if (copter.mode_auto.mission.add_cmd(cmd)) {
-                    // log event
-                    LOGGER_WRITE_EVENT(LogEvent::SAVEWP_ADD_WP);
-                }
-            }
-            break;
-
-        case AUX_FUNC::AUTO:
-            do_aux_function_change_mode(Mode::Number::AUTO, ch_flag);
-            break;
-#endif
 
 #if AP_RANGEFINDER_ENABLED
         case AUX_FUNC::RANGEFINDER:
@@ -291,33 +236,6 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             break;
 #endif // AP_RANGEFINDER_ENABLED
 
-#if MODE_ACRO_ENABLED
-        case AUX_FUNC::ACRO_TRAINER:
-            switch(ch_flag) {
-                case AuxSwitchPos::LOW:
-                    copter.g.acro_trainer.set((uint8_t)ModeAcro::Trainer::OFF);
-                    LOGGER_WRITE_EVENT(LogEvent::ACRO_TRAINER_OFF);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                    copter.g.acro_trainer.set((uint8_t)ModeAcro::Trainer::LEVELING);
-                    LOGGER_WRITE_EVENT(LogEvent::ACRO_TRAINER_LEVELING);
-                    break;
-                case AuxSwitchPos::HIGH:
-                    copter.g.acro_trainer.set((uint8_t)ModeAcro::Trainer::LIMITED);
-                    LOGGER_WRITE_EVENT(LogEvent::ACRO_TRAINER_LIMITED);
-                    break;
-            }
-            break;
-#endif
-
-#if AUTOTUNE_ENABLED
-        case AUX_FUNC::AUTOTUNE_MODE:
-            do_aux_function_change_mode(Mode::Number::AUTOTUNE, ch_flag);
-            break;
-        case AUX_FUNC::AUTOTUNE_TEST_GAINS:
-            copter.mode_autotune.autotune.do_aux_function(ch_flag);
-            break;
-#endif
 
         case AUX_FUNC::LAND:
             do_aux_function_change_mode(Mode::Number::LAND, ch_flag);
@@ -528,11 +446,7 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             do_aux_function_change_mode(Mode::Number::ALT_HOLD, ch_flag);
             break;
 
-#if MODE_ACRO_ENABLED
-        case AUX_FUNC::ACRO:
-            do_aux_function_change_mode(Mode::Number::ACRO, ch_flag);
-            break;
-#endif
+
 /*
 #if MODE_FLOWHOLD_ENABLED
         case AUX_FUNC::FLOWHOLD:
@@ -616,20 +530,12 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
 
         case AUX_FUNC::AIRMODE:
             do_aux_function_change_air_mode(ch_flag);
-#if MODE_ACRO_ENABLED && FRAME_CONFIG != HELI_FRAME
-            copter.mode_acro.air_mode_aux_changed();
-#endif
             break;
 
         case AUX_FUNC::FORCEFLYING:
             do_aux_function_change_force_flying(ch_flag);
             break;
 
-#if MODE_AUTO_ENABLED
-        case AUX_FUNC::AUTO_RTL:
-            do_aux_function_change_mode(Mode::Number::AUTO_RTL, ch_flag);
-            break;
-#endif
 
 #if MODE_TURTLE_ENABLED
         case AUX_FUNC::TURTLE:

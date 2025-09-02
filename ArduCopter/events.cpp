@@ -425,13 +425,6 @@ void Copter::set_mode_SmartRTL_or_RTL(ModeReason reason)
 // This can come from failsafe or RC option
 void Copter::set_mode_auto_do_land_start_or_RTL(ModeReason reason)
 {
-#if MODE_AUTO_ENABLED
-    if (set_mode(Mode::Number::AUTO_RTL, reason)) {
-        AP_Notify::events.failsafe_mode_change = 1;
-        return;
-    }
-#endif
-
     gcs().send_text(MAV_SEVERITY_WARNING, "Trying RTL Mode");
     set_mode_RTL_or_land_with_pause(reason);
 }

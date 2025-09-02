@@ -365,21 +365,12 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
 
 MISSION_STATE GCS_MAVLINK_Copter::mission_state(const class AP_Mission &mission) const
 {
-#if MODE_AUTO_ENABLED
-    if (copter.mode_auto.paused()) {
-        return MISSION_STATE_PAUSED;
-    }
-#endif
     return GCS_MAVLINK::mission_state(mission);
 }
 
 bool GCS_MAVLINK_Copter::handle_guided_request(AP_Mission::Mission_Command &cmd)
 {
-#if MODE_AUTO_ENABLED
-    return copter.mode_auto.do_guided(cmd);
-#else
     return false;
-#endif
 }
 
 void GCS_MAVLINK_Copter::packetReceived(const mavlink_status_t &status,
@@ -552,10 +543,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_packet(const mavlink_command_i
         return handle_MAV_CMD_SOLO_BTN_FLY_CLICK(packet);
 #endif
 
-#if MODE_AUTO_ENABLED
-    case MAV_CMD_MISSION_START:
-        return handle_MAV_CMD_MISSION_START(packet);
-#endif
 
 #if AP_WINCH_ENABLED
     case MAV_CMD_DO_WINCH:
@@ -580,20 +567,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_packet(const mavlink_command_i
             return MAV_RESULT_FAILED;
         }
         return MAV_RESULT_ACCEPTED;
-
-#if MODE_AUTO_ENABLED
-    case MAV_CMD_DO_RETURN_PATH_START:
-        if (copter.mode_auto.return_path_start_auto_RTL(ModeReason::GCS_COMMAND)) {
-            return MAV_RESULT_ACCEPTED;
-        }
-        return MAV_RESULT_FAILED;
-
-    case MAV_CMD_DO_LAND_START:
-        if (copter.mode_auto.jump_to_landing_sequence_auto_RTL(ModeReason::GCS_COMMAND)) {
-            return MAV_RESULT_ACCEPTED;
-        }
-        return MAV_RESULT_FAILED;
-#endif
 
     default:
         return GCS_MAVLINK::handle_command_int_packet(packet, msg);
@@ -703,25 +676,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_DO_CHANGE_SPEED(const mavlink_comm
 
     return success ? MAV_RESULT_ACCEPTED : MAV_RESULT_FAILED;
 }
-
-#if MODE_AUTO_ENABLED
-MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_MISSION_START(const mavlink_command_int_t &packet)
-{
-        if (!is_zero(packet.param1) || !is_zero(packet.param2)) {
-            // first-item/last item not supported
-            return MAV_RESULT_DENIED;
-        }
-        if (copter.set_mode(Mode::Number::AUTO, ModeReason::GCS_COMMAND)) {
-            copter.set_auto_armed(true);
-            if (copter.mode_auto.mission.state() != AP_Mission::MISSION_RUNNING) {
-                copter.mode_auto.mission.start_or_resume();
-            }
-            return MAV_RESULT_ACCEPTED;
-        }
-        return MAV_RESULT_FAILED;
-}
-#endif
-
 
 
 #if HAL_PARACHUTE_ENABLED
@@ -1420,13 +1374,6 @@ uint8_t GCS_MAVLINK_Copter::high_latency_wind_direction() const
 uint8_t GCS_MAVLINK_Copter::send_available_mode(uint8_t index) const
 {
     const Mode* modes[] {
-#if MODE_AUTO_ENABLED
-        &copter.mode_auto, // This auto is actually auto RTL!
-        &copter.mode_auto, // This one is really is auto!
-#endif
-#if MODE_ACRO_ENABLED
-        &copter.mode_acro,
-#endif
         &copter.mode_stabilize,
         &copter.mode_althold,
 #if MODE_CIRCLE_ENABLED
@@ -1453,9 +1400,7 @@ uint8_t GCS_MAVLINK_Copter::send_available_mode(uint8_t index) const
 #if MODE_FLIP_ENABLED
         &copter.mode_flip,
 #endif
-#if AUTOTUNE_ENABLED
-        &copter.mode_autotune,
-#endif
+
 #if MODE_POSHOLD_ENABLED
         &copter.mode_poshold,
 #endif
@@ -1539,19 +1484,6 @@ uint8_t GCS_MAVLINK_Copter::send_available_mode(uint8_t index) const
 #endif
     }
 
-#if MODE_AUTO_ENABLED
-    // Auto RTL is odd
-    // Have to deal with is separately because its number and name can change depending on if were in it or not
-    if (index_zero == 0) {
-        mode_number = (uint8_t)Mode::Number::AUTO_RTL;
-        name = "AUTO RTL";
-
-    } else if (index_zero == 1) {
-        mode_number = (uint8_t)Mode::Number::AUTO;
-        name = "AUTO";
-
-    }
-#endif
 
     mavlink_msg_available_modes_send(
         chan,

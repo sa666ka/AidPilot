@@ -115,28 +115,11 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-//  Auto Tuning
-#ifndef AUTOTUNE_ENABLED
- # define AUTOTUNE_ENABLED  1
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
 // Nav-Guided - allows external nav computer to control vehicle
 #ifndef AC_NAV_GUIDED
  # define AC_NAV_GUIDED    1
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
-// Acro - fly vehicle in acrobatic mode
-#ifndef MODE_ACRO_ENABLED
-# define MODE_ACRO_ENABLED 1
-#endif
-
-//////////////////////////////////////////////////////////////////////////////
-// Auto mode - allows vehicle to trace waypoints and perform automated actions
-#ifndef MODE_AUTO_ENABLED
-# define MODE_AUTO_ENABLED 1
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Brake mode - bring vehicle to stop
@@ -548,21 +531,7 @@
   #error Follow Mode relies on AP_AVOIDANCE_ENABLED which is disabled
 #endif
 
-#if MODE_AUTO_ENABLED && !MODE_GUIDED_ENABLED
-  #error ModeAuto requires ModeGuided which is disabled
-#endif
 
-#if MODE_AUTO_ENABLED && !MODE_CIRCLE_ENABLED
-  #error ModeAuto requires ModeCircle which is disabled
-#endif
-
-#if MODE_AUTO_ENABLED && !MODE_RTL_ENABLED
-  #error ModeAuto requires ModeRTL which is disabled
-#endif
-
-#if FRAME_CONFIG == HELI_FRAME && !MODE_ACRO_ENABLED
-  #error Helicopter frame requires acro mode support which is disabled
-#endif
 
 #if MODE_SMARTRTL_ENABLED && !MODE_RTL_ENABLED
   #error SmartRTL requires ModeRTL which is disabled

@@ -708,11 +708,7 @@ private:
     bool set_circle_rate(float rate_dps) override;
 #endif
     bool set_desired_speed(float speed) override;
-#if MODE_AUTO_ENABLED
-    bool nav_scripting_enable(uint8_t mode) override;
-    bool nav_script_time(uint16_t &id, uint8_t &cmd, float &arg1, float &arg2, int16_t &arg3, int16_t &arg4) override;
-    void nav_script_time_done(uint16_t id) override;
-#endif
+
     // lua scripts use this to retrieve EKF failsafe state
     // returns true if the EKF failsafe has triggered
     bool has_ekf_failsafed() const override;
@@ -938,7 +934,7 @@ private:
     // called when an attempt to change into a mode is unsuccessful:
     void mode_change_failed(const Mode *mode, const char *reason);
     uint8_t get_mode() const override { return (uint8_t)flightmode->mode_number(); }
-    bool current_mode_requires_mission() const override;
+    // bool current_mode_requires_mission() const override;
     void update_flight_mode();
     void notify_flight_mode();
 
@@ -1034,24 +1030,10 @@ private:
     void userhook_auxSwitch1(const RC_Channel::AuxSwitchPos ch_flag);
     void userhook_auxSwitch2(const RC_Channel::AuxSwitchPos ch_flag);
     void userhook_auxSwitch3(const RC_Channel::AuxSwitchPos ch_flag);
-/*
-#if MODE_ACRO_ENABLED
-#if FRAME_CONFIG == HELI_FRAME
-    ModeAcro_Heli mode_acro;
-#else
-    ModeAcro mode_acro;
-#endif
-#endif
-*/
+
     ModeAltHold mode_althold;
 /*
-#if MODE_AUTO_ENABLED
-    ModeAuto mode_auto;
-#endif
 
-#if AUTOTUNE_ENABLED
-    ModeAutoTune mode_autotune;
-#endif
 #if MODE_BRAKE_ENABLED
     ModeBrake mode_brake;
 #endif

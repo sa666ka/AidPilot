@@ -468,18 +468,7 @@ public:
 #endif
 */
     AP_Int16                rc_speed; // speed of fast RC Channels in Hz
-/*
-#if MODE_ACRO_ENABLED || MODE_SPORT_ENABLED
-    // Acro parameters
-    AP_Float                acro_balance_roll;
-    AP_Float                acro_balance_pitch;
-#endif
 
-#if MODE_ACRO_ENABLED
-    // Acro parameters
-    AP_Int8                 acro_trainer;
-#endif
-*/
     // Note: keep initializers here in the same order as they are declared
     // above.
     Parameters()
@@ -543,9 +532,6 @@ public:
     // developer options
     AP_Int32 dev_options;
 
-#if MODE_ACRO_ENABLED
-    AP_Float acro_thr_mid;
-#endif
 
     // frame class
     AP_Int8 frame_class;
@@ -591,10 +577,6 @@ public:
     UserParameters user_parameters;
 #endif
 
-#if AUTOTUNE_ENABLED
-    // we need a pointer to autotune for the G2 table
-    void *autotune_ptr;
-#endif
  */
 #if AP_RC_TRANSMITTER_TUNING_ENABLED
     AP_Float rc_tuning_min;
@@ -627,24 +609,10 @@ public:
     void *mode_zigzag_ptr;
 #endif
 
-    // command model parameters
-#if MODE_ACRO_ENABLED || MODE_SPORT_ENABLED
-    AC_CommandModel command_model_acro_rp;
-#endif
 
-#if MODE_ACRO_ENABLED || MODE_DRIFT_ENABLED
-    AC_CommandModel command_model_acro_y;
-#endif
 
     AC_CommandModel command_model_pilot_y;
 
-#if MODE_ACRO_ENABLED
-    AP_Int8 acro_options;
-#endif
-
-#if MODE_AUTO_ENABLED
-    AP_Int32 auto_options;
-#endif
 
 #if MODE_GUIDED_ENABLED
     AP_Int32 guided_options;

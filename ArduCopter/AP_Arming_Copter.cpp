@@ -225,13 +225,6 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
             return false;
         }
 
-        // acro balance parameter check
-#if MODE_ACRO_ENABLED || MODE_SPORT_ENABLED
-        if ((copter.g.acro_balance_roll > copter.attitude_control->get_angle_roll_p().kP()) || (copter.g.acro_balance_pitch > copter.attitude_control->get_angle_pitch_p().kP())) {
-            check_failed(Check::PARAMETERS, display_failure, "Check ACRO_BAL_ROLL/PITCH");
-            return false;
-        }
-#endif
 
         // pilot-speed-up parameter check
         if (copter.g.pilot_speed_up_cms <= 0) {
@@ -836,10 +829,6 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method, bool do_disarm_che
     // send disarm command to motors
     copter.motors->armed(false);
 
-#if MODE_AUTO_ENABLED
-    // reset the mission
-    copter.mode_auto.mission.reset();
-#endif
 
 #if HAL_LOGGING_ENABLED
     AP::logger().set_vehicle_armed(false);
@@ -849,10 +838,6 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method, bool do_disarm_che
 
     copter.ap.in_arming_delay = false;
 
-#if AUTOTUNE_ENABLED
-    // Possibly save auto tuned parameters
-    copter.mode_autotune.autotune.disarmed(copter.flightmode == &copter.mode_autotune);
-#endif
 
     return true;
 }

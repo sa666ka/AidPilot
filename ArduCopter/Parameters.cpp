@@ -393,34 +393,8 @@ const AP_Param::Info Copter::var_info[] = {
     // @User: Advanced
     GSCALAR(rc_speed, "RC_SPEED",              RC_FAST_SPEED),
 
-#if MODE_ACRO_ENABLED || MODE_SPORT_ENABLED
-    // @Param: ACRO_BAL_ROLL
-    // @DisplayName: Acro Balance Roll
-    // @Description: rate at which roll angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the roll axis. A higher value causes faster decay of desired to actual attitude.
-    // @Range: 0 3
-    // @Increment: 0.1
-    // @User: Advanced
-    GSCALAR(acro_balance_roll,      "ACRO_BAL_ROLL",    ACRO_BALANCE_ROLL),
-
-    // @Param: ACRO_BAL_PITCH
-    // @DisplayName: Acro Balance Pitch
-    // @Description: rate at which pitch angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the pitch axis. A higher value causes faster decay of desired to actual attitude.
-    // @Range: 0 3
-    // @Increment: 0.1
-    // @User: Advanced
-    GSCALAR(acro_balance_pitch,     "ACRO_BAL_PITCH",   ACRO_BALANCE_PITCH),
-#endif
-
     // ACRO_RP_EXPO moved to Command Model class
 
-#if MODE_ACRO_ENABLED
-    // @Param: ACRO_TRAINER
-    // @DisplayName: Acro Trainer
-    // @Description: Type of trainer used in acro mode
-    // @Values: 0:Disabled,1:Leveling,2:Leveling and Limited
-    // @User: Advanced
-    GSCALAR(acro_trainer,   "ACRO_TRAINER",     (uint8_t)ModeAcro::Trainer::LIMITED),
-#endif
 
     // variables not in the g class which contain EEPROM saved variables
 
@@ -573,11 +547,6 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECTN(ahrs.EKF3, NavEKF3, "EK3_", NavEKF3),
 #endif
 
-#if MODE_AUTO_ENABLED
-    // @Group: MIS_
-    // @Path: ../libraries/AP_Mission/AP_Mission.cpp
-    GOBJECTN(mode_auto.mission, mission, "MIS_", AP_Mission),
-#endif
 
 #if AP_RSSI_ENABLED
     // @Group: RSSI_
@@ -760,14 +729,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
     // ACRO_Y_EXPO (9) moved to Command Model Class
 
-#if MODE_ACRO_ENABLED
-    // @Param: ACRO_THR_MID
-    // @DisplayName: Acro Thr Mid
-    // @Description: Acro Throttle Mid
-    // @Range: 0 1
-    // @User: Advanced
-    AP_GROUPINFO("ACRO_THR_MID", 10, ParametersG2, acro_thr_mid, ACRO_THR_MID_DEFAULT),
-#endif
+
 
     // 11 was SYSID_ENFORCE
 
@@ -853,11 +815,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(user_parameters, "USR", 28, ParametersG2, UserParameters),
 #endif
 
-#if AUTOTUNE_ENABLED
-    // @Group: AUTOTUNE_
-    // @Path: ../libraries/AC_AutoTune/AC_AutoTune_Multi.cpp,../libraries/AC_AutoTune/AC_AutoTune_Heli.cpp
-    AP_SUBGROUPPTR(autotune_ptr, "AUTOTUNE_",  29, ParametersG2, AutoTune),
-#endif
 
     // 30 was AP_Scripting
 
@@ -913,23 +870,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
 #endif
 
-#if MODE_ACRO_ENABLED
-    // @Param: ACRO_OPTIONS
-    // @DisplayName: Acro mode options
-    // @Description: A range of options that can be applied to change acro mode behaviour. Air-mode enables ATC_THR_MIX_MAN at all times (air-mode has no effect on helicopters). Rate Loop Only disables the use of angle stabilization and uses angular rate stabilization only.
-    // @Bitmask: 0:Air-mode,1:Rate Loop Only
-    // @User: Advanced
-    AP_GROUPINFO("ACRO_OPTIONS", 39, ParametersG2, acro_options, 0),
-#endif
 
-#if MODE_AUTO_ENABLED
-    // @Param: AUTO_OPTIONS
-    // @DisplayName: Auto mode options
-    // @Description: A range of options that can be applied to change auto mode behaviour. Allow Arming allows the copter to be armed in Auto. Allow Takeoff Without Raising Throttle allows takeoff without the pilot having to raise the throttle. Ignore pilot yaw overrides the pilot's yaw stick being used while in auto.
-    // @Bitmask: 0:Allow Arming,1:Allow Takeoff Without Raising Throttle,2:Ignore pilot yaw,7:Allow weathervaning
-    // @User: Advanced
-    AP_GROUPINFO("AUTO_OPTIONS", 40, ParametersG2, auto_options, 0),
-#endif
 
 #if MODE_GUIDED_ENABLED
     // @Param: GUID_OPTIONS
@@ -1012,58 +953,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Range: 0 120
     // @User: Standard
     AP_GROUPINFO("FS_DR_TIMEOUT", 53, ParametersG2, failsafe_dr_timeout, 30),
-
-#if MODE_ACRO_ENABLED || MODE_SPORT_ENABLED
-    // @Param: ACRO_RP_RATE
-    // @DisplayName: Acro Roll and Pitch Rate
-    // @Description: Acro mode maximum roll and pitch rate.  Higher values mean faster rate of rotation
-    // @Units: deg/s
-    // @Range: 1 1080
-    // @User: Standard
-
-    // @Param: ACRO_RP_EXPO
-    // @DisplayName: Acro Roll/Pitch Expo
-    // @Description: Acro roll/pitch Expo to allow faster rotation when stick at edges
-    // @Values: 0:Disabled,0.1:Very Low,0.2:Low,0.3:Medium,0.4:High,0.5:Very High
-    // @Range: -0.5 0.95
-    // @User: Advanced
-
-    // @Param: ACRO_RP_RATE_TC
-    // @DisplayName: Acro roll/pitch rate control input time constant
-    // @Description: Acro roll and pitch rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response
-    // @Units: s
-    // @Range: 0 1
-    // @Increment: 0.01
-    // @Values: 0.5:Very Soft, 0.2:Soft, 0.15:Medium, 0.1:Crisp, 0.05:Very Crisp
-    // @User: Standard
-    AP_SUBGROUPINFO(command_model_acro_rp, "ACRO_RP_", 54, ParametersG2, AC_CommandModel),
-#endif
-
-#if MODE_ACRO_ENABLED || MODE_DRIFT_ENABLED
-    // @Param: ACRO_Y_RATE
-    // @DisplayName: Acro Yaw Rate
-    // @Description: Acro mode maximum yaw rate.  Higher value means faster rate of rotation
-    // @Units: deg/s
-    // @Range: 1 360
-    // @User: Standard
-
-    // @Param: ACRO_Y_EXPO
-    // @DisplayName: Acro Yaw Expo
-    // @Description: Acro yaw expo to allow faster rotation when stick at edges
-    // @Values: 0:Disabled,0.1:Very Low,0.2:Low,0.3:Medium,0.4:High,0.5:Very High
-    // @Range: -1.0 0.95
-    // @User: Advanced
-
-    // @Param: ACRO_Y_RATE_TC
-    // @DisplayName: Acro yaw rate control input time constant
-    // @Description: Acro yaw rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response
-    // @Units: s
-    // @Range: 0 1
-    // @Increment: 0.01
-    // @Values: 0.5:Very Soft, 0.2:Soft, 0.15:Medium, 0.1:Crisp, 0.05:Very Crisp
-    // @User: Standard
-    AP_SUBGROUPINFO(command_model_acro_y, "ACRO_Y_", 55, ParametersG2, AC_CommandModel),
-#endif
 
     // @Param: PILOT_Y_RATE
     // @DisplayName: Pilot controlled yaw rate
@@ -1268,9 +1157,6 @@ ParametersG2::ParametersG2(void) :
 #if MODE_FOLLOW_ENABLED
     ,follow()
 #endif
-#if AUTOTUNE_ENABLED
-    ,autotune_ptr(&copter.mode_autotune.autotune)
-#endif
 #if MODE_SYSTEMID_ENABLED
     ,mode_systemid_ptr(&copter.mode_systemid)
 #endif
@@ -1279,13 +1165,6 @@ ParametersG2::ParametersG2(void) :
 #endif
 #if MODE_ZIGZAG_ENABLED
     ,mode_zigzag_ptr(&copter.mode_zigzag)
-#endif
-#if MODE_ACRO_ENABLED || MODE_SPORT_ENABLED
-    ,command_model_acro_rp(ACRO_RP_RATE_DEFAULT, ACRO_RP_EXPO_DEFAULT, 0.0f)
-#endif
-
-#if MODE_ACRO_ENABLED || MODE_DRIFT_ENABLED
-    ,command_model_acro_y(ACRO_Y_RATE_DEFAULT, ACRO_Y_EXPO_DEFAULT, 0.0f)
 #endif
 
     ,command_model_pilot_y(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)

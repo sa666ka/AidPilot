@@ -33,22 +33,14 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 {
 
     switch (mode) {
-/*
-#if MODE_ACRO_ENABLED
-        case Mode::Number::ACRO:
-            return &mode_acro;
-#endif
-*/
+
         case Mode::Number::STABILIZE:
             return &mode_stabilize;
 
         case Mode::Number::ALT_HOLD:
             return &mode_althold;
 /*
-#if MODE_AUTO_ENABLED
-        case Mode::Number::AUTO:
-            return &mode_auto;
-#endif
+
 
 #if MODE_CIRCLE_ENABLED
         case Mode::Number::CIRCLE:
@@ -86,11 +78,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 #if MODE_FLIP_ENABLED
         case Mode::Number::FLIP:
             return &mode_flip;
-#endif
-
-#if AUTOTUNE_ENABLED
-        case Mode::Number::AUTOTUNE:
-            return &mode_autotune;
 #endif
 
 #if MODE_POSHOLD_ENABLED
@@ -256,13 +243,6 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
         return false;
     }
 
-#if MODE_AUTO_ENABLED
-    if (mode == Mode::Number::AUTO_RTL) {
-        // Special case for AUTO RTL, not a true mode, just AUTO in disguise
-        // Attempt to join return path, fallback to do-land-start
-        return mode_auto.return_path_or_jump_to_landing_sequence_auto_RTL(reason);
-    }
-#endif
 
     Mode *new_flightmode = mode_from_mode_num(mode);
     if (new_flightmode == nullptr) {
@@ -372,15 +352,9 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 #endif
 
     // set rate shaping time constants
-#if MODE_ACRO_ENABLED || MODE_SPORT_ENABLED
-    attitude_control->set_roll_pitch_rate_tc(g2.command_model_acro_rp.get_rate_tc());
-#endif
+
     attitude_control->set_yaw_rate_tc(g2.command_model_pilot_y.get_rate_tc());
-#if MODE_ACRO_ENABLED || MODE_DRIFT_ENABLED
-    if (mode== Mode::Number::ACRO || mode== Mode::Number::DRIFT) {
-        attitude_control->set_yaw_rate_tc(g2.command_model_acro_y.get_rate_tc());
-    }
-#endif
+
 
     // update notify object
     notify_flight_mode();

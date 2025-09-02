@@ -511,33 +511,6 @@ bool Copter::set_desired_speed(float speed_ms)
     return flightmode->set_speed_NE_ms(speed_ms);
 }
 
-#if MODE_AUTO_ENABLED
-// returns true if mode supports NAV_SCRIPT_TIME mission commands
-bool Copter::nav_scripting_enable(uint8_t mode)
-{
-    return mode == (uint8_t)mode_auto.mode_number();
-}
-
-// lua scripts use this to retrieve the contents of the active command
-bool Copter::nav_script_time(uint16_t &id, uint8_t &cmd, float &arg1, float &arg2, int16_t &arg3, int16_t &arg4)
-{
-    if (flightmode != &mode_auto) {
-        return false;
-    }
-
-    return mode_auto.nav_script_time(id, cmd, arg1, arg2, arg3, arg4);
-}
-
-// lua scripts use this to indicate when they have complete the command
-void Copter::nav_script_time_done(uint16_t id)
-{
-    if (flightmode != &mode_auto) {
-        return;
-    }
-
-    return mode_auto.nav_script_time_done(id);
-}
-#endif
 
 // returns true if the EKF failsafe has triggered.  Only used by Lua scripts
 bool Copter::has_ekf_failsafed() const
@@ -585,14 +558,10 @@ bool Copter::is_taking_off() const
     return flightmode->is_taking_off();
 }
 
-bool Copter::current_mode_requires_mission() const
-{
-#if MODE_AUTO_ENABLED
-        return flightmode == &mode_auto;
-#else
-        return false;
-#endif
-}
+// bool Copter::current_mode_requires_mission() const
+// {
+//     return false;
+// }
 
 // rc_loops - reads user input from transmitter/receiver
 // called at 100hz

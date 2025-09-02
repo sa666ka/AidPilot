@@ -405,74 +405,6 @@ public:
     // end pass-through functions
 };
 
-/*
-#if MODE_ACRO_ENABLED
-class ModeAcro : public Mode {
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::ACRO; }
-
-    enum class Trainer {
-        OFF = 0,
-        LEVELING = 1,
-        LIMITED = 2,
-    };
-
-    enum class AcroOptions {
-        AIR_MODE = 1 << 0,
-        RATE_LOOP_ONLY = 1 << 1,
-    };
-
-    virtual void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return true; }
-    bool allows_arming(AP_Arming::Method method) const override { return true; };
-    bool is_autopilot() const override { return false; }
-    bool init(bool ignore_checks) override;
-    void exit() override;
-    // Called when air mode is enabled via AUX switch; prevents automatic reset to default air_mode state
-    void air_mode_aux_changed();
-    bool allows_save_trim() const override { return true; }
-    bool allows_flip() const override { return true; }
-    bool crash_check_enabled() const override { return false; }
-    bool allows_entry_in_rc_failsafe() const override { return false; }
-
-protected:
-
-    const char *name() const override { return "ACRO"; }
-    const char *name4() const override { return "ACRO"; }
-
-    // get_pilot_desired_rates_rads - transform pilot's normalised roll pitch and yaw input into a desired lean angle rates
-    // the function returns desired angle rates in radians-per-second
-    void get_pilot_desired_rates_rads(float &roll_out_rads, float &pitch_out_rads, float &yaw_out_rads);
-
-    float throttle_hover() const override;
-
-private:
-    bool disable_air_mode_reset;
-};
-#endif
-
-#if FRAME_CONFIG == HELI_FRAME
-class ModeAcro_Heli : public ModeAcro {
-
-public:
-    // inherit constructor
-    using ModeAcro::Mode;
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-    void virtual_flybar( float &roll_out, float &pitch_out, float &yaw_out, float pitch_leak, float roll_leak);
-
-protected:
-private:
-};
-#endif
-*/
-
 class ModeAltHold : public Mode {
 
 public:
@@ -790,58 +722,6 @@ private:
 
     float circle_last_num_complete;
 };
-#if AUTOTUNE_ENABLED
-
-// wrapper class for AC_AutoTune
-
-#if FRAME_CONFIG == HELI_FRAME
-class AutoTune : public AC_AutoTune_Heli
-#else
-class AutoTune : public AC_AutoTune_Multi
-#endif
-{
-public:
-    bool init() override;
-    void run() override;
-
-protected:
-    bool position_ok() override;
-    float get_pilot_desired_climb_rate_cms(void) const override;
-    void get_pilot_desired_rp_yrate_rad(float &des_roll_rad, float &des_pitch_rad, float &des_yaw_rate_rads) override;
-    void init_z_limits() override;
-#if HAL_LOGGING_ENABLED
-    void log_pids() override;
-#endif
-};
-
-class ModeAutoTune : public Mode {
-
-    // ParametersG2 sets a pointer within our autotune object:
-    friend class ParametersG2;
-
-public:
-    // inherit constructor
-    using Mode::Mode;
-    Number mode_number() const override { return Number::AUTOTUNE; }
-
-    bool init(bool ignore_checks) override;
-    void exit() override;
-    void run() override;
-
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(AP_Arming::Method method) const override { return false; }
-    bool is_autopilot() const override { return false; }
-
-    AutoTune autotune;
-
-protected:
-
-    const char *name() const override { return "AUTOTUNE"; }
-    const char *name4() const override { return "ATUN"; }
-};
-#endif
-
 
 class ModeBrake : public Mode {
 
