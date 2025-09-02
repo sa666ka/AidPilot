@@ -201,12 +201,12 @@ public:
 
     // handle situations where the vehicle is on the ground waiting for takeoff
     void make_safe_ground_handling(bool force_throttle_unlimited = false);
-
+/*
     // true if weathervaning is allowed in the current mode
 #if WEATHERVANE_ENABLED
     virtual bool allows_weathervaning() const { return false; }
 #endif
-
+*/
 protected:
 
     // helper functions
@@ -344,11 +344,11 @@ public:
         void set_yaw_angle_offset_deg(const float yaw_angle_offset_deg);
 
         bool reached_fixed_yaw_target();
-
+/*
 #if WEATHERVANE_ENABLED
         void update_weathervane(const float pilot_yaw_rads);
 #endif
-
+*/
         AC_AttitudeControl::HeadingCommand get_heading();
 
     private:
@@ -405,7 +405,7 @@ public:
     // end pass-through functions
 };
 
-
+/*
 #if MODE_ACRO_ENABLED
 class ModeAcro : public Mode {
 
@@ -471,7 +471,7 @@ protected:
 private:
 };
 #endif
-
+*/
 
 class ModeAltHold : public Mode {
 
@@ -505,7 +505,7 @@ protected:
 private:
 
 };
-
+/*
 class ModeAuto : public Mode {
 
 public:
@@ -688,9 +688,11 @@ private:
     void do_set_home(const AP_Mission::Mission_Command& cmd);
     void do_roi(const AP_Mission::Mission_Command& cmd);
     void do_mount_control(const AP_Mission::Mission_Command& cmd);
+*/
 #if HAL_PARACHUTE_ENABLED
     void do_parachute(const AP_Mission::Mission_Command& cmd);
 #endif
+/*
 #if AP_WINCH_ENABLED
     void do_winch(const AP_Mission::Mission_Command& cmd);
 #endif
@@ -788,11 +790,9 @@ private:
 
     float circle_last_num_complete;
 };
-
 #if AUTOTUNE_ENABLED
-/*
-  wrapper class for AC_AutoTune
- */
+
+// wrapper class for AC_AutoTune
 
 #if FRAME_CONFIG == HELI_FRAME
 class AutoTune : public AC_AutoTune_Heli
@@ -974,10 +974,10 @@ private:
 
 
 #if MODE_FLOWHOLD_ENABLED
-/*
-  class to support FLOWHOLD mode, which is a position hold mode using
-  optical flow directly, avoiding the need for a rangefinder
- */
+
+  // class to support FLOWHOLD mode, which is a position hold mode using
+  // optical flow directly, avoiding the need for a rangefinder
+ 
 
 class ModeFlowHold : public Mode {
 public:
@@ -1060,7 +1060,7 @@ private:
     uint32_t last_stick_input_ms;
 };
 #endif // MODE_FLOWHOLD_ENABLED
-
+*/
 
 class ModeGuided : public Mode {
 
@@ -1160,12 +1160,12 @@ public:
     // pause continue in guided mode
     bool pause() override;
     bool resume() override;
-
+/*
     // true if weathervaning is allowed in guided
 #if WEATHERVANE_ENABLED
     bool allows_weathervaning(void) const override;
 #endif
-
+*/
 protected:
 
     const char *name() const override { return "GUIDED"; }
@@ -1311,7 +1311,7 @@ private:
     bool land_pause;
 };
 
-
+/*
 class ModeLoiter : public Mode {
 
 public:
@@ -1652,7 +1652,7 @@ protected:
 private:
 
 };
-
+*/
 
 class ModeStabilize : public Mode {
 
@@ -1779,7 +1779,7 @@ private:
         SYSTEMID_STATE_TESTING
     } systemid_state;
 };
-
+/*
 class ModeThrow : public Mode {
 
 public:
@@ -1873,7 +1873,7 @@ private:
     bool shutdown;
 };
 #endif
-
+*/
 // modes below rely on Guided mode so must be declared at the end (instead of in alphabetical order)
 
 #if AP_ADSB_AVOIDANCE_ENABLED
@@ -1903,7 +1903,7 @@ private:
 
 };
 #endif  // AP_ADSB_AVOIDANCE_ENABLED
-
+/*
 #if MODE_FOLLOW_ENABLED
 class ModeFollow : public ModeGuided {
 
@@ -2077,3 +2077,4 @@ private:
 
 };
 #endif
+*/

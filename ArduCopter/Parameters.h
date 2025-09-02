@@ -5,14 +5,14 @@
 #include <AP_Common/AP_Common.h>
 #include "RC_Channel_Copter.h"
 #include <AP_Proximity/AP_Proximity.h>
-
+/*
 #if MODE_FOLLOW_ENABLED
  # include <AP_Follow/AP_Follow.h>
 #endif
 #if WEATHERVANE_ENABLED
  #include <AC_AttitudeControl/AC_WeatherVane.h>
 #endif
-
+*/
 // Global parameter class.
 //
 class Parameters {
@@ -394,7 +394,7 @@ public:
     AP_Float        throttle_filt;
     AP_Int16        throttle_behavior;
     AP_Float        pilot_takeoff_alt_cm;
-
+/*
 #if MODE_RTL_ENABLED
     AP_Int32        rtl_altitude_cm;
     AP_Int16        rtl_speed_cms;
@@ -404,19 +404,19 @@ public:
     AP_Int32        rtl_loiter_time;
     AP_Enum<ModeRTL::RTLAltType> rtl_alt_type;
 #endif
-
+*/
     AP_Int8         failsafe_gcs;               // ground station failsafe behavior
     AP_Int16        gps_hdop_good;              // GPS Hdop value at or below this value represent a good position
 
     AP_Int8         super_simple;
 
     AP_Int8         wp_yaw_behavior;            // controls how the autopilot controls yaw during missions
-
+/*
 #if MODE_POSHOLD_ENABLED
     AP_Int16        poshold_brake_rate_degs;    // PosHold flight mode's rotation rate during braking in deg/sec
     AP_Int16        poshold_brake_angle_max;    // PosHold flight mode's max lean angle during braking in centi-degrees
 #endif
-
+*/
     // Waypoints
     //
     AP_Int16        land_speed_cms;
@@ -457,7 +457,7 @@ public:
     AP_Int8         fs_crash_check;
     AP_Float        fs_ekf_thresh;
     AP_Int16        gcs_pid_mask;
-
+/*
 #if MODE_THROW_ENABLED
     AP_Enum<ModeThrow::PreThrowMotorState>         throw_motor_start;
     AP_Int16         throw_altitude_min; // minimum altitude in m above which a throw can be detected
@@ -466,9 +466,9 @@ public:
     AP_Float         throw_altitude_descend;    // target altitude (meters) to descend during a drop, (must be positive)
     AP_Float         throw_altitude_ascend;     // target altitude (meters) to ascend during a throw upwards, (must be positive)
 #endif
-
+*/
     AP_Int16                rc_speed; // speed of fast RC Channels in Hz
-
+/*
 #if MODE_ACRO_ENABLED || MODE_SPORT_ENABLED
     // Acro parameters
     AP_Float                acro_balance_roll;
@@ -479,7 +479,7 @@ public:
     // Acro parameters
     AP_Int8                 acro_trainer;
 #endif
-
+*/
     // Note: keep initializers here in the same order as they are declared
     // above.
     Parameters()
@@ -510,13 +510,13 @@ public:
 #if HAL_BUTTON_ENABLED
     AP_Button *button_ptr;
 #endif
-
+/*
 #if MODE_THROW_ENABLED
     // Throw mode parameters
     AP_Int8 throw_nextmode;
     AP_Enum<ModeThrow::ThrowType> throw_type;
 #endif
-
+*/
     // ground effect compensation enable/disable
     AP_Int8 gndeffect_comp_enabled;
 
@@ -524,12 +524,12 @@ public:
     // temperature calibration handling
     AP_TempCalibration temp_calibration;
 #endif
-
+/*
 #if AP_BEACON_ENABLED
     // beacon (non-GPS positioning) library
     AP_Beacon beacon;
 #endif
-
+*/
 #if HAL_PROXIMITY_ENABLED
     // proximity (aka object avoidance) library
     AP_Proximity proximity;
@@ -571,7 +571,7 @@ public:
 
     // Land alt final stage
     AP_Int16 land_alt_low_cm;
-
+/*
 #if TOY_MODE_ENABLED
     ToyMode toy_mode;
 #endif
@@ -595,7 +595,7 @@ public:
     // we need a pointer to autotune for the G2 table
     void *autotune_ptr;
 #endif
-
+ */
 #if AP_RC_TRANSMITTER_TUNING_ENABLED
     AP_Float rc_tuning_min;
     AP_Float rc_tuning_max;
@@ -681,11 +681,11 @@ public:
 
     // EKF variance filter cutoff
     AP_Float fs_ekf_filt_hz;
-
+/* 
 #if WEATHERVANE_ENABLED
     AC_WeatherVane weathervane;
 #endif
-
+ */
     // payload place parameters
     AP_Float pldp_thrust_placed_fraction;
     AP_Float pldp_range_finder_maximum_m;

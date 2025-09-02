@@ -15,11 +15,12 @@ static void failsafe_check_static()
 
 void Copter::init_ardupilot()
 {
+/*
     // init winch
 #if AP_WINCH_ENABLED
     g2.winch.init();
 #endif
-
+*/
     // initialise notify system
     notify.init();
     notify_flight_mode();
@@ -36,14 +37,14 @@ void Copter::init_ardupilot()
 
     // setup telem slots with serial ports
     gcs().setup_uarts();
-
+/* 
 #if OSD_ENABLED
     osd.init();
 #endif
-
+ */
     // update motor interlock state
     update_using_interlock();
-
+/* 
 #if FRAME_CONFIG == HELI_FRAME
     // trad heli specific initialisation
     heli_init();
@@ -51,7 +52,7 @@ void Copter::init_ardupilot()
 #if FRAME_CONFIG == HELI_FRAME
     input_manager.set_loop_rate(scheduler.get_loop_rate_hz());
 #endif
-
+ */
     init_rc_in();               // sets up rc channels from radio
 
 #if AP_RANGEFINDER_ENABLED
@@ -102,12 +103,12 @@ void Copter::init_ardupilot()
 #endif
 
     attitude_control->parameter_sanity_check();
-
+/* 
 #if AP_OPTICALFLOW_ENABLED
     // initialise optical flow sensor
     optflow.init(MASK_LOG_OPTFLOW);
 #endif      // AP_OPTICALFLOW_ENABLED
-
+*/
 #if HAL_MOUNT_ENABLED
     // initialise camera mount
     camera_mount.init();
@@ -117,21 +118,21 @@ void Copter::init_ardupilot()
     // initialise camera
     camera.init();
 #endif
-
+/*
 #if AC_PRECLAND_ENABLED
     // initialise precision landing
     init_precland();
 #endif
-
+*/
 #if AP_LANDINGGEAR_ENABLED
     // initialise landing gear position
     landinggear.init();
 #endif
-
+/*
 #ifdef USERHOOK_INIT
     USERHOOK_INIT
 #endif
-
+ */
     // read Baro pressure at ground
     //-----------------------------
     barometer.set_log_baro_bit(MASK_LOG_IMU);
@@ -146,12 +147,12 @@ void Copter::init_ardupilot()
     // init proximity sensor
     g2.proximity.init();
 #endif
-
+/* 
 #if AP_BEACON_ENABLED
     // init beacons used for non-gps position estimation
     g2.beacon.init();
 #endif
-
+ */
 #if MODE_AUTO_ENABLED
     // initialise mission library
     mode_auto.mission.init();
@@ -159,19 +160,19 @@ void Copter::init_ardupilot()
     mode_auto.mission.set_log_start_mission_item_bit(MASK_LOG_CMD);
 #endif
 #endif
-
+/* 
 #if MODE_SMARTRTL_ENABLED
     // initialize SmartRTL
     g2.smart_rtl.init();
 #endif
-
+ */
 #if HAL_LOGGING_ENABLED
     // initialise AP_Logger library
     logger.setVehicle_Startup_Writer(FUNCTOR_BIND(&copter, &Copter::Log_Write_Vehicle_Startup_Messages, void));
 #endif
 
     startup_INS_ground();
-
+ 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
     custom_control.init();
 #endif

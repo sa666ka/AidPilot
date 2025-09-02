@@ -33,17 +33,18 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 {
 
     switch (mode) {
+/*
 #if MODE_ACRO_ENABLED
         case Mode::Number::ACRO:
             return &mode_acro;
 #endif
-
+*/
         case Mode::Number::STABILIZE:
             return &mode_stabilize;
 
         case Mode::Number::ALT_HOLD:
             return &mode_althold;
-
+/*
 #if MODE_AUTO_ENABLED
         case Mode::Number::AUTO:
             return &mode_auto;
@@ -58,7 +59,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         case Mode::Number::LOITER:
             return &mode_loiter;
 #endif
-
+*/
 #if MODE_GUIDED_ENABLED
         case Mode::Number::GUIDED:
             return &mode_guided;
@@ -66,7 +67,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 
         case Mode::Number::LAND:
             return &mode_land;
-
+/*
 #if MODE_RTL_ENABLED
         case Mode::Number::RTL:
             return &mode_rtl;
@@ -106,7 +107,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         case Mode::Number::THROW:
             return &mode_throw;
 #endif
-
+*/
 #if AP_ADSB_AVOIDANCE_ENABLED
         case Mode::Number::AVOID_ADSB:
             return &mode_avoid_adsb;
@@ -116,7 +117,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         case Mode::Number::GUIDED_NOGPS:
             return &mode_guided_nogps;
 #endif
-
+/*
 #if MODE_SMARTRTL_ENABLED
         case Mode::Number::SMART_RTL:
             return &mode_smartrtl;
@@ -136,12 +137,12 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         case Mode::Number::ZIGZAG:
             return &mode_zigzag;
 #endif
-
+*/
 #if MODE_SYSTEMID_ENABLED
         case Mode::Number::SYSTEMID:
             return (Mode *)g2.mode_systemid_ptr;
 #endif
-
+/*
 #if MODE_AUTOROTATE_ENABLED
         case Mode::Number::AUTOROTATE:
             return &mode_autorotate;
@@ -151,7 +152,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         case Mode::Number::TURTLE:
             return &mode_turtle;
 #endif
-
+*/
         default:
             break;
     }

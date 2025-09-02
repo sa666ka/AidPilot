@@ -119,14 +119,14 @@ bool ModeGuided::allows_arming(AP_Arming::Method method) const
     // optionally allow arming from the transmitter
     return option_is_enabled(Option::AllowArmingFromTX);
 };
-
+/*
 #if WEATHERVANE_ENABLED
 bool ModeGuided::allows_weathervaning() const
 {
     return option_is_enabled(Option::AllowWeatherVaning);
 }
 #endif
-
+*/
 // initialises position controller to implement take-off
 // takeoff_alt_m is interpreted as alt-above-home (in m) or alt-above-terrain if a rangefinder is available
 bool ModeGuided::do_user_takeoff_start_m(float takeoff_alt_m)

@@ -509,13 +509,13 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_CANManager/AP_CANManager.cpp
     GOBJECT(can_mgr,        "CAN_",       AP_CANManager),
 #endif
-
+/*
 #if HAL_SPRAYER_ENABLED
     // @Group: SPRAY_
     // @Path: ../libraries/AC_Sprayer/AC_Sprayer.cpp
     GOBJECT(sprayer,                "SPRAY_",       AC_Sprayer),
 #endif
-
+*/
 #if AP_SIM_ENABLED
     // @Group: SIM_
     // @Path: ../libraries/SITL/SITL.cpp
@@ -540,13 +540,13 @@ const AP_Param::Info Copter::var_info[] = {
 #if AP_AVOIDANCE_ENABLED
     GOBJECT(avoid,      "AVOID_",   AC_Avoid),
 #endif
-
+/*
 #if HAL_RALLY_ENABLED
     // @Group: RALLY_
     // @Path: AP_Rally.cpp,../libraries/AP_Rally/AP_Rally.cpp
     GOBJECT(rally,      "RALLY_",   AP_Rally_Copter),
 #endif
-
+*/
 #if FRAME_CONFIG == HELI_FRAME
     // @Group: H_
     // @Path: ../libraries/AP_Motors/AP_MotorsHeli_Single.cpp,../libraries/AP_Motors/AP_MotorsHeli_Dual.cpp,../libraries/AP_Motors/AP_MotorsHeli.cpp
@@ -661,13 +661,13 @@ const AP_Param::Info Copter::var_info[] = {
     // @User: Advanced
     GSCALAR(throw_altitude_ascend, "THROW_ALT_ACSND", 3.0),
 #endif
-
+/*
 #if OSD_ENABLED || OSD_PARAM_ENABLED
     // @Group: OSD
     // @Path: ../libraries/AP_OSD/AP_OSD.cpp
     GOBJECT(osd, "OSD", AP_OSD),
 #endif
-
+*/
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
     // @Group: CC
     // @Path: ../libraries/AC_CustomControl/AC_CustomControl.cpp
@@ -745,13 +745,13 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Bitmask: 0:ADSBMavlinkProcessing,1:DevOptionVFR_HUDRelativeAlt
     // @User: Advanced
     AP_GROUPINFO("DEV_OPTIONS", 7, ParametersG2, dev_options, 0),
-
+/*
 #if AP_BEACON_ENABLED
     // @Group: BCN
     // @Path: ../libraries/AP_Beacon/AP_Beacon.cpp
     AP_SUBGROUPINFO(beacon, "BCN", 14, ParametersG2, AP_Beacon),
 #endif
-
+*/
 #if HAL_PROXIMITY_ENABLED
     // @Group: PRX
     // @Path: ../libraries/AP_Proximity/AP_Proximity.cpp
@@ -836,13 +836,13 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Increment: 10
     // @User: Advanced
     AP_GROUPINFO("LAND_ALT_LOW", 25, ParametersG2, land_alt_low_cm, 1000),
-
+/*
 #if MODE_FLOWHOLD_ENABLED
     // @Group: FHLD
     // @Path: mode_flowhold.cpp
     AP_SUBGROUPPTR(mode_flowhold_ptr, "FHLD", 26, ParametersG2, ModeFlowHold),
 #endif
-
+*/
 #if MODE_FOLLOW_ENABLED
     // @Group: FOLL
     // @Path: ../libraries/AP_Follow/AP_Follow.cpp
@@ -1105,13 +1105,13 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("TKOFF_RPM_MIN", 58, ParametersG2, takeoff_rpm_min, 0),
 #endif
-
+/*
 #if WEATHERVANE_ENABLED
     // @Group: WVANE_
     // @Path: ../libraries/AC_AttitudeControl/AC_WeatherVane.cpp
     AP_SUBGROUPINFO(weathervane, "WVANE_", 59, ParametersG2, AC_WeatherVane),
 #endif
-
+*/
     // ID 60 is reserved for the SHIP_OPS
 
     // extend to a new group
@@ -1243,9 +1243,11 @@ ParametersG2::ParametersG2(void) :
 #if AP_TEMPCALIBRATION_ENABLED
     , temp_calibration()
 #endif
+/*
 #if AP_BEACON_ENABLED
     , beacon()
 #endif
+*/
 #if HAL_PROXIMITY_ENABLED
     , proximity()
 #endif
@@ -1258,9 +1260,11 @@ ParametersG2::ParametersG2(void) :
 #if USER_PARAMS_ENABLED
     ,user_parameters()
 #endif
+/*
 #if MODE_FLOWHOLD_ENABLED
     ,mode_flowhold_ptr(&copter.mode_flowhold)
 #endif
+*/
 #if MODE_FOLLOW_ENABLED
     ,follow()
 #endif
@@ -1285,10 +1289,11 @@ ParametersG2::ParametersG2(void) :
 #endif
 
     ,command_model_pilot_y(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
-
+/*
 #if WEATHERVANE_ENABLED
     ,weathervane()
 #endif
+*/
 {
     AP_Param::setup_object_defaults(this, var_info);
     AP_Param::setup_object_defaults(this, var_info2);

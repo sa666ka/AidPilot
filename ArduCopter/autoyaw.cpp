@@ -340,11 +340,11 @@ AC_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
         // RC failsafe, or disabled make sure not in pilot control
         auto_yaw.set_mode(AutoYaw::Mode::HOLD);
     }
-
+/*
 #if WEATHERVANE_ENABLED
     update_weathervane(_pilot_yaw_rate_rads);
 #endif
-
+*/
     AC_AttitudeControl::HeadingCommand heading;
     heading.yaw_angle_rad = auto_yaw.yaw_rad();
     heading.yaw_rate_rads = auto_yaw.rate_rads();
@@ -369,7 +369,7 @@ AC_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
 
     return heading;
 }
-
+/*
 // handle the interface to the weathervane library
 // pilot_yaw can be an angle or a rate or rcin from yaw channel. It just needs to represent a pilot's request to yaw the vehicle to enable pilot overrides.
 #if WEATHERVANE_ENABLED
@@ -401,3 +401,4 @@ void Mode::AutoYaw::update_weathervane(const float pilot_yaw_rads)
     }
 }
 #endif // WEATHERVANE_ENABLED
+*/

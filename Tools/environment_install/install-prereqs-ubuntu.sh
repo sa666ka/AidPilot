@@ -433,10 +433,10 @@ fi
 
 if [ -n "$PYTHON_VENV_PACKAGE" ]; then
     $APT_GET install $PYTHON_VENV_PACKAGE
-    python3 -m venv --system-site-packages $HOME/venv-ardupilot
+    python3 -m venv --system-site-packages $HOME/venv-py
 
     # activate it:
-    SOURCE_LINE="source $HOME/venv-ardupilot/bin/activate"
+    SOURCE_LINE="source $HOME/venv-py/bin/activate"
     $SOURCE_LINE
     PIP_USER_ARGUMENT=""
 

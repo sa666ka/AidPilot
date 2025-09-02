@@ -82,11 +82,11 @@
 #else
  #define MOTOR_CLASS AP_MotorsMulticopter
 #endif
-
+/* 
 #if MODE_AUTOROTATE_ENABLED
  #include <AC_Autorotation/AC_Autorotation.h> // Autorotation controllers
 #endif
-
+ */
 #include "RC_Channel_Copter.h"         // RC Channel Library
 
 #include "GCS_MAVLink_Copter.h"
@@ -98,29 +98,33 @@
 #if AP_EXTERNAL_CONTROL_ENABLED
 #include "AP_ExternalControl_Copter.h"
 #endif
-
+/*
 #include <AP_Beacon/AP_Beacon_config.h>
 #if AP_BEACON_ENABLED
  #include <AP_Beacon/AP_Beacon.h>
 #endif
-
+*/
 #if AP_AVOIDANCE_ENABLED
  #include <AC_Avoidance/AC_Avoid.h>
 #endif
+
 #if AP_OAPATHPLANNER_ENABLED
  #include <AC_WPNav/AC_WPNav_OA.h>
  #include <AC_Avoidance/AP_OAPathPlanner.h>
 #endif
+
 #if AC_PRECLAND_ENABLED
  # include <AC_PrecLand/AC_PrecLand.h>
  # include <AC_PrecLand/AC_PrecLand_StateMachine.h>
 #endif
+/*
 #if MODE_FOLLOW_ENABLED
  # include <AP_Follow/AP_Follow.h>
 #endif
 #if AP_TERRAIN_AVAILABLE
  # include <AP_Terrain/AP_Terrain.h>
 #endif
+ */
 #if AP_RANGEFINDER_ENABLED
  # include <AP_RangeFinder/AP_RangeFinder.h>
 #endif
@@ -129,6 +133,7 @@
 
 #include <AP_Camera/AP_Camera.h>
 
+/* 
 #if HAL_BUTTON_ENABLED
  # include <AP_Button/AP_Button.h>
 #endif
@@ -143,19 +148,20 @@
 #if TOY_MODE_ENABLED
  # include "toy_mode.h"
 #endif
+*/
 #if AP_WINCH_ENABLED
  # include <AP_Winch/AP_Winch.h>
 #endif
 #include <AP_RPM/AP_RPM.h>
-
+/*
 #if AP_SCRIPTING_ENABLED
 #include <AP_Scripting/AP_Scripting.h>
 #endif
-
+*/
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
 #include <AC_CustomControl/AC_CustomControl.h>                  // Custom control library
 #endif
-
+/*
 #if AP_AVOIDANCE_ENABLED && !AP_FENCE_ENABLED
   #error AC_Avoidance relies on AP_FENCE_ENABLED which is disabled
 #endif
@@ -167,15 +173,18 @@
 #if MODE_AUTOROTATE_ENABLED && !AP_RPM_ENABLED
   #error AC_Autorotation relies on AP_RPM_ENABLED which is disabled
 #endif
-
+*/
 #if HAL_ADSB_ENABLED
 #include "avoidance_adsb.h"
-#endif
+#endif 
+
 // Local modules
 #include "Parameters.h"
+/*
 #if USER_PARAMS_ENABLED
 #include "UserParameters.h"
 #endif
+*/
 #include "mode.h"
 
 class Copter : public AP_Vehicle {
@@ -191,42 +200,44 @@ public:
     friend class AP_AdvancedFailsafe_Copter;
 #endif
     friend class AP_Arming_Copter;
+ 
 #if AP_EXTERNAL_CONTROL_ENABLED
     friend class AP_ExternalControl_Copter;
 #endif
-    friend class ToyMode;
+  
+    // friend class ToyMode;
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
 
-    friend class AutoTune;
+    // friend class AutoTune;
 
     friend class Mode;
-    friend class ModeAcro;
-    friend class ModeAcro_Heli;
+    // friend class ModeAcro;
+    // friend class ModeAcro_Heli;
     friend class ModeAltHold;
-    friend class ModeAuto;
-    friend class ModeAutoTune;
+    // friend class ModeAuto;
+    // friend class ModeAutoTune;
     friend class ModeAvoidADSB;
-    friend class ModeBrake;
-    friend class ModeCircle;
-    friend class ModeDrift;
-    friend class ModeFlip;
-    friend class ModeFlowHold;
-    friend class ModeFollow;
+    // friend class ModeBrake;
+    // friend class ModeCircle;
+    // friend class ModeDrift;
+    // friend class ModeFlip;
+    // friend class ModeFlowHold;
+    // friend class ModeFollow;
     friend class ModeGuided;
     friend class ModeLand;
     friend class ModeLoiter;
-    friend class ModePosHold;
-    friend class ModeRTL;
-    friend class ModeSmartRTL;
-    friend class ModeSport;
+    // friend class ModePosHold;
+    // friend class ModeRTL;
+    // friend class ModeSmartRTL;
+    // friend class ModeSport;
     friend class ModeStabilize;
     friend class ModeStabilize_Heli;
     friend class ModeSystemId;
-    friend class ModeThrow;
-    friend class ModeZigZag;
-    friend class ModeAutorotate;
-    friend class ModeTurtle;
+    // friend class ModeThrow;
+    // friend class ModeZigZag;
+    // friend class ModeAutorotate;
+    // friend class ModeTurtle;
 
     friend class _AutoTakeoff;
 
@@ -315,12 +326,12 @@ private:
 #if AP_OPTICALFLOW_ENABLED
     AP_OpticalFlow optflow;
 #endif
-
+ 
     // external control library
 #if AP_EXTERNAL_CONTROL_ENABLED
     AP_ExternalControl_Copter external_control;
 #endif
-
+ 
 
     // system time in milliseconds of last recorded yaw reset from ekf
     uint32_t ekfYawReset_ms;
@@ -458,11 +469,11 @@ private:
     AP_BattMonitor battery{MASK_LOG_CURRENT,
                            FUNCTOR_BIND_MEMBER(&Copter::handle_battery_failsafe, void, const char*, const int8_t),
                            _failsafe_priorities};
-
+/*
 #if OSD_ENABLED || OSD_PARAM_ENABLED
     AP_OSD osd;
 #endif
-
+*/
     // Altitude
     float baro_alt_m;                           // barometer altitude in meters above home
     LowPassFilterVector3f land_accel_ef_filter; // accelerations for land and crash detector tests
@@ -508,7 +519,7 @@ private:
 #if AP_AVOIDANCE_ENABLED
     AC_Avoid avoid;
 #endif
-
+/*
     // Rally library
 #if HAL_RALLY_ENABLED
     AP_Rally_Copter rally;
@@ -518,7 +529,7 @@ private:
 #if HAL_SPRAYER_ENABLED
     AC_Sprayer sprayer;
 #endif
-
+*/
     // Parachute release
 #if HAL_PARACHUTE_ENABLED
     AP_Parachute parachute;
@@ -539,13 +550,13 @@ private:
     AC_PrecLand precland;
     AC_PrecLand_StateMachine precland_statemachine;
 #endif
-
+/*
     // Pilot Input Management Library
     // Only used for Helicopter for now
 #if FRAME_CONFIG == HELI_FRAME
     AC_InputManager_Heli input_manager;
 #endif
-
+*/
 #if HAL_ADSB_ENABLED
     AP_ADSB adsb;
 #endif  // HAL_ADSB_ENABLED
@@ -752,7 +763,7 @@ private:
     void disable_fast_rate_loop(RateControllerRates& rates);
     void update_dynamic_notch_at_specified_rate_main();
     // endif AP_INERTIALSENSOR_FAST_SAMPLE_WINDOW_ENABLED
-
+ 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
     void run_custom_controller() { custom_control.update(); }
 #endif
@@ -838,7 +849,7 @@ private:
     void fence_check();
     void fence_checks_async() override;
 #endif
-
+/*
     // heli.cpp
     void heli_init();
     void check_dynamic_flight(void);
@@ -849,7 +860,7 @@ private:
     void heli_update_rotor_speed_targets();
     void heli_update_autorotation();
     void update_collective_low_flag(int16_t throttle_control);
-
+*/
     // inertia.cpp
     void read_inertia();
 
@@ -887,7 +898,7 @@ private:
     // landing_gear.cpp
     void landinggear_update();
 #endif
-
+ 
     // standby.cpp
     void standby_update();
 
@@ -984,7 +995,7 @@ private:
     bool rangefinder_alt_ok() const;
     bool rangefinder_up_ok() const;
     void update_rangefinder_terrain_offset();
-    void update_optical_flow(void);
+    // void update_optical_flow(void);
 
     // takeoff_check.cpp
     void takeoff_check();
@@ -1023,7 +1034,7 @@ private:
     void userhook_auxSwitch1(const RC_Channel::AuxSwitchPos ch_flag);
     void userhook_auxSwitch2(const RC_Channel::AuxSwitchPos ch_flag);
     void userhook_auxSwitch3(const RC_Channel::AuxSwitchPos ch_flag);
-
+/*
 #if MODE_ACRO_ENABLED
 #if FRAME_CONFIG == HELI_FRAME
     ModeAcro_Heli mode_acro;
@@ -1031,10 +1042,13 @@ private:
     ModeAcro mode_acro;
 #endif
 #endif
+*/
     ModeAltHold mode_althold;
+/*
 #if MODE_AUTO_ENABLED
     ModeAuto mode_auto;
 #endif
+
 #if AUTOTUNE_ENABLED
     ModeAutoTune mode_autotune;
 #endif
@@ -1053,6 +1067,7 @@ private:
 #if MODE_FOLLOW_ENABLED
     ModeFollow mode_follow;
 #endif
+*/
 #if MODE_GUIDED_ENABLED
     ModeGuided mode_guided;
 #if AP_SCRIPTING_ENABLED
@@ -1061,6 +1076,7 @@ private:
 #endif
 #endif
     ModeLand mode_land;
+/*
 #if MODE_LOITER_ENABLED
     ModeLoiter mode_loiter;
 #endif
@@ -1070,26 +1086,33 @@ private:
 #if MODE_RTL_ENABLED
     ModeRTL mode_rtl;
 #endif
+*/
 #if FRAME_CONFIG == HELI_FRAME
     ModeStabilize_Heli mode_stabilize;
 #else
     ModeStabilize mode_stabilize;
 #endif
+/*
 #if MODE_SPORT_ENABLED
     ModeSport mode_sport;
 #endif
+*/
 #if MODE_SYSTEMID_ENABLED
     ModeSystemId mode_systemid;
 #endif
+
 #if AP_ADSB_AVOIDANCE_ENABLED
     ModeAvoidADSB mode_avoid_adsb;
 #endif  // AP_ADSB_AVOIDANCE_ENABLED
+/*
 #if MODE_THROW_ENABLED
     ModeThrow mode_throw;
 #endif
+*/
 #if MODE_GUIDED_NOGPS_ENABLED
     ModeGuidedNoGPS mode_guided_nogps;
 #endif
+/*
 #if MODE_SMARTRTL_ENABLED
     ModeSmartRTL mode_smartrtl;
 #endif
@@ -1105,7 +1128,7 @@ private:
 #if MODE_TURTLE_ENABLED
     ModeTurtle mode_turtle;
 #endif
-
+*/
     // mode.cpp
     Mode *mode_from_mode_num(const Mode::Number mode);
     void exit_mode(Mode *&old_flightmode, Mode *&new_flightmode);

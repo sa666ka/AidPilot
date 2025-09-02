@@ -286,10 +286,12 @@ void Copter::failsafe_terrain_on_event()
 
     if (should_disarm_on_failsafe()) {
         arming.disarm(AP_Arming::Method::TERRAINFAILSAFE);
+/*
 #if MODE_RTL_ENABLED
     } else if (flightmode->mode_number() == Mode::Number::RTL) {
         mode_rtl.restart_without_terrain();
 #endif
+*/
     } else {
         set_mode_RTL_or_land_with_pause(ModeReason::TERRAIN_FAILSAFE);
     }

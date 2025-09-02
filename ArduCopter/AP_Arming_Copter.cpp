@@ -192,11 +192,12 @@ bool AP_Arming_Copter::terrain_database_required() const
         // primary terrain source is from rangefinder, allow arming without terrain database
         return false;
     }
-
+#if MODE_RTL_ENABLED
     if (copter.wp_nav->get_terrain_source() == AC_WPNav::TerrainSource::TERRAIN_FROM_TERRAINDATABASE &&
         copter.mode_rtl.get_alt_type() == ModeRTL::RTLAltType::TERRAIN) {
         return true;
     }
+#endif
     return AP_Arming::terrain_database_required();
 }
 
@@ -747,12 +748,12 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
 #endif
 
     hal.util->set_soft_armed(true);
-
+/*
 #if HAL_SPRAYER_ENABLED
     // turn off sprayer's test if on
     copter.sprayer.test_pump(false);
 #endif
-
+*/
     // output lowest possible value to motors
     copter.motors->output_min();
 

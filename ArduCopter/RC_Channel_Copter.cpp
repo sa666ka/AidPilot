@@ -533,13 +533,13 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             do_aux_function_change_mode(Mode::Number::ACRO, ch_flag);
             break;
 #endif
-
+/*
 #if MODE_FLOWHOLD_ENABLED
         case AUX_FUNC::FLOWHOLD:
             do_aux_function_change_mode(Mode::Number::FLOWHOLD, ch_flag);
             break;
 #endif
-
+*/
 #if MODE_CIRCLE_ENABLED
         case AUX_FUNC::CIRCLE:
             do_aux_function_change_mode(Mode::Number::CIRCLE, ch_flag);
@@ -662,7 +662,7 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             copter.custom_control.set_custom_controller(ch_flag == AuxSwitchPos::HIGH);
             break;
 #endif
-
+/*
 #if WEATHERVANE_ENABLED
     case AUX_FUNC::WEATHER_VANE_ENABLE: {
         switch (ch_flag) {
@@ -678,6 +678,7 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
         break;
     }
 #endif
+*/
 #if AP_RC_TRANSMITTER_TUNING_ENABLED
     case AUX_FUNC::TRANSMITTER_TUNING:
     case AUX_FUNC::TRANSMITTER_TUNING2:
