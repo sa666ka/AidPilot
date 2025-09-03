@@ -100,12 +100,7 @@
  # include <AC_PrecLand/AC_PrecLand.h>
  # include <AC_PrecLand/AC_PrecLand_StateMachine.h>
 #endif
-/*
 
-#if AP_TERRAIN_AVAILABLE
- # include <AP_Terrain/AP_Terrain.h>
-#endif
- */
 #if AP_RANGEFINDER_ENABLED
  # include <AP_RangeFinder/AP_RangeFinder.h>
 #endif
@@ -441,10 +436,6 @@ private:
     AP_LandingGear landinggear;
 #endif
 
-    // terrain handling
-#if AP_TERRAIN_AVAILABLE
-    AP_Terrain terrain;
-#endif
 
     // Precision Landing
 #if AC_PRECLAND_ENABLED
@@ -873,10 +864,6 @@ private:
     bool should_log(uint32_t mask);
     const char* get_frame_string() const;
     void allocate_motors(void);
-
-    // terrain.cpp
-    void terrain_update();
-    void terrain_logging();
 
 #if AP_RC_TRANSMITTER_TUNING_ENABLED
     // tuning.cpp

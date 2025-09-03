@@ -230,10 +230,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
 */
 /*
-#if AP_TERRAIN_AVAILABLE
-    SCHED_TASK(terrain_update,        10,    100, 144),
-#endif
-
 
 #if HAL_BUTTON_ENABLED
     SCHED_TASK_CLASS(AP_Button,            &copter.button,              update,           5, 100, 168),
@@ -696,11 +692,6 @@ void Copter::one_hz_loop()
 
     // update assigned functions and enable auxiliary servos
     AP::srv().enable_aux_servos();
-
-#if HAL_LOGGING_ENABLED
-    // log terrain data
-    terrain_logging();
-#endif
 
     AP_Notify::flags.flying = !ap.land_complete;
 

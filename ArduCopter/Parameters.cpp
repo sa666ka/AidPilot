@@ -444,11 +444,6 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(rangefinder,   "RNGFND", RangeFinder),
 #endif
 
-#if AP_TERRAIN_AVAILABLE
-    // @Group: TERRAIN_
-    // @Path: ../libraries/AP_Terrain/AP_Terrain.cpp
-    GOBJECT(terrain,                "TERRAIN_", AP_Terrain),
-#endif
 
 #if AP_OPTICALFLOW_ENABLED
     // @Group: FLOW
