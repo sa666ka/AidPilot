@@ -19,7 +19,7 @@
 #define MODE_RTL_ENABLED      0            // disable rtl mode support
 #define MODE_SMARTRTL_ENABLED 0            // disable smartrtl mode support
 #define MODE_SPORT_ENABLED    0            // disable sport mode support
-//#define MODE_SYSTEMID_ENABLED 0            // disable system ID mode support
+#define MODE_SYSTEMID_ENABLED 0            // disable system ID mode support
 #define MODE_THROW_ENABLED    0            // disable throw mode support
 #define MODE_ZIGZAG_ENABLED   0            // disable zigzag mode support
 // #define OSD_ENABLED           0            // disable on-screen-display support

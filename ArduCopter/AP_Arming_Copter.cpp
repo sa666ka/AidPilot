@@ -55,13 +55,6 @@ bool AP_Arming_Copter::run_pre_arm_checks(bool display_failure)
         passed = false;
     }
 
-#if FRAME_CONFIG == HELI_FRAME && MODE_AUTOROTATE_ENABLED
-    // check on autorotation config
-    if (!copter.g2.arot.arming_checks(ARRAY_SIZE(failure_msg), failure_msg)) {
-        check_failed(display_failure, "AROT: %s", failure_msg);
-        passed = false;
-    }
-#endif
 
     // If not passed all checks return false
     if (!passed) {
@@ -104,11 +97,8 @@ bool AP_Arming_Copter::rc_throttle_failsafe_checks(bool display_failure) const
         return true;
     }
 
-#if FRAME_CONFIG == HELI_FRAME
-    const char *rc_item = "Collective";
-#else
+
     const char *rc_item = "Throttle";
-#endif
 
     if (!rc().has_had_rc_receiver() && !rc().has_had_rc_override()) {
         check_failed(Check::RC, display_failure, "RC not found");
@@ -192,12 +182,6 @@ bool AP_Arming_Copter::terrain_database_required() const
         // primary terrain source is from rangefinder, allow arming without terrain database
         return false;
     }
-#if MODE_RTL_ENABLED
-    if (copter.wp_nav->get_terrain_source() == AC_WPNav::TerrainSource::TERRAIN_FROM_TERRAINDATABASE &&
-        copter.mode_rtl.get_alt_type() == ModeRTL::RTLAltType::TERRAIN) {
-        return true;
-    }
-#endif
     return AP_Arming::terrain_database_required();
 }
 
@@ -232,21 +216,7 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
             return false;
         }
 
-        #if FRAME_CONFIG == HELI_FRAME
-        char fail_msg[100]{};
-        // check input manager parameters
-        if (!copter.input_manager.parameter_check(fail_msg, ARRAY_SIZE(fail_msg))) {
-            check_failed(Check::PARAMETERS, display_failure, "%s", fail_msg);
-            return false;
-        }
-
-        // Ensure an Aux Channel is configured for motor interlock
-        if (rc().find_channel_for_option(RC_Channel::AUX_FUNC::MOTOR_INTERLOCK) == nullptr) {
-            check_failed(Check::PARAMETERS, display_failure, "Motor Interlock not configured");
-            return false;
-        }
-
-        #else
+       
         switch (copter.g2.frame_class.get()) {
         case AP_Motors::MOTOR_FRAME_HELI_QUAD:
         case AP_Motors::MOTOR_FRAME_HELI_DUAL:
@@ -257,47 +227,9 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
         default:
             break;
         }
-        #endif // HELI_FRAME
 
-        // checks when using range finder for RTL
-#if MODE_RTL_ENABLED
-        if (copter.mode_rtl.get_alt_type() == ModeRTL::RTLAltType::TERRAIN) {
-            // get terrain source from wpnav
-            const char *failure_template = "RTL_ALT_TYPE is above-terrain but %s";
-            switch (copter.wp_nav->get_terrain_source()) {
-            case AC_WPNav::TerrainSource::TERRAIN_UNAVAILABLE:
-                check_failed(Check::PARAMETERS, display_failure, failure_template, "no terrain data");
-                return false;
-                break;
-            case AC_WPNav::TerrainSource::TERRAIN_FROM_RANGEFINDER:
-#if AP_RANGEFINDER_ENABLED
-                if (!copter.rangefinder_state.enabled || !copter.rangefinder.has_orientation(ROTATION_PITCH_270)) {
-                    check_failed(Check::PARAMETERS, display_failure, failure_template, "no rangefinder");
-                    return false;
-                }
-                // check if RTL_ALT is higher than rangefinder's max range
-                if (copter.g.rtl_altitude_cm > copter.rangefinder.max_distance_orient(ROTATION_PITCH_270) * 100) {
-                    check_failed(Check::PARAMETERS, display_failure, failure_template, "RTL_ALT (in cm) above RNGFND_MAX (in metres)");
-                    return false;
-                }
-#else
-                check_failed(Check::PARAMETERS, display_failure, failure_template, "rangefinder not in firmware");
-#endif
-                break;
-            case AC_WPNav::TerrainSource::TERRAIN_FROM_TERRAINDATABASE:
-                // these checks are done in AP_Arming
-                break;
-            }
-        }
-#endif
 
-        // check adsb avoidance failsafe
-#if HAL_ADSB_ENABLED
-        if (copter.failsafe.adsb) {
-            check_failed(Check::PARAMETERS, display_failure, "ADSB threat detected");
-            return false;
-        }
-#endif
+
 
         // ensure controllers are OK with us arming:
         char failure_msg[100] = {};
@@ -360,7 +292,7 @@ bool AP_Arming_Copter::gps_checks(bool display_failure)
 #endif
 
     // check if flight mode requires GPS
-    bool mode_requires_gps = copter.flightmode->requires_GPS() || fence_requires_gps || (copter.simple_mode == Copter::SimpleMode::SUPERSIMPLE);
+    bool mode_requires_gps = copter.flightmode->requires_GPS() || fence_requires_gps;
 
     // call parent gps checks
     if (mode_requires_gps) {
@@ -419,19 +351,6 @@ bool AP_Arming_Copter::proximity_checks(bool display_failure) const
         // check is disabled
         return true;
     }
-
-    // get closest object if we might use it for avoidance
-#if AP_AVOIDANCE_ENABLED
-    float angle_deg, distance;
-    if (copter.avoid.proximity_avoidance_enabled() && copter.g2.proximity.get_closest_object(angle_deg, distance)) {
-        // display error if something is within 60cm
-        const float tolerance = 0.6f;
-        if (distance <= tolerance) {
-            check_failed(Check::PARAMETERS, display_failure, "Proximity %d deg, %4.2fm (want > %0.1fm)", (int)angle_deg, (double)distance, (double)tolerance);
-            return false;
-        }
-    }
-#endif
 
     return true;
 }
@@ -524,22 +443,6 @@ bool AP_Arming_Copter::gcs_failsafe_check(bool display_failure)
 // check winch
 bool AP_Arming_Copter::winch_checks(bool display_failure) const
 {
-#if AP_WINCH_ENABLED
-    // pass if parameter or all arming checks disabled
-    if (!check_enabled(Check::PARAMETERS)) {
-        return true;
-    }
-
-    const AP_Winch *winch = AP::winch();
-    if (winch == nullptr) {
-        return true;
-    }
-    char failure_msg[100] = {};
-    if (!winch->pre_arm_check(failure_msg, sizeof(failure_msg))) {
-        check_failed(display_failure, "%s", failure_msg);
-        return false;
-    }
-#endif
     return true;
 }
 
@@ -599,23 +502,12 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
         }
     }
 
-    // check adsb
-#if HAL_ADSB_ENABLED
-    if (check_enabled(Check::PARAMETERS)) {
-        if (copter.failsafe.adsb) {
-            check_failed(Check::PARAMETERS, true, "ADSB threat detected");
-            return false;
-        }
-    }
-#endif
 
     // check throttle
     if (check_enabled(Check::RC)) {
-#if FRAME_CONFIG == HELI_FRAME
-        const char *rc_item = "Collective";
-#else
+
         const char *rc_item = "Throttle";
-#endif
+
         // check throttle is not too high - skips checks if arming from GCS/scripting in Guided,Guided_NoGPS or Auto 
         if (!((AP_Arming::method_is_GCS(method) || method == AP_Arming::Method::SCRIPTING) && copter.flightmode->allows_GCS_or_SCR_arming_with_throttle_high())) {
             // above top of deadband is too always high
@@ -623,13 +515,6 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
                 check_failed(Check::RC, true, "%s too high", rc_item);
                 return false;
             }
-            // in manual modes throttle must be at zero
-#if FRAME_CONFIG != HELI_FRAME
-            if ((copter.flightmode->has_manual_throttle() || copter.flightmode->mode_number() == Mode::Number::DRIFT) && copter.channel_throttle->get_control_in() > 0) {
-                check_failed(Check::RC, true, "%s too high", rc_item);
-                return false;
-            }
-#endif
         }
     }
 
@@ -733,20 +618,9 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
         UNUSED_RESULT(AP::ahrs().get_relative_position_D_origin_float(pos_d_m));
         copter.arming_altitude_m = -pos_d_m;
     }
-    copter.update_super_simple_bearing(false);
-
-    // Reset SmartRTL return location. If activated, SmartRTL will ultimately try to land at this point
-#if MODE_SMARTRTL_ENABLED
-    copter.g2.smart_rtl.set_home(copter.position_ok());
-#endif
 
     hal.util->set_soft_armed(true);
-/*
-#if HAL_SPRAYER_ENABLED
-    // turn off sprayer's test if on
-    copter.sprayer.test_pump(false);
-#endif
-*/
+
     // output lowest possible value to motors
     copter.motors->output_min();
 

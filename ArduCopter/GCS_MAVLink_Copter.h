@@ -89,9 +89,6 @@ private:
 
     void send_pid_tuning() override;
 
-#if AP_WINCH_ENABLED
-    void send_winch_status() const override;
-#endif
 
     void send_wind() const;
 
@@ -123,8 +120,5 @@ private:
     MAV_RESULT handle_MAV_CMD_MISSION_START(const mavlink_command_int_t &packet);
     MAV_RESULT handle_MAV_CMD_NAV_TAKEOFF(const mavlink_command_int_t &packet);
 
-#if AP_WINCH_ENABLED
-    MAV_RESULT handle_MAV_CMD_DO_WINCH(const mavlink_command_int_t &packet);
-#endif
 
 };

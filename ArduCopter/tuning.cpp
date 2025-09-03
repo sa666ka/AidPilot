@@ -132,33 +132,10 @@ void Copter::tuning(const RC_Channel *tuning_ch, int8_t tuning_param, float tuni
 
 
 
-#if FRAME_CONFIG == HELI_FRAME
-    case TUNING_HELI_EXTERNAL_GYRO:
-        motors->ext_gyro_gain(tuning_value);
-        break;
-
-    case TUNING_RATE_PITCH_FF:
-        attitude_control->get_rate_pitch_pid().set_ff(tuning_value);
-        break;
-
-    case TUNING_RATE_ROLL_FF:
-        attitude_control->get_rate_roll_pid().set_ff(tuning_value);
-        break;
-
-    case TUNING_RATE_YAW_FF:
-        attitude_control->get_rate_yaw_pid().set_ff(tuning_value);
-        break;
-#endif
 
     case TUNING_DECLINATION:
         compass.set_declination(radians(tuning_value), false);     // 2nd parameter is false because we do not want to save to eeprom because this would have a performance impact
         break;
-
-#if MODE_CIRCLE_ENABLED
-    case TUNING_CIRCLE_RATE:
-        circle_nav->set_rate_degs(tuning_value);
-        break;
-#endif
 
     case TUNING_RC_FEEL_RP:
         attitude_control->set_input_tc(tuning_value);
@@ -188,20 +165,17 @@ void Copter::tuning(const RC_Channel *tuning_ch, int8_t tuning_param, float tuni
         attitude_control->get_rate_roll_pid().set_kD(tuning_value);
         break;
 
-#if FRAME_CONFIG != HELI_FRAME
+
     case TUNING_RATE_MOT_YAW_HEADROOM:
         motors->set_yaw_headroom(tuning_value);
         break;
-#endif
+
 
     case TUNING_RATE_YAW_FILT:
         attitude_control->get_rate_yaw_pid().set_filt_E_hz(tuning_value);
         break;
 
     case TUNING_SYSTEM_ID_MAGNITUDE:
-#if MODE_SYSTEMID_ENABLED
-        copter.mode_systemid.set_magnitude(tuning_value);
-#endif
         break;
 
     case TUNING_POS_CONTROL_ANGLE_MAX:

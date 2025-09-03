@@ -123,7 +123,7 @@ void _AutoTakeoff::run()
     // if not armed set throttle to zero and exit immediately
     if (!motors->armed() || !copter.ap.auto_armed) {
         // do not spool down tradheli when on the ground with motor interlock enabled
-        copter.flightmode->make_safe_ground_handling(copter.is_tradheli() && motors->get_interlock());
+        copter.flightmode->make_safe_ground_handling(false);
         // update auto_takeoff_no_nav_alt_m
         no_nav_alt_m = pos_control->get_pos_estimate_NEU_m().z + g2.wp_navalt_min_m;
         return;

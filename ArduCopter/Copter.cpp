@@ -119,20 +119,12 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
     FAST_TASK(run_custom_controller),
 #endif
-/*
-#if FRAME_CONFIG == HELI_FRAME
-    FAST_TASK(heli_update_autorotation),
-#endif //HELI_FRAME
-*/
+
     // send outputs to the motors library immediately
     FAST_TASK(motors_output_main),
      // run EKF state estimator (expensive)
     FAST_TASK(read_AHRS),
-/*
-#if FRAME_CONFIG == HELI_FRAME
-    FAST_TASK(update_heli_control_dynamics),
-#endif //HELI_FRAME
-*/
+
     // Inertial Nav
     FAST_TASK(read_inertia),
     // check if ekf has reset target heading or position
@@ -171,9 +163,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(update_batt_compass,   10,    120, 15),
     SCHED_TASK_CLASS(RC_Channels, (RC_Channels*)&copter.g2.rc_channels, read_aux_all,    10,  50,  18),
 /*
-#if TOY_MODE_ENABLED
-    SCHED_TASK_CLASS(ToyMode,              &copter.g2.toy_mode,         update,          10,  50,  24),
-#endif
+
     SCHED_TASK(auto_disarm_check,     10,     50,  27),
 #if AP_COPTER_AHRS_AUTO_TRIM_ENABLED
     SCHED_TASK_CLASS(RC_Channels_Copter,   &copter.g2.rc_channels,      auto_trim_run,   10,  75,  30),
@@ -186,30 +176,18 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if HAL_PROXIMITY_ENABLED
     SCHED_TASK_CLASS(AP_Proximity,         &copter.g2.proximity,        update,         200,  50,  36),
 #endif
-#if AP_BEACON_ENABLED
-    SCHED_TASK_CLASS(AP_Beacon,            &copter.g2.beacon,           update,         400,  50,  39),
-#endif
 */
     SCHED_TASK(update_altitude,       10,    100,  42),
     SCHED_TASK(run_nav_updates,       50,    100,  45),
     SCHED_TASK(update_throttle_hover,100,     90,  48),
 /*
-#if MODE_SMARTRTL_ENABLED
-    SCHED_TASK_CLASS(ModeSmartRTL,         &copter.mode_smartrtl,       save_position,    3, 100,  51),
-#endif
-#if HAL_SPRAYER_ENABLED
-    SCHED_TASK_CLASS(AC_Sprayer,           &copter.sprayer,               update,         3,  90,  54),
-#endif
+
     SCHED_TASK(three_hz_loop,          3,     75, 57),
 #if AP_SERVORELAYEVENTS_ENABLED
     SCHED_TASK_CLASS(AP_ServoRelayEvents,  &copter.ServoRelayEvents,      update_events, 50,  75,  60),
 #endif
-#if AC_PRECLAND_ENABLED
-    SCHED_TASK(update_precland,      400,     50,  69),
-#endif
-#if FRAME_CONFIG == HELI_FRAME
-    SCHED_TASK(check_dynamic_flight,  50,     75,  72),
-#endif
+
+
 #if HAL_LOGGING_ENABLED
     SCHED_TASK(loop_rate_logging, LOOP_RATE,    50,  75),
 #endif
@@ -251,35 +229,12 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK_CLASS(AP_TempCalibration,   &copter.g2.temp_calibration, update,          10, 100, 135),
 #endif
 */
-#if HAL_ADSB_ENABLED || AP_ADSB_AVOIDANCE_ENABLED
-    SCHED_TASK(avoidance_adsb_update, 10,    100, 138),
-#endif  // HAL_ADSB_ENABLED || AP_ADSB_AVOIDANCE_ENABLED
 /*
-#if AP_COPTER_ADVANCED_FAILSAFE_ENABLED
-    SCHED_TASK(afs_fs_check,          10,    100, 141),
-#endif
 #if AP_TERRAIN_AVAILABLE
     SCHED_TASK(terrain_update,        10,    100, 144),
 #endif
 
-#if AP_WINCH_ENABLED
-    SCHED_TASK_CLASS(AP_Winch,             &copter.g2.winch,            update,          50,  50, 150),
-#endif
-#ifdef USERHOOK_FASTLOOP
-    SCHED_TASK(userhook_FastLoop,    100,     75, 153),
-#endif
-#ifdef USERHOOK_50HZLOOP
-    SCHED_TASK(userhook_50Hz,         50,     75, 156),
-#endif
-#ifdef USERHOOK_MEDIUMLOOP
-    SCHED_TASK(userhook_MediumLoop,   10,     75, 159),
-#endif
-#ifdef USERHOOK_SLOWLOOP
-    SCHED_TASK(userhook_SlowLoop,      3.3,   75, 162),
-#endif
-#ifdef USERHOOK_SUPERSLOWLOOP
-    SCHED_TASK(userhook_SuperSlowLoop, 1,     75, 165),
-#endif
+
 #if HAL_BUTTON_ENABLED
     SCHED_TASK_CLASS(AP_Button,            &copter.button,              update,           5, 100, 168),
 #endif
@@ -490,20 +445,6 @@ AP_Vehicle::custom_mode_state* Copter::register_custom_mode(const uint8_t num, c
 }
 #endif // MODE_GUIDED_ENABLED
 
-#if MODE_CIRCLE_ENABLED
-// circle mode controls
-bool Copter::get_circle_radius(float &radius_m)
-{
-    radius_m = circle_nav->get_radius_m();
-    return true;
-}
-
-bool Copter::set_circle_rate(float rate_degs)
-{
-    circle_nav->set_rate_degs(rate_degs);
-    return true;
-}
-#endif
 
 // set desired speed (m/s). Used for scripting.
 bool Copter::set_desired_speed(float speed_ms)
@@ -583,13 +524,6 @@ void Copter::throttle_loop()
     // check auto_armed status
     update_auto_armed();
 
-#if FRAME_CONFIG == HELI_FRAME
-    // update rotor speed
-    heli_update_rotor_speed_targets();
-
-    // update trad heli swash plate movement
-    heli_update_landing_swash();
-#endif
 
     // compensate for ground effect (if enabled)
     update_ground_effect_detector();
@@ -656,10 +590,6 @@ void Copter::ten_hz_logging_loop()
     if (!should_log(MASK_LOG_ATTITUDE_FAST)) {
         Log_Write_EKF_POS();
     }
-    if ((FRAME_CONFIG == HELI_FRAME) || should_log(MASK_LOG_MOTBATT)) {
-        // always write motors log if we are a heli
-        motors->Log_Write();
-    }
     if (should_log(MASK_LOG_RCIN)) {
         logger.Write_RCIN();
 #if AP_RSSI_ENABLED
@@ -681,17 +611,9 @@ void Copter::ten_hz_logging_loop()
 #if HAL_PROXIMITY_ENABLED
         g2.proximity.log();  // Write proximity sensor distances
 #endif
-/*
-#if AP_BEACON_ENABLED
-        g2.beacon.log();
-#endif
-*/
+
     }
-#if AP_WINCH_ENABLED
-    if (should_log(MASK_LOG_ANY)) {
-        g2.winch.write_log();
-    }
-#endif
+
 #if HAL_MOUNT_ENABLED
     if (should_log(MASK_LOG_CAMERA)) {
         camera_mount.write_log();
@@ -770,11 +692,6 @@ void Copter::one_hz_loop()
 
         // check the user hasn't updated the frame class or type
         motors->set_frame_class_and_type((AP_Motors::motor_frame_class)g2.frame_class.get(), (AP_Motors::motor_frame_type)g.frame_type.get());
-
-#if FRAME_CONFIG != HELI_FRAME
-        // set all throttle channel settings
-        motors->update_throttle_range();
-#endif
     }
 
     // update assigned functions and enable auxiliary servos
@@ -783,10 +700,6 @@ void Copter::one_hz_loop()
 #if HAL_LOGGING_ENABLED
     // log terrain data
     terrain_logging();
-#endif
-
-#if HAL_ADSB_ENABLED
-    adsb.set_is_flying(!ap.land_complete);
 #endif
 
     AP_Notify::flags.flying = !ap.land_complete;
@@ -840,7 +753,7 @@ void Copter::update_simple_mode(void)
     float rollx, pitchx;
 
     // exit immediately if no new radio frame or not in simple mode
-    if (simple_mode == SimpleMode::NONE || !ap.new_radio_frame) {
+    if (!ap.new_radio_frame) {
         return;
     }
 
@@ -851,16 +764,9 @@ void Copter::update_simple_mode(void)
     if (!rc().has_valid_input()) {
         return;
     }
-
-    if (simple_mode == SimpleMode::SIMPLE) {
-        // rotate roll, pitch input by -initial simple heading (i.e. north facing)
-        rollx = channel_roll->get_control_in()*simple_cos_yaw - channel_pitch->get_control_in()*simple_sin_yaw;
-        pitchx = channel_roll->get_control_in()*simple_sin_yaw + channel_pitch->get_control_in()*simple_cos_yaw;
-    }else{
-        // rotate roll, pitch input by -super simple heading (reverse of heading to home)
-        rollx = channel_roll->get_control_in()*super_simple_cos_yaw - channel_pitch->get_control_in()*super_simple_sin_yaw;
-        pitchx = channel_roll->get_control_in()*super_simple_sin_yaw + channel_pitch->get_control_in()*super_simple_cos_yaw;
-    }
+    // rotate roll, pitch input by -super simple heading (reverse of heading to home)
+    rollx = channel_roll->get_control_in()*super_simple_cos_yaw - channel_pitch->get_control_in()*super_simple_sin_yaw;
+    pitchx = channel_roll->get_control_in()*super_simple_sin_yaw + channel_pitch->get_control_in()*super_simple_cos_yaw;
 
     // rotate roll, pitch input from north facing to vehicle's perspective
     channel_roll->set_control_in(rollx*ahrs.cos_yaw() + pitchx*ahrs.sin_yaw());
@@ -871,14 +777,6 @@ void Copter::update_simple_mode(void)
 // should be called after home_bearing_rad has been updated
 void Copter::update_super_simple_bearing(bool force_update)
 {
-    if (!force_update) {
-        if (simple_mode != SimpleMode::SUPERSIMPLE) {
-            return;
-        }
-        if (home_distance_m() < SUPER_SIMPLE_RADIUS_M) {
-            return;
-        }
-    }
 
     const float bearing_rad = home_bearing_rad();
 

@@ -262,11 +262,6 @@ float Mode::AutoYaw::yaw_rad()
         break;
 
     case Mode::CIRCLE:
-#if MODE_CIRCLE_ENABLED
-        if (copter.circle_nav->is_active()) {
-            _yaw_angle_rad = copter.circle_nav->get_yaw_rad();
-        }
-#endif
         break;
 
     case Mode::ANGLE_RATE:{
@@ -340,11 +335,7 @@ AC_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
         // RC failsafe, or disabled make sure not in pilot control
         auto_yaw.set_mode(AutoYaw::Mode::HOLD);
     }
-/*
-#if WEATHERVANE_ENABLED
-    update_weathervane(_pilot_yaw_rate_rads);
-#endif
-*/
+
     AC_AttitudeControl::HeadingCommand heading;
     heading.yaw_angle_rad = auto_yaw.yaw_rad();
     heading.yaw_rate_rads = auto_yaw.rate_rads();
@@ -369,36 +360,3 @@ AC_AttitudeControl::HeadingCommand Mode::AutoYaw::get_heading()
 
     return heading;
 }
-/*
-// handle the interface to the weathervane library
-// pilot_yaw can be an angle or a rate or rcin from yaw channel. It just needs to represent a pilot's request to yaw the vehicle to enable pilot overrides.
-#if WEATHERVANE_ENABLED
-void Mode::AutoYaw::update_weathervane(const float pilot_yaw_rads)
-{
-    if (!copter.flightmode->allows_weathervaning()) {
-        return;
-    }
-
-    float yaw_rate_cds;
-    if (copter.g2.weathervane.get_yaw_out(yaw_rate_cds, rad_to_cd(pilot_yaw_rads), copter.flightmode->get_alt_above_ground_m(),
-                                                                       copter.pos_control->get_roll_cd()-copter.attitude_control->get_roll_trim_cd(),
-                                                                       copter.pos_control->get_pitch_cd(),
-                                                                       copter.flightmode->is_taking_off(),
-                                                                       copter.flightmode->is_landing())) {
-        set_mode(Mode::WEATHERVANE);
-        _yaw_rate_rads = cd_to_rad(yaw_rate_cds);
-        return;
-    }
-
-    // if the weathervane controller has previously been activated we need to ensure we return control back to what was previously set
-    if (mode() == Mode::WEATHERVANE) {
-        _yaw_rate_rads = 0.0;
-        if (_last_mode == Mode::HOLD) {
-            set_mode_to_default(false);
-        } else {
-            set_mode(_last_mode);
-        }
-    }
-}
-#endif // WEATHERVANE_ENABLED
-*/

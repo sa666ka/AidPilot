@@ -71,14 +71,3 @@ void Copter::failsafe_check()
     }
 }
 
-
-#if AP_COPTER_ADVANCED_FAILSAFE_ENABLED
-/*
-  check for AFS failsafe check
-*/
-void Copter::afs_fs_check(void)
-{
-    // perform AFS failsafe checks
-    g2.afs.check(last_radio_update_ms);
-}
-#endif

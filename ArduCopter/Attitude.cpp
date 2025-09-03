@@ -77,14 +77,6 @@ float Copter::get_pilot_desired_climb_rate_ms()
 
     float throttle_control = copter.channel_throttle->get_control_in();
 
-#if TOY_MODE_ENABLED
-    if (g2.toy_mode.enabled()) {
-        // allow throttle to be reduced after throttle arming and for
-        // slower descent close to the ground
-        g2.toy_mode.throttle_adjust(throttle_control);
-    }
-#endif
-
     // ensure a reasonable throttle value
     throttle_control = constrain_float(throttle_control, 0.0f, 1000.0f);
 

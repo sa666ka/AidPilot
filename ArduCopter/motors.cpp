@@ -27,11 +27,11 @@ void Copter::auto_disarm_check()
 
     // always allow auto disarm if using interlock switch or motors are Emergency Stopped
     if ((ap.using_interlock && !motors->get_interlock()) || SRV_Channels::get_emergency_stop()) {
-#if FRAME_CONFIG != HELI_FRAME
+
         // use a shorter delay if using throttle interlock switch or Emergency Stop, because it is less
         // obvious the copter is armed as the motors will not be spinning
         disarm_delay_ms /= 2;
-#endif
+
     } else {
         bool sprung_throttle_stick = (g.throttle_behavior & THR_BEHAVE_FEEDBACK_FROM_MID_STICK) != 0;
         bool thr_low;
@@ -59,19 +59,6 @@ void Copter::auto_disarm_check()
 // full_push is true when slower rate updates (e.g. servo output) need to be performed at the main loop rate.
 void Copter::motors_output(bool full_push)
 {
-#if AP_COPTER_ADVANCED_FAILSAFE_ENABLED
-    // this is to allow the failsafe module to deliberately crash
-    // the vehicle. Only used in extreme circumstances to meet the
-    // OBC rules
-    if (g2.afs.should_crash_vehicle()) {
-        g2.afs.terminate_vehicle();
-        if (!g2.afs.terminating_vehicle_via_landing()) {
-            return;
-        }
-        // landing must continue to run the motors output
-    }
-#endif
-
     // Update arming delay state
     if (ap.in_arming_delay && (!motors->armed() || millis()-arm_time_ms > ARMING_DELAY_SEC*1.0e3f || flightmode->mode_number() == Mode::Number::THROW)) {
         ap.in_arming_delay = false;

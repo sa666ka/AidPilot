@@ -39,19 +39,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 
         case Mode::Number::ALT_HOLD:
             return &mode_althold;
-/*
 
-
-#if MODE_CIRCLE_ENABLED
-        case Mode::Number::CIRCLE:
-            return &mode_circle;
-#endif
-
-#if MODE_LOITER_ENABLED
-        case Mode::Number::LOITER:
-            return &mode_loiter;
-#endif
-*/
 #if MODE_GUIDED_ENABLED
         case Mode::Number::GUIDED:
             return &mode_guided;
@@ -59,87 +47,12 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 
         case Mode::Number::LAND:
             return &mode_land;
-/*
-#if MODE_RTL_ENABLED
-        case Mode::Number::RTL:
-            return &mode_rtl;
-#endif
 
-#if MODE_DRIFT_ENABLED
-        case Mode::Number::DRIFT:
-            return &mode_drift;
-#endif
-
-#if MODE_SPORT_ENABLED
-        case Mode::Number::SPORT:
-            return &mode_sport;
-#endif
-
-#if MODE_FLIP_ENABLED
-        case Mode::Number::FLIP:
-            return &mode_flip;
-#endif
-
-#if MODE_POSHOLD_ENABLED
-        case Mode::Number::POSHOLD:
-            return &mode_poshold;
-#endif
-
-#if MODE_BRAKE_ENABLED
-        case Mode::Number::BRAKE:
-            return &mode_brake;
-#endif
-
-#if MODE_THROW_ENABLED
-        case Mode::Number::THROW:
-            return &mode_throw;
-#endif
-*/
-#if AP_ADSB_AVOIDANCE_ENABLED
-        case Mode::Number::AVOID_ADSB:
-            return &mode_avoid_adsb;
-#endif
 
 #if MODE_GUIDED_NOGPS_ENABLED
         case Mode::Number::GUIDED_NOGPS:
             return &mode_guided_nogps;
 #endif
-/*
-#if MODE_SMARTRTL_ENABLED
-        case Mode::Number::SMART_RTL:
-            return &mode_smartrtl;
-#endif
-
-#if MODE_FLOWHOLD_ENABLED
-        case Mode::Number::FLOWHOLD:
-            return (Mode *)g2.mode_flowhold_ptr;
-#endif
-
-#if MODE_FOLLOW_ENABLED
-        case Mode::Number::FOLLOW:
-            return &mode_follow;
-#endif
-
-#if MODE_ZIGZAG_ENABLED
-        case Mode::Number::ZIGZAG:
-            return &mode_zigzag;
-#endif
-*/
-#if MODE_SYSTEMID_ENABLED
-        case Mode::Number::SYSTEMID:
-            return (Mode *)g2.mode_systemid_ptr;
-#endif
-/*
-#if MODE_AUTOROTATE_ENABLED
-        case Mode::Number::AUTOROTATE:
-            return &mode_autorotate;
-#endif
-
-#if MODE_TURTLE_ENABLED
-        case Mode::Number::TURTLE:
-            return &mode_turtle;
-#endif
-*/
         default:
             break;
     }
@@ -252,26 +165,15 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 
     bool ignore_checks = !motors->armed();   // allow switching to any mode if disarmed.  We rely on the arming check to perform
 
-#if FRAME_CONFIG == HELI_FRAME
-    // do not allow helis to enter a non-manual throttle mode if the
-    // rotor runup is not complete
-    if (!ignore_checks && !new_flightmode->has_manual_throttle() && !motors->rotor_runup_complete()) {
-        mode_change_failed(new_flightmode, "runup not complete");
-        return false;
-    }
-#endif
 
-#if FRAME_CONFIG != HELI_FRAME
+
+
     // ensure vehicle doesn't leap off the ground if a user switches
     // into a manual throttle mode from a non-manual-throttle mode
     // (e.g. user arms in guided, raises throttle to 1300 (not enough to
     // trigger auto takeoff), then switches into manual):
     bool user_throttle = new_flightmode->has_manual_throttle();
-#if MODE_DRIFT_ENABLED
-    if (new_flightmode == &mode_drift) {
-        user_throttle = true;
-    }
-#endif
+
     if (!ignore_checks &&
         ap.land_complete &&
         user_throttle &&
@@ -280,7 +182,7 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
         mode_change_failed(new_flightmode, "throttle too high");
         return false;
     }
-#endif
+
 
     if (!ignore_checks &&
         new_flightmode->requires_GPS() &&
@@ -334,9 +236,6 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 #endif
     gcs().send_message(MSG_HEARTBEAT);
 
-#if HAL_ADSB_ENABLED
-    adsb.set_is_auto_mode((mode == Mode::Number::AUTO) || (mode == Mode::Number::RTL) || (mode == Mode::Number::GUIDED));
-#endif
 
 #if AP_FENCE_ENABLED
     if (fence.get_action() != AC_Fence::Action::REPORT_ONLY) {
@@ -408,29 +307,6 @@ void Copter::exit_mode(Mode *&old_flightmode,
     // perform cleanup required for each flight mode
     old_flightmode->exit();
 
-#if FRAME_CONFIG == HELI_FRAME
-    // firmly reset the flybar passthrough to false when exiting acro mode.
-    if (old_flightmode == &mode_acro) {
-        attitude_control->use_flybar_passthrough(false, false);
-        motors->set_acro_tail(false);
-    }
-
-    // if we are changing from a mode that did not use manual throttle,
-    // stab col ramp value should be pre-loaded to the correct value to avoid a twitch
-    // heli_stab_col_ramp should really only be active switching between Stabilize and Acro modes
-    if (!old_flightmode->has_manual_throttle()){
-        if (new_flightmode == &mode_stabilize){
-            input_manager.set_stab_col_ramp(1.0);
-        } else if (new_flightmode == &mode_acro){
-            input_manager.set_stab_col_ramp(0.0);
-        }
-    }
-
-    // Make sure inverted flight is disabled if not supported in the new mode
-    if (!new_flightmode->allows_inverted()) {
-        attitude_control->set_inverted_flight(false);
-    }
-#endif //HELI_FRAME
 }
 
 // notify_flight_mode - sets notify object based on current flight mode.  Only used for OreoLED notify device
@@ -878,13 +754,8 @@ float Mode::get_pilot_desired_throttle() const
 
 float Mode::get_avoidance_adjusted_climbrate_ms(float target_rate_ms)
 {
-#if AP_AVOIDANCE_ENABLED
-    float target_rate_cms = target_rate_ms * 100.0;
-    AP::ac_avoid()->adjust_velocity_z(pos_control->get_pos_U_p().kP(), pos_control->get_max_accel_U_mss() * 100.0, target_rate_cms, G_Dt);
-    return target_rate_cms * 0.01;
-#else
     return target_rate_ms;
-#endif
+
 }
 
 // send output to the motors, can be overridden by subclasses

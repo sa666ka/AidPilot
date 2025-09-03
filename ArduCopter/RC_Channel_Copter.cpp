@@ -24,17 +24,6 @@ void RC_Channel_Copter::mode_switch_changed(modeswitch_pos_t new_pos)
     if (!copter.set_mode((Mode::Number)copter.flight_modes[new_pos].get(), ModeReason::RC_COMMAND)) {
         return;
     }
-
-    if (!rc().find_channel_for_option(AUX_FUNC::SIMPLE_MODE) &&
-        !rc().find_channel_for_option(AUX_FUNC::SUPERSIMPLE_MODE)) {
-        // if none of the Aux Switches are set to Simple or Super Simple Mode then
-        // set Simple Mode using stored parameters from EEPROM
-        if (BIT_IS_SET(copter.g.super_simple, new_pos)) {
-            copter.set_simple_mode(Copter::SimpleMode::SUPERSIMPLE);
-        } else {
-            copter.set_simple_mode(BIT_IS_SET(copter.g.simple_modes, new_pos) ? Copter::SimpleMode::SIMPLE : Copter::SimpleMode::NONE);
-        }
-    }
 }
 
 bool RC_Channels_Copter::in_rc_failsafe() const
@@ -101,9 +90,7 @@ void RC_Channel_Copter::init_aux_function(const AUX_FUNC ch_option, const AuxSwi
     case AUX_FUNC::USER_FUNC1:
     case AUX_FUNC::USER_FUNC2:
     case AUX_FUNC::USER_FUNC3:
-#if AP_WINCH_ENABLED
-    case AUX_FUNC::WINCH_CONTROL:
-#endif
+
     case AUX_FUNC::ZIGZAG:
     case AUX_FUNC::ZIGZAG_Auto:
     case AUX_FUNC::ZIGZAG_SaveWP:
@@ -135,9 +122,7 @@ void RC_Channel_Copter::init_aux_function(const AUX_FUNC ch_option, const AuxSwi
     case AUX_FUNC::STANDBY:
     case AUX_FUNC::SUPERSIMPLE_MODE:
     case AUX_FUNC::SURFACE_TRACKING:
-#if AP_WINCH_ENABLED
-    case AUX_FUNC::WINCH_ENABLE:
-#endif
+
     case AUX_FUNC::AIRMODE:
     case AUX_FUNC::FORCEFLYING:
     case AUX_FUNC::CUSTOM_CONTROLLER:
@@ -188,32 +173,6 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             }
             break;
 
-        case AUX_FUNC::SIMPLE_MODE:
-            // low = simple mode off, middle or high position turns simple mode on
-            copter.set_simple_mode((ch_flag == AuxSwitchPos::LOW) ? Copter::SimpleMode::NONE : Copter::SimpleMode::SIMPLE);
-            break;
-
-        case AUX_FUNC::SUPERSIMPLE_MODE: {
-            Copter::SimpleMode newmode = Copter::SimpleMode::NONE;
-            switch (ch_flag) {
-            case AuxSwitchPos::LOW:
-                break;
-            case AuxSwitchPos::MIDDLE:
-                newmode = Copter::SimpleMode::SIMPLE;
-                break;
-            case AuxSwitchPos::HIGH:
-                newmode = Copter::SimpleMode::SUPERSIMPLE;
-                break;
-            }
-            copter.set_simple_mode(newmode);
-            break;
-        }
-
-#if MODE_RTL_ENABLED
-        case AUX_FUNC::RTL:
-            do_aux_function_change_mode(Mode::Number::RTL, ch_flag);
-            break;
-#endif
 
         case AUX_FUNC::SAVE_TRIM:
             if ((ch_flag == AuxSwitchPos::HIGH) &&
@@ -293,154 +252,15 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             break;
 
         case AUX_FUNC::MOTOR_INTERLOCK:
-#if FRAME_CONFIG == HELI_FRAME
-            // The interlock logic for ROTOR_CONTROL_MODE_PASSTHROUGH is handled 
-            // in heli_update_rotor_speed_targets.  Otherwise turn on when above low.
-            if (copter.motors->get_rsc_mode() != ROTOR_CONTROL_MODE_PASSTHROUGH) {
-                copter.ap.motor_interlock_switch = (ch_flag == AuxSwitchPos::HIGH || ch_flag == AuxSwitchPos::MIDDLE);
-            }
-#else
+
             copter.ap.motor_interlock_switch = (ch_flag == AuxSwitchPos::HIGH || ch_flag == AuxSwitchPos::MIDDLE);
-#endif
             break;
 
-#if FRAME_CONFIG == HELI_FRAME
-        case AUX_FUNC::TURBINE_START:
-           switch (ch_flag) {
-                case AuxSwitchPos::HIGH:
-                    copter.motors->set_turb_start(true);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                    // nothing
-                    break;
-                case AuxSwitchPos::LOW:
-                    copter.motors->set_turb_start(false);
-                    break;
-           }
-           break;
-#endif
-
-#if MODE_BRAKE_ENABLED
-        case AUX_FUNC::BRAKE:
-            do_aux_function_change_mode(Mode::Number::BRAKE, ch_flag);
-            break;
-#endif
-
-#if MODE_THROW_ENABLED
-        case AUX_FUNC::THROW:
-            do_aux_function_change_mode(Mode::Number::THROW, ch_flag);
-            break;
-#endif
-
-#if AC_PRECLAND_ENABLED && MODE_LOITER_ENABLED
-        case AUX_FUNC::PRECISION_LOITER:
-            switch (ch_flag) {
-                case AuxSwitchPos::HIGH:
-                    copter.mode_loiter.set_precision_loiter_enabled(true);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                    // nothing
-                    break;
-                case AuxSwitchPos::LOW:
-                    copter.mode_loiter.set_precision_loiter_enabled(false);
-                    break;
-            }
-            break;
-#endif
-
-#if MODE_SMARTRTL_ENABLED
-        case AUX_FUNC::SMART_RTL:
-            do_aux_function_change_mode(Mode::Number::SMART_RTL, ch_flag);
-            break;
-#endif
-
-#if FRAME_CONFIG == HELI_FRAME
-        case AUX_FUNC::INVERTED:
-            switch (ch_flag) {
-            case AuxSwitchPos::HIGH:
-                if (copter.flightmode->allows_inverted()) {
-                    copter.attitude_control->set_inverted_flight(true);
-                } else {
-                    gcs().send_text(MAV_SEVERITY_WARNING, "Inverted flight not available in %s mode", copter.flightmode->name());
-                }
-                break;
-            case AuxSwitchPos::MIDDLE:
-                // nothing
-                break;
-            case AuxSwitchPos::LOW:
-                copter.attitude_control->set_inverted_flight(false);
-                break;
-            }
-            break;
-#endif
-
-#if AP_WINCH_ENABLED
-        case AUX_FUNC::WINCH_ENABLE:
-            switch (ch_flag) {
-                case AuxSwitchPos::HIGH:
-                    // high switch position stops winch using rate control
-                    copter.g2.winch.set_desired_rate(0.0f);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                case AuxSwitchPos::LOW:
-                    // all other position relax winch
-                    copter.g2.winch.relax();
-                    break;
-                }
-            break;
-
-        case AUX_FUNC::WINCH_CONTROL:
-            // do nothing, used to control the rate of the winch and is processed within AP_Winch
-            break;
-#endif  // AP_WINCH_ENABLED
-
-#ifdef USERHOOK_AUXSWITCH
-        case AUX_FUNC::USER_FUNC1:
-            copter.userhook_auxSwitch1(ch_flag);
-            break;
-
-        case AUX_FUNC::USER_FUNC2:
-            copter.userhook_auxSwitch2(ch_flag);
-            break;
-
-        case AUX_FUNC::USER_FUNC3:
-            copter.userhook_auxSwitch3(ch_flag);
-            break;
-#endif
-
-#if MODE_ZIGZAG_ENABLED
-        case AUX_FUNC::ZIGZAG:
-            do_aux_function_change_mode(Mode::Number::ZIGZAG, ch_flag);
-            break;
-
-        case AUX_FUNC::ZIGZAG_SaveWP:
-            if (copter.flightmode == &copter.mode_zigzag) {
-                // initialize zigzag auto
-                copter.mode_zigzag.init_auto();
-                switch (ch_flag) {
-                    case AuxSwitchPos::LOW:
-                        copter.mode_zigzag.save_or_move_to_destination(ModeZigZag::Destination::A);
-                        break;
-                    case AuxSwitchPos::MIDDLE:
-                        copter.mode_zigzag.return_to_manual_control(false);
-                        break;
-                    case AuxSwitchPos::HIGH:
-                        copter.mode_zigzag.save_or_move_to_destination(ModeZigZag::Destination::B);
-                        break;
-                }
-            }
-            break;
-#endif
 
         case AUX_FUNC::STABILIZE:
             do_aux_function_change_mode(Mode::Number::STABILIZE, ch_flag);
             break;
 
-#if MODE_POSHOLD_ENABLED
-        case AUX_FUNC::POSHOLD:
-            do_aux_function_change_mode(Mode::Number::POSHOLD, ch_flag);
-            break;
-#endif
 
         case AUX_FUNC::ALTHOLD:
             do_aux_function_change_mode(Mode::Number::ALT_HOLD, ch_flag);
@@ -454,17 +274,7 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             break;
 #endif
 */
-#if MODE_CIRCLE_ENABLED
-        case AUX_FUNC::CIRCLE:
-            do_aux_function_change_mode(Mode::Number::CIRCLE, ch_flag);
-            break;
-#endif
 
-#if MODE_DRIFT_ENABLED
-        case AUX_FUNC::DRIFT:
-            do_aux_function_change_mode(Mode::Number::DRIFT, ch_flag);
-            break;
-#endif
 
         case AUX_FUNC::STANDBY: {
             switch (ch_flag) {
@@ -513,21 +323,6 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             }
             break;
 
-#if MODE_ZIGZAG_ENABLED
-        case AUX_FUNC::ZIGZAG_Auto:
-            if (copter.flightmode == &copter.mode_zigzag) {
-                switch (ch_flag) {
-                case AuxSwitchPos::HIGH:
-                    copter.mode_zigzag.run_auto();
-                    break;
-                default:
-                    copter.mode_zigzag.suspend_auto();
-                    break;
-                }
-            }
-            break;
-#endif
-
         case AUX_FUNC::AIRMODE:
             do_aux_function_change_air_mode(ch_flag);
             break;
@@ -536,12 +331,6 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             do_aux_function_change_force_flying(ch_flag);
             break;
 
-
-#if MODE_TURTLE_ENABLED
-        case AUX_FUNC::TURTLE:
-            do_aux_function_change_mode(Mode::Number::TURTLE, ch_flag);
-            break;
-#endif
 
 #if AP_COPTER_AHRS_AUTO_TRIM_ENABLED
         case AUX_FUNC::AHRS_AUTO_TRIM:
@@ -568,23 +357,7 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             copter.custom_control.set_custom_controller(ch_flag == AuxSwitchPos::HIGH);
             break;
 #endif
-/*
-#if WEATHERVANE_ENABLED
-    case AUX_FUNC::WEATHER_VANE_ENABLE: {
-        switch (ch_flag) {
-            case AuxSwitchPos::HIGH:
-                copter.g2.weathervane.allow_weathervaning(true);
-                break;
-            case AuxSwitchPos::MIDDLE:
-                break;
-            case AuxSwitchPos::LOW:
-                copter.g2.weathervane.allow_weathervaning(false);
-                break;
-        }
-        break;
-    }
-#endif
-*/
+
 #if AP_RC_TRANSMITTER_TUNING_ENABLED
     case AUX_FUNC::TRANSMITTER_TUNING:
     case AUX_FUNC::TRANSMITTER_TUNING2:

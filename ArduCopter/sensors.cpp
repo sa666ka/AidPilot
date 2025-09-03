@@ -61,9 +61,6 @@ void Copter::update_rangefinder_terrain_offset()
 
     if (rangefinder_state.alt_healthy || rangefinder_state.data_stale()) {
         wp_nav->set_rangefinder_terrain_offset_m(rangefinder_state.enabled, rangefinder_state.alt_healthy, rangefinder_state.terrain_offset_m);
-#if MODE_CIRCLE_ENABLED
-        circle_nav->set_rangefinder_terrain_offset_m(rangefinder_state.enabled && wp_nav->rangefinder_used(), rangefinder_state.alt_healthy, rangefinder_state.terrain_offset_m);
-#endif
     }
 }
 

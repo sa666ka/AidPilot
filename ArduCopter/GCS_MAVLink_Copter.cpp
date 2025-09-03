@@ -11,11 +11,9 @@ MAV_TYPE GCS_Copter::frame_type() const
       information and won't display UIs such as flight mode
       selection
     */
-#if FRAME_CONFIG == HELI_FRAME
-    const MAV_TYPE mav_type_default = MAV_TYPE_HELICOPTER;
-#else
+
     const MAV_TYPE mav_type_default = MAV_TYPE_QUADROTOR;
-#endif
+
     if (copter.motors == nullptr) {
         return mav_type_default;
     }
@@ -301,17 +299,6 @@ void GCS_MAVLINK_Copter::send_pid_tuning()
     }
 }
 
-#if AP_WINCH_ENABLED
-// send winch status message
-void GCS_MAVLINK_Copter::send_winch_status() const
-{
-    AP_Winch *winch = AP::winch();
-    if (winch == nullptr) {
-        return;
-    }
-    winch->send_status(*this);
-}
-#endif
 
 bool GCS_Copter::vehicle_initialised() const {
     return copter.ap.initialised;
@@ -339,10 +326,7 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
         break;
 
     case MSG_ADSB_VEHICLE: {
-#if HAL_ADSB_ENABLED
-        CHECK_PAYLOAD_SIZE(ADSB_VEHICLE);
-        copter.adsb.send_adsb_vehicle(chan);
-#endif
+
 #if AP_OAPATHPLANNER_ENABLED
         AP_OADatabase *oadb = AP_OADatabase::get_singleton();
         if (oadb != nullptr) {
@@ -376,13 +360,6 @@ bool GCS_MAVLINK_Copter::handle_guided_request(AP_Mission::Mission_Command &cmd)
 void GCS_MAVLINK_Copter::packetReceived(const mavlink_status_t &status,
                                         const mavlink_message_t &msg)
 {
-    // we handle these messages here to avoid them being blocked by mavlink routing code
-#if AP_ADSB_AVOIDANCE_ENABLED
-    if (copter.g2.dev_options.get() & DevOptionADSBMAVLink) {
-        // optional handling of GLOBAL_POSITION_INT as a MAVLink based avoidance source
-        copter.avoidance_adsb.handle_msg(msg);
-    }
-#endif
     GCS_MAVLINK::packetReceived(status, msg);
 }
 
@@ -543,11 +520,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_int_packet(const mavlink_command_i
         return handle_MAV_CMD_SOLO_BTN_FLY_CLICK(packet);
 #endif
 
-
-#if AP_WINCH_ENABLED
-    case MAV_CMD_DO_WINCH:
-        return handle_MAV_CMD_DO_WINCH(packet);
-#endif
 
     case MAV_CMD_NAV_LOITER_UNLIM:
         if (!copter.set_mode(Mode::Number::LOITER, ModeReason::GCS_COMMAND)) {
@@ -714,32 +686,6 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_DO_MOTOR_TEST(const mavlink_comman
                                                (uint8_t)packet.x);
 }
 
-#if AP_WINCH_ENABLED
-MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_DO_WINCH(const mavlink_command_int_t &packet)
-{
-        // param1 : winch number (ignored)
-        // param2 : action (0=relax, 1=relative length control, 2=rate control). See WINCH_ACTIONS enum.
-        if (!copter.g2.winch.enabled()) {
-            return MAV_RESULT_FAILED;
-        }
-        switch ((uint8_t)packet.param2) {
-        case WINCH_RELAXED:
-            copter.g2.winch.relax();
-            return MAV_RESULT_ACCEPTED;
-        case WINCH_RELATIVE_LENGTH_CONTROL: {
-            copter.g2.winch.release_length(packet.param3);
-            return MAV_RESULT_ACCEPTED;
-        }
-        case WINCH_RATE_CONTROL:
-            copter.g2.winch.set_desired_rate(packet.param4);
-            return MAV_RESULT_ACCEPTED;
-        default:
-            break;
-        }
-        return MAV_RESULT_FAILED;
-}
-#endif  // AP_WINCH_ENABLED
-
 #if AC_MAVLINK_SOLO_BUTTON_COMMAND_HANDLING_ENABLED
 MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_SOLO_BTN_FLY_CLICK(const mavlink_command_int_t &packet)
 {
@@ -791,15 +737,7 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_MAV_CMD_SOLO_BTN_PAUSE_CLICK(const mavlink
                 bool shot_mode = (!is_zero(packet.param1) && (copter.flightmode->mode_number() == Mode::Number::GUIDED || copter.flightmode->mode_number() == Mode::Number::GUIDED_NOGPS));
 
                 if (!shot_mode) {
-#if MODE_BRAKE_ENABLED
-                    if (copter.set_mode(Mode::Number::BRAKE, ModeReason::GCS_COMMAND)) {
-                        copter.mode_brake.timeout_to_loiter_ms(2500);
-                    } else {
-                        copter.set_mode(Mode::Number::ALT_HOLD, ModeReason::GCS_COMMAND);
-                    }
-#else
                     copter.set_mode(Mode::Number::ALT_HOLD, ModeReason::GCS_COMMAND);
-#endif
                 } else {
                     // SoloLink is expected to handle pause in shots
                 }
@@ -1218,11 +1156,6 @@ void GCS_MAVLINK_Copter::handle_message(const mavlink_message_t &msg)
         copter.terrain.handle_data(chan, msg);
         break;
 #endif
-#if TOY_MODE_ENABLED
-    case MAVLINK_MSG_ID_NAMED_VALUE_INT:
-        copter.g2.toy_mode.handle_message(msg);
-        break;
-#endif
     default:
         GCS_MAVLINK::handle_message(msg);
         break;
@@ -1230,11 +1163,7 @@ void GCS_MAVLINK_Copter::handle_message(const mavlink_message_t &msg)
 }
 
 MAV_RESULT GCS_MAVLINK_Copter::handle_flight_termination(const mavlink_command_int_t &packet) {
-#if AP_COPTER_ADVANCED_FAILSAFE_ENABLED
-    if (GCS_MAVLINK::handle_flight_termination(packet) == MAV_RESULT_ACCEPTED) {
-        return MAV_RESULT_ACCEPTED;
-    }
-#endif
+
     if (packet.param1 > 0.5f) {
         copter.arming.disarm(AP_Arming::Method::TERMINATION);
         return MAV_RESULT_ACCEPTED;
@@ -1376,71 +1305,18 @@ uint8_t GCS_MAVLINK_Copter::send_available_mode(uint8_t index) const
     const Mode* modes[] {
         &copter.mode_stabilize,
         &copter.mode_althold,
-#if MODE_CIRCLE_ENABLED
-        &copter.mode_circle,
-#endif
-#if MODE_LOITER_ENABLED
-        &copter.mode_loiter,
-#endif
+
+
 #if MODE_GUIDED_ENABLED
         &copter.mode_guided,
 #endif
         &copter.mode_land,
-/*
-#if MODE_RTL_ENABLED
-        &copter.mode_rtl,
-#endif
-*/
-#if MODE_DRIFT_ENABLED
-        &copter.mode_drift,
-#endif
-#if MODE_SPORT_ENABLED
-        &copter.mode_sport,
-#endif
-#if MODE_FLIP_ENABLED
-        &copter.mode_flip,
-#endif
 
-#if MODE_POSHOLD_ENABLED
-        &copter.mode_poshold,
-#endif
-#if MODE_BRAKE_ENABLED
-        &copter.mode_brake,
-#endif
-#if MODE_THROW_ENABLED
-        &copter.mode_throw,
-#endif
-#if AP_ADSB_AVOIDANCE_ENABLED
-        &copter.mode_avoid_adsb,
-#endif
 #if MODE_GUIDED_NOGPS_ENABLED
         &copter.mode_guided_nogps,
 #endif
-#if MODE_SMARTRTL_ENABLED
-        &copter.mode_smartrtl,
-#endif
-/*
-#if MODE_FLOWHOLD_ENABLED
-        (Mode*)copter.g2.mode_flowhold_ptr,
-#endif
-*/
-#if MODE_FOLLOW_ENABLED
-        &copter.mode_follow,
-#endif
-#if MODE_ZIGZAG_ENABLED
-        &copter.mode_zigzag,
-#endif
-#if MODE_SYSTEMID_ENABLED
-        (Mode *)copter.g2.mode_systemid_ptr,
-#endif
-#if MODE_AUTOROTATE_ENABLED
-        &copter.mode_autorotate,
-#endif
-/*
-#if MODE_TURTLE_ENABLED
-        &copter.mode_turtle,
-#endif
-*/
+
+
     };
 
     const uint8_t base_mode_count = ARRAY_SIZE(modes);

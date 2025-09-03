@@ -23,12 +23,8 @@
  *
  */
 
-#if FRAME_CONFIG == HELI_FRAME
-// 6 here is AP_Motors::MOTOR_FRAME_HELI
-#define DEFAULT_FRAME_CLASS 6
-#else
 #define DEFAULT_FRAME_CLASS 0
-#endif
+
 
 const AP_Param::Info Copter::var_info[] = {
     // @Param: FORMAT_VERSION
@@ -75,68 +71,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Bitmask: 0:Roll,1:Pitch,2:Yaw,3:AccelZ
     GSCALAR(gcs_pid_mask,           "GCS_PID_MASK",     0),
 
-#if MODE_RTL_ENABLED
-    // @Param: RTL_ALT
-    // @DisplayName: RTL Altitude
-    // @Description: The minimum alt above home the vehicle will climb to before returning.  If the vehicle is flying higher than this value it will return at its current altitude.
-    // @Units: cm
-    // @Range: 30 300000
-    // @Increment: 1
-    // @User: Standard
-    GSCALAR(rtl_altitude_cm,   "RTL_ALT",     RTL_ALT),
-
-    // @Param: RTL_CONE_SLOPE
-    // @DisplayName: RTL cone slope
-    // @Description: Defines a cone above home which determines maximum climb
-    // @Range: 0.5 10.0
-    // @Increment: 0.1
-    // @Values: 0:Disabled,1:Shallow,3:Steep
-    // @User: Standard
-    GSCALAR(rtl_cone_slope,   "RTL_CONE_SLOPE",     RTL_CONE_SLOPE_DEFAULT),
-
-    // @Param: RTL_SPEED
-    // @DisplayName: RTL speed
-    // @Description: Defines the speed in cm/s which the aircraft will attempt to maintain horizontally while flying home. If this is set to zero, WPNAV_SPEED will be used instead.
-    // @Units: cm/s
-    // @Range: 0 2000
-    // @Increment: 50
-    // @User: Standard
-    GSCALAR(rtl_speed_cms,   "RTL_SPEED",     0),
-
-    // @Param: RTL_ALT_FINAL
-    // @DisplayName: RTL Final Altitude
-    // @Description: This is the altitude the vehicle will move to as the final stage of Returning to Launch or after completing a mission.  Set to zero to land.
-    // @Units: cm
-    // @Range: 0 1000
-    // @Increment: 1
-    // @User: Standard
-    GSCALAR(rtl_alt_final_cm,  "RTL_ALT_FINAL", RTL_ALT_FINAL),
-
-    // @Param: RTL_CLIMB_MIN
-    // @DisplayName: RTL minimum climb
-    // @Description: The vehicle will climb this many cm during the initial climb portion of the RTL
-    // @Units: cm
-    // @Range: 0 3000
-    // @Increment: 10
-    // @User: Standard
-    GSCALAR(rtl_climb_min_cm,  "RTL_CLIMB_MIN",    RTL_CLIMB_MIN_DEFAULT),
-
-    // @Param: RTL_LOIT_TIME
-    // @DisplayName: RTL loiter time
-    // @Description: Time (in milliseconds) to loiter above home before beginning final descent
-    // @Units: ms
-    // @Range: 0 60000
-    // @Increment: 1000
-    // @User: Standard
-    GSCALAR(rtl_loiter_time,      "RTL_LOIT_TIME",    RTL_LOITER_TIME),
-
-    // @Param: RTL_ALT_TYPE
-    // @DisplayName: RTL mode altitude type
-    // @Description: RTL altitude type.  Set to 1 for Terrain following during RTL and then set WPNAV_RFND_USE=1 to use rangefinder or WPNAV_RFND_USE=0 to use Terrain database
-    // @Values: 0:Relative to Home, 1:Terrain
-    // @User: Standard
-    GSCALAR(rtl_alt_type, "RTL_ALT_TYPE", 0),
-#endif
 
     // @Param: FS_GCS_ENABLE
     // @DisplayName: Ground Station Failsafe Enable
@@ -337,24 +271,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @User: Advanced
     ASCALAR(angle_max, "ANGLE_MAX",                 DEFAULT_ANGLE_MAX),
 
-#if MODE_POSHOLD_ENABLED
-    // @Param: PHLD_BRAKE_RATE
-    // @DisplayName: PosHold braking rate
-    // @Description: PosHold flight mode's rotation rate during braking in deg/sec
-    // @Units: deg/s
-    // @Range: 4 12
-    // @User: Advanced
-    GSCALAR(poshold_brake_rate_degs, "PHLD_BRAKE_RATE",  POSHOLD_BRAKE_RATE_DEFAULT),
-
-    // @Param: PHLD_BRAKE_ANGLE
-    // @DisplayName: PosHold braking angle max
-    // @Description: PosHold flight mode's max lean angle during braking in centi-degrees
-    // @Units: cdeg
-    // @Increment: 10
-    // @Range: 2000 4500
-    // @User: Advanced
-    GSCALAR(poshold_brake_angle_max, "PHLD_BRAKE_ANGLE",  POSHOLD_BRAKE_ANGLE_DEFAULT),
-#endif
 
     // @Param: LAND_REPOSITION
     // @DisplayName: Land repositioning
@@ -422,11 +338,6 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(landinggear,    "LGR_", AP_LandingGear),
 #endif
 
-#if FRAME_CONFIG == HELI_FRAME
-    // @Group: IM_
-    // @Path: ../libraries/AC_InputManager/AC_InputManager_Heli.cpp
-    GOBJECT(input_manager, "IM_", AC_InputManager_Heli),
-#endif
 
     // @Group: COMPASS_
     // @Path: ../libraries/AP_Compass/AP_Compass.cpp
@@ -444,11 +355,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AC_WPNav/AC_Loiter.cpp
     GOBJECTPTR(loiter_nav, "LOIT_", AC_Loiter),
 
-#if MODE_CIRCLE_ENABLED
-    // @Group: CIRCLE_
-    // @Path: ../libraries/AC_WPNav/AC_Circle.cpp
-    GOBJECTPTR(circle_nav, "CIRCLE_",  AC_Circle),
-#endif
 
     // @Group: ATC_
     // @Path: ../libraries/AC_AttitudeControl/AC_AttitudeControl.cpp,../libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp,../libraries/AC_AttitudeControl/AC_AttitudeControl_Heli.cpp
@@ -483,13 +389,7 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_CANManager/AP_CANManager.cpp
     GOBJECT(can_mgr,        "CAN_",       AP_CANManager),
 #endif
-/*
-#if HAL_SPRAYER_ENABLED
-    // @Group: SPRAY_
-    // @Path: ../libraries/AC_Sprayer/AC_Sprayer.cpp
-    GOBJECT(sprayer,                "SPRAY_",       AC_Sprayer),
-#endif
-*/
+
 #if AP_SIM_ENABLED
     // @Group: SIM_
     // @Path: ../libraries/SITL/SITL.cpp
@@ -509,27 +409,11 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_Scheduler/AP_Scheduler.cpp
     GOBJECT(scheduler, "SCHED_", AP_Scheduler),
 
-    // @Group: AVOID_
-    // @Path: ../libraries/AC_Avoidance/AC_Avoid.cpp
-#if AP_AVOIDANCE_ENABLED
-    GOBJECT(avoid,      "AVOID_",   AC_Avoid),
-#endif
-/*
-#if HAL_RALLY_ENABLED
-    // @Group: RALLY_
-    // @Path: AP_Rally.cpp,../libraries/AP_Rally/AP_Rally.cpp
-    GOBJECT(rally,      "RALLY_",   AP_Rally_Copter),
-#endif
-*/
-#if FRAME_CONFIG == HELI_FRAME
-    // @Group: H_
-    // @Path: ../libraries/AP_Motors/AP_MotorsHeli_Single.cpp,../libraries/AP_Motors/AP_MotorsHeli_Dual.cpp,../libraries/AP_Motors/AP_MotorsHeli.cpp
-    GOBJECTVARPTR(motors, "H_",        &copter.motors_var_info),
-#else
+
     // @Group: MOT_
     // @Path: ../libraries/AP_Motors/AP_MotorsMulticopter.cpp
     GOBJECTVARPTR(motors, "MOT_",      &copter.motors_var_info),
-#endif
+
 
     // @Group: RCMAP_
     // @Path: ../libraries/AP_RCMapper/AP_RCMapper.cpp
@@ -578,58 +462,10 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(precland, "PLND_", AC_PrecLand),
 #endif
 
-#if HAL_ADSB_ENABLED
-    // @Group: ADSB_
-    // @Path: ../libraries/AP_ADSB/AP_ADSB.cpp
-    GOBJECT(adsb,                "ADSB_", AP_ADSB),
-#endif  // HAL_ADSB_ENABLED
-
-#if AP_ADSB_AVOIDANCE_ENABLED
-    // @Group: AVD_
-    // @Path: ../libraries/AP_Avoidance/AP_Avoidance.cpp
-    GOBJECT(avoidance_adsb, "AVD_", AP_Avoidance_Copter),
-#endif  // AP_ADSB_AVOIDANCE_ENABLED
 
     // @Group: NTF_
     // @Path: ../libraries/AP_Notify/AP_Notify.cpp
     GOBJECT(notify, "NTF_",  AP_Notify),
-
-#if MODE_THROW_ENABLED
-    // @Param: THROW_MOT_START
-    // @DisplayName: Start motors before throwing is detected
-    // @Description: Used by Throw mode. Controls whether motors will run at the speed set by MOT_SPIN_MIN or will be stopped when armed and waiting for the throw.
-    // @Values: 0:Stopped,1:Running
-    // @User: Standard
-    GSCALAR(throw_motor_start, "THROW_MOT_START", (float)ModeThrow::PreThrowMotorState::STOPPED),
-
-    // @Param: THROW_ALT_MIN
-    // @DisplayName: Throw mode minimum altitude
-    // @Description: Minimum altitude above which Throw mode will detect a throw or a drop - 0 to disable the check
-    // @Units: m
-    // @User: Advanced
-    GSCALAR(throw_altitude_min, "THROW_ALT_MIN", 0),
-
-    // @Param: THROW_ALT_MAX
-    // @DisplayName: Throw mode maximum altitude
-    // @Description: Maximum altitude under which Throw mode will detect a throw or a drop - 0 to disable the check
-    // @Units: m
-    // @User: Advanced
-    GSCALAR(throw_altitude_max, "THROW_ALT_MAX", 0),
-
-    // @Param: THROW_ALT_DCSND
-    // @DisplayName: Throw mode target altitude to descend
-    // @Description: Target altitude to descend during a drop, (must be positive). This allows for rapidly clearing surrounding obstacles.
-    // @Units: m
-    // @User: Advanced
-    GSCALAR(throw_altitude_descend, "THROW_ALT_DCSND", 1.0),
-
-    // @Param: THROW_ALT_ACSND
-    // @DisplayName: Throw mode target altitude to ascsend
-    // @Description: Target altitude to ascend during a throw upwards (must be positive). This allows for rapidly clearing surrounding obstacles.
-    // @Units: m
-    // @User: Advanced
-    GSCALAR(throw_altitude_ascend, "THROW_ALT_ACSND", 3.0),
-#endif
 /*
 #if OSD_ENABLED || OSD_PARAM_ENABLED
     // @Group: OSD
@@ -679,22 +515,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPPTR(button_ptr, "BTN_", 2, ParametersG2, AP_Button),
 #endif
 
-#if MODE_THROW_ENABLED
-    // @Param: THROW_NEXTMODE
-    // @DisplayName: Throw mode's follow up mode
-    // @Description: Vehicle will switch to this mode after the throw is successfully completed.  Default is to stay in throw mode (18)
-    // @Values: 3:Auto,4:Guided,5:LOITER,6:RTL,9:Land,17:Brake,18:Throw
-    // @User: Standard
-    AP_GROUPINFO("THROW_NEXTMODE", 3, ParametersG2, throw_nextmode, 18),
-
-    // @Param: THROW_TYPE
-    // @DisplayName: Type of Type
-    // @Description: Used by Throw mode. Specifies whether Copter is thrown upward or dropped.
-    // @Values: 0:Upward Throw,1:Drop
-    // @User: Standard
-    AP_GROUPINFO("THROW_TYPE", 4, ParametersG2, throw_type, (float)ModeThrow::ThrowType::Upward),
-#endif
-
     // @Param: GND_EFFECT_COMP
     // @DisplayName: Ground Effect Compensation Enable/Disable
     // @Description: Ground Effect Compensation Enable/Disable
@@ -702,11 +522,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("GND_EFFECT_COMP", 5, ParametersG2, gndeffect_comp_enabled, 1),
 
-#if AP_COPTER_ADVANCED_FAILSAFE_ENABLED
-    // @Group: AFS_
-    // @Path: ../libraries/AP_AdvancedFailsafe/AP_AdvancedFailsafe.cpp
-    AP_SUBGROUPINFO(afs, "AFS_", 6, ParametersG2, AP_AdvancedFailsafe),
-#endif
 
     // @Param: DEV_OPTIONS
     // @DisplayName: Development options
@@ -714,13 +529,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Bitmask: 0:ADSBMavlinkProcessing,1:DevOptionVFR_HUDRelativeAlt
     // @User: Advanced
     AP_GROUPINFO("DEV_OPTIONS", 7, ParametersG2, dev_options, 0),
-/*
-#if AP_BEACON_ENABLED
-    // @Group: BCN
-    // @Path: ../libraries/AP_Beacon/AP_Beacon.cpp
-    AP_SUBGROUPINFO(beacon, "BCN", 14, ParametersG2, AP_Beacon),
-#endif
-*/
+
 #if HAL_PROXIMITY_ENABLED
     // @Group: PRX
     // @Path: ../libraries/AP_Proximity/AP_Proximity.cpp
@@ -761,25 +570,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(temp_calibration, "TCAL", 19, ParametersG2, AP_TempCalibration),
 #endif
 
-#if TOY_MODE_ENABLED
-    // @Group: TMODE
-    // @Path: toy_mode.cpp
-    AP_SUBGROUPINFO(toy_mode, "TMODE", 20, ParametersG2, ToyMode),
-#endif
-
-#if MODE_SMARTRTL_ENABLED
-    // @Group: SRTL_
-    // @Path: ../libraries/AP_SmartRTL/AP_SmartRTL.cpp
-    AP_SUBGROUPINFO(smart_rtl, "SRTL_", 21, ParametersG2, AP_SmartRTL),
-#endif
-
-#if AP_WINCH_ENABLED
-    // 22 was AP_WheelEncoder
-
-    // @Group: WINCH
-    // @Path: ../libraries/AP_Winch/AP_Winch.cpp
-    AP_SUBGROUPINFO(winch, "WINCH", 23, ParametersG2, AP_Winch),
-#endif
 
     // @Param: PILOT_SPEED_DN
     // @DisplayName: Pilot maximum vertical speed descending
@@ -805,15 +595,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPPTR(mode_flowhold_ptr, "FHLD", 26, ParametersG2, ModeFlowHold),
 #endif
 */
-#if MODE_FOLLOW_ENABLED
-    // @Group: FOLL
-    // @Path: ../libraries/AP_Follow/AP_Follow.cpp
-    AP_SUBGROUPINFO(follow, "FOLL", 27, ParametersG2, AP_Follow),
-#endif
 
-#if USER_PARAMS_ENABLED
-    AP_SUBGROUPINFO(user_parameters, "USR", 28, ParametersG2, UserParameters),
-#endif
 
 
     // 30 was AP_Scripting
@@ -838,12 +620,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(oa, "OA_", 33, ParametersG2, AP_OAPathPlanner),
 #endif
 
-#if MODE_SYSTEMID_ENABLED
-    // @Group: SID
-    // @Path: mode_systemid.cpp
-    AP_SUBGROUPPTR(mode_systemid_ptr, "SID", 34, ParametersG2, ModeSystemId),
-#endif
-
     // @Param: FS_VIBE_ENABLE
     // @DisplayName: Vibration Failsafe enable
     // @Description: This enables the vibration failsafe which will use modified altitude estimation and control during high vibrations
@@ -857,18 +633,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Bitmask: 0:Continue if in Auto on RC failsafe, 1:Continue if in Auto on GCS failsafe, 2:Continue if in Guided on RC failsafe, 3:Continue if landing on any failsafe, 4:Continue if in pilot controlled modes on GCS failsafe, 5:Release Gripper
     // @User: Advanced
     AP_GROUPINFO("FS_OPTIONS", 36, ParametersG2, fs_options, (float)Copter::FailsafeOption::GCS_CONTINUE_IF_PILOT_CONTROL),
-
-#if MODE_AUTOROTATE_ENABLED
-    // @Group: AROT_
-    // @Path: ../libraries/AC_Autorotation/AC_Autorotation.cpp
-    AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
-#endif
-
-#if MODE_ZIGZAG_ENABLED
-    // @Group: ZIGZ_
-    // @Path: mode_zigzag.cpp
-    AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
-#endif
 
 
 
@@ -890,14 +654,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("FS_GCS_TIMEOUT", 42, ParametersG2, fs_gcs_timeout, 5),
 
-#if MODE_RTL_ENABLED
-    // @Param: RTL_OPTIONS
-    // @DisplayName: RTL mode options
-    // @Description: Options that can be applied to change RTL mode behaviour
-    // @Bitmask: 2:Ignore pilot yaw
-    // @User: Advanced
-    AP_GROUPINFO("RTL_OPTIONS", 43, ParametersG2, rtl_options, 0),
-#endif
 
     // @Param: FLIGHT_OPTIONS
     // @DisplayName: Flight mode options
@@ -986,7 +742,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("TKOFF_SLEW_TIME", 57, ParametersG2, takeoff_throttle_slew_time, 2.0),
 
-#if HAL_WITH_ESC_TELEM && FRAME_CONFIG != HELI_FRAME
+#if HAL_WITH_ESC_TELEM
     // @Param: TKOFF_RPM_MIN
     // @DisplayName: Takeoff Check RPM minimum
     // @Description: Takeoff is not permitted until motors report at least this RPM.  Set to zero to disable check
@@ -994,13 +750,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("TKOFF_RPM_MIN", 58, ParametersG2, takeoff_rpm_min, 0),
 #endif
-/*
-#if WEATHERVANE_ENABLED
-    // @Group: WVANE_
-    // @Path: ../libraries/AC_AttitudeControl/AC_WeatherVane.cpp
-    AP_SUBGROUPINFO(weathervane, "WVANE_", 59, ParametersG2, AC_WeatherVane),
-#endif
-*/
+
     // ID 60 is reserved for the SHIP_OPS
 
     // extend to a new group
@@ -1063,7 +813,7 @@ const AP_Param::GroupInfo ParametersG2::var_info2[] = {
     // @User: Advanced
     AP_GROUPINFO("TKOFF_THR_MAX", 6, ParametersG2, takeoff_throttle_max, 0.9),
 
-#if HAL_WITH_ESC_TELEM && FRAME_CONFIG != HELI_FRAME
+#if HAL_WITH_ESC_TELEM
     // @Param: TKOFF_RPM_MAX
     // @DisplayName: Takeoff Check RPM maximum
     // @Description: Takeoff is not permitted until motors report no more than this RPM.  Set to zero to disable check
@@ -1132,47 +882,10 @@ ParametersG2::ParametersG2(void) :
 #if AP_TEMPCALIBRATION_ENABLED
     , temp_calibration()
 #endif
-/*
-#if AP_BEACON_ENABLED
-    , beacon()
-#endif
-*/
 #if HAL_PROXIMITY_ENABLED
     , proximity()
 #endif
-#if AP_COPTER_ADVANCED_FAILSAFE_ENABLED
-    ,afs()
-#endif
-#if MODE_SMARTRTL_ENABLED
-    ,smart_rtl()
-#endif
-#if USER_PARAMS_ENABLED
-    ,user_parameters()
-#endif
-/*
-#if MODE_FLOWHOLD_ENABLED
-    ,mode_flowhold_ptr(&copter.mode_flowhold)
-#endif
-*/
-#if MODE_FOLLOW_ENABLED
-    ,follow()
-#endif
-#if MODE_SYSTEMID_ENABLED
-    ,mode_systemid_ptr(&copter.mode_systemid)
-#endif
-#if MODE_AUTOROTATE_ENABLED
-    ,arot(copter.motors, copter.attitude_control)
-#endif
-#if MODE_ZIGZAG_ENABLED
-    ,mode_zigzag_ptr(&copter.mode_zigzag)
-#endif
-
     ,command_model_pilot_y(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
-/*
-#if WEATHERVANE_ENABLED
-    ,weathervane()
-#endif
-*/
 {
     AP_Param::setup_object_defaults(this, var_info);
     AP_Param::setup_object_defaults(this, var_info2);
@@ -1181,11 +894,6 @@ ParametersG2::ParametersG2(void) :
 void Copter::load_parameters(void)
 {
     AP_Vehicle::load_parameters(g.format_version, Parameters::k_format_version);
-
-#if MODE_RTL_ENABLED
-    // PARAMETER_CONVERSION - Added: Sep-2021
-    g.rtl_altitude_cm.convert_parameter_width(AP_PARAM_INT16);
-#endif
 
     // PARAMETER_CONVERSION - Added: Mar-2022
 #if AP_FENCE_ENABLED
@@ -1259,27 +967,6 @@ void Copter::convert_pid_parameters(void)
         AP_Param::convert_old_parameter(&info, 1.0f);
     }
 
-    // TradHeli default parameters
-#if FRAME_CONFIG == HELI_FRAME
-    static const struct AP_Param::defaults_table_struct heli_defaults_table[] = {
-        { "LOIT_ACC_MAX", 500.0f },
-        { "LOIT_BRK_ACCEL", 125.0f },
-        { "LOIT_BRK_DELAY", 1.0f },
-        { "LOIT_BRK_JERK", 250.0f },
-        { "LOIT_SPEED", 3000.0f },
-        { "PHLD_BRAKE_ANGLE", 800.0f },
-        { "PHLD_BRAKE_RATE", 4.0f },
-        { "PSC_ACCZ_P", 0.28f },
-        { "PSC_VELXY_D", 0.0f },
-        { "PSC_VELXY_I", 0.5f },
-        { "PSC_VELXY_P", 1.0f },
-        { "RC8_OPTION", 32 },
-        { "RC_OPTIONS", 0 },
-        { "ATC_RAT_RLL_ILMI", 0.05},
-        { "ATC_RAT_PIT_ILMI", 0.05},
-    };
-    AP_Param::set_defaults_from_table(heli_defaults_table, ARRAY_SIZE(heli_defaults_table));
-#endif  // FRAME_CONFIG == HELI_FRAME
 
 #if AP_INERTIALSENSOR_HARMONICNOTCH_ENABLED
 #if HAL_INS_NUM_HARMONIC_NOTCH_FILTERS > 1

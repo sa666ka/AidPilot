@@ -8,13 +8,10 @@ void Copter::default_dead_zones()
 {
     channel_roll->set_default_dead_zone(20);
     channel_pitch->set_default_dead_zone(20);
-#if FRAME_CONFIG == HELI_FRAME
-    channel_throttle->set_default_dead_zone(10);
-    channel_yaw->set_default_dead_zone(15);
-#else
+
     channel_throttle->set_default_dead_zone(30);
     channel_yaw->set_default_dead_zone(20);
-#endif
+
 }
 
 void Copter::init_rc_in()
@@ -54,7 +51,7 @@ void Copter::init_rc_out()
     // update rate must be set after motors->init() to allow for motor mapping
     motors->set_update_rate(g.rc_speed);
 
-#if FRAME_CONFIG != HELI_FRAME
+
     if (channel_throttle->configured()) {
         // throttle inputs setup, use those to set motor PWM min and max if not already configured
         motors->convert_pwm_min_max_param(channel_throttle->get_radio_min(), channel_throttle->get_radio_max());
@@ -63,22 +60,17 @@ void Copter::init_rc_out()
         motors->convert_pwm_min_max_param(1000, 2000);
     }
     motors->update_throttle_range();
-#else
-    // setup correct scaling for ESCs like the UAVCAN ESCs which
-    // take a proportion of speed.
-    hal.rcout->set_esc_scaling(channel_throttle->get_radio_min(), channel_throttle->get_radio_max());
-#endif
+
 
     // refresh auxiliary channel to function map
     SRV_Channels::update_aux_servo_function();
 
-#if FRAME_CONFIG != HELI_FRAME
     /*
       setup a default safety ignore mask, so that servo gimbals can be active while safety is on
      */
     uint16_t safety_ignore_mask = (~copter.motors->get_motor_mask()) & 0x3FFF;
     BoardConfig.set_default_safety_ignore_mask(safety_ignore_mask);
-#endif
+
 }
 
 
@@ -203,10 +195,5 @@ void Copter::radio_passthrough_to_motors()
  */
 int16_t Copter::get_throttle_mid(void)
 {
-#if TOY_MODE_ENABLED
-    if (g2.toy_mode.enabled()) {
-        return g2.toy_mode.get_throttle_mid();
-    }
-#endif
     return channel_throttle->get_control_mid();
 }

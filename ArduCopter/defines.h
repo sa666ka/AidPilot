@@ -5,7 +5,6 @@
 // Frame types
 #define UNDEFINED_FRAME 0
 #define MULTICOPTER_FRAME 1
-#define HELI_FRAME 2
 
 // Tuning enumeration
 enum tuning_func {

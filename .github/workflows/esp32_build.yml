@@ -3,11 +3,6 @@ name: ESP32 Build
 on:
   push:
     paths-ignore:
-      # remove non copter and plane vehicles
-      - 'AntennaTracker/**'
-      - 'ArduSub/**'
-      - 'Blimp/**'
-      - 'Rover/**'
       # remove non esp32 HAL
       - 'libraries/AP_HAL_ChibiOS/**'
       - 'libraries/AP_HAL_SITL/**'
@@ -70,11 +65,6 @@ on:
 
   pull_request:
     paths-ignore:
-      # remove non copter and plane vehicles
-      - 'AntennaTracker/**'
-      - 'ArduSub/**'
-      - 'Blimp/**'
-      - 'Rover/**'
       # remove non esp32 HAL
       - 'libraries/AP_HAL_ChibiOS/**'
       - 'libraries/AP_HAL_SITL/**'

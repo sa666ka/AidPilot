@@ -25,9 +25,6 @@ public:
 
     bool vehicle_initialised() const override;
 
-    bool simple_input_active() const override;
-    bool supersimple_input_active() const override;
-
 protected:
 
 

@@ -14,7 +14,6 @@ void Copter::esc_calibration_startup_check()
         return;
     }
 
-#if FRAME_CONFIG != HELI_FRAME
     // delay up to 2 second for first radio input
     uint8_t i = 0;
     while ((i++ < 100) && (last_radio_update_ms == 0)) {
@@ -71,13 +70,11 @@ void Copter::esc_calibration_startup_check()
     if (g.esc_calibrate != ESCCalibrationModes::ESCCAL_DISABLED) {
         g.esc_calibrate.set_and_save(ESCCalibrationModes::ESCCAL_NONE);
     }
-#endif  // FRAME_CONFIG != HELI_FRAME
 }
 
 // esc_calibration_passthrough - pass through pilot throttle to escs
 void Copter::esc_calibration_passthrough()
 {
-#if FRAME_CONFIG != HELI_FRAME
     // send message to GCS
     gcs().send_text(MAV_SEVERITY_INFO,"ESC calibration: Passing pilot throttle to ESCs");
 
@@ -100,13 +97,11 @@ void Copter::esc_calibration_passthrough()
         motors->set_throttle_passthrough_for_esc_calibration(channel_throttle->get_control_in() * 0.001f);
         srv.push();
     }
-#endif  // FRAME_CONFIG != HELI_FRAME
 }
 
 // esc_calibration_auto - calibrate the ESCs automatically using a timer and no pilot input
 void Copter::esc_calibration_auto()
 {
-#if FRAME_CONFIG != HELI_FRAME
     // send message to GCS
     gcs().send_text(MAV_SEVERITY_INFO,"ESC calibration: Auto calibration");
 
@@ -136,7 +131,6 @@ void Copter::esc_calibration_auto()
         esc_calibration_notify();
         hal.scheduler->delay(3);
     }
-#endif // FRAME_CONFIG != HELI_FRAME
 }
 
 // flash LEDs to notify the user that ESC calibration is happening

@@ -79,11 +79,6 @@ void ModeAltHold::run()
     case AltHoldModeState::Flying:
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
-#if AP_AVOIDANCE_ENABLED
-        // apply avoidance
-        copter.avoid.adjust_roll_pitch_rad(target_roll_rad, target_pitch_rad, attitude_control->lean_angle_max_rad());
-#endif
-
         // get avoidance adjusted climb rate
         target_climb_rate_ms = get_avoidance_adjusted_climbrate_ms(target_climb_rate_ms);
 

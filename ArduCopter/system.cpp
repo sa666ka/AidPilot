@@ -15,12 +15,7 @@ static void failsafe_check_static()
 
 void Copter::init_ardupilot()
 {
-/*
-    // init winch
-#if AP_WINCH_ENABLED
-    g2.winch.init();
-#endif
-*/
+
     // initialise notify system
     notify.init();
     notify_flight_mode();
@@ -37,22 +32,14 @@ void Copter::init_ardupilot()
 
     // setup telem slots with serial ports
     gcs().setup_uarts();
-/* 
+
 #if OSD_ENABLED
     osd.init();
 #endif
- */
+ 
     // update motor interlock state
     update_using_interlock();
-/* 
-#if FRAME_CONFIG == HELI_FRAME
-    // trad heli specific initialisation
-    heli_init();
-#endif
-#if FRAME_CONFIG == HELI_FRAME
-    input_manager.set_loop_rate(scheduler.get_loop_rate_hz());
-#endif
- */
+
     init_rc_in();               // sets up rc channels from radio
 
 #if AP_RANGEFINDER_ENABLED
@@ -128,11 +115,7 @@ void Copter::init_ardupilot()
     // initialise landing gear position
     landinggear.init();
 #endif
-/*
-#ifdef USERHOOK_INIT
-    USERHOOK_INIT
-#endif
- */
+
     // read Baro pressure at ground
     //-----------------------------
     barometer.set_log_baro_bit(MASK_LOG_IMU);
@@ -147,18 +130,7 @@ void Copter::init_ardupilot()
     // init proximity sensor
     g2.proximity.init();
 #endif
-/* 
-#if AP_BEACON_ENABLED
-    // init beacons used for non-gps position estimation
-    g2.beacon.init();
-#endif
- */
-/* 
-#if MODE_SMARTRTL_ENABLED
-    // initialize SmartRTL
-    g2.smart_rtl.init();
-#endif
- */
+
 #if HAL_LOGGING_ENABLED
     // initialise AP_Logger library
     logger.setVehicle_Startup_Writer(FUNCTOR_BIND(&copter, &Copter::Log_Write_Vehicle_Startup_Messages, void));
@@ -357,7 +329,7 @@ bool Copter::should_log(uint32_t mask)
 void Copter::allocate_motors(void)
 {
     switch ((AP_Motors::motor_frame_class)g2.frame_class.get()) {
-#if FRAME_CONFIG != HELI_FRAME
+
         case AP_Motors::MOTOR_FRAME_QUAD:
         case AP_Motors::MOTOR_FRAME_HEXA:
         case AP_Motors::MOTOR_FRAME_Y6:
@@ -401,26 +373,6 @@ void Copter::allocate_motors(void)
             motors_var_info = AP_MotorsMatrix_Scripting_Dynamic::var_info;
 #endif // AP_SCRIPTING_ENABLED
             break;
-#else // FRAME_CONFIG == HELI_FRAME
-        case AP_Motors::MOTOR_FRAME_HELI_DUAL:
-            motors = NEW_NOTHROW AP_MotorsHeli_Dual(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsHeli_Dual::var_info;
-            AP_Param::set_frame_type_flags(AP_PARAM_FRAME_HELI);
-            break;
-
-        case AP_Motors::MOTOR_FRAME_HELI_QUAD:
-            motors = NEW_NOTHROW AP_MotorsHeli_Quad(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsHeli_Quad::var_info;
-            AP_Param::set_frame_type_flags(AP_PARAM_FRAME_HELI);
-            break;
-            
-        case AP_Motors::MOTOR_FRAME_HELI:
-        default:
-            motors = NEW_NOTHROW AP_MotorsHeli_Single(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsHeli_Single::var_info;
-            AP_Param::set_frame_type_flags(AP_PARAM_FRAME_HELI);
-            break;
-#endif
     }
     if (motors == nullptr) {
         AP_BoardConfig::allocation_error("FRAME_CLASS=%u", (unsigned)g2.frame_class.get());
@@ -432,7 +384,7 @@ void Copter::allocate_motors(void)
         AP_BoardConfig::allocation_error("AP_AHRS_View");
     }
 
-#if FRAME_CONFIG != HELI_FRAME
+
     if ((AP_Motors::motor_frame_class)g2.frame_class.get() == AP_Motors::MOTOR_FRAME_6DOF_SCRIPTING) {
 #if AP_SCRIPTING_ENABLED
         attitude_control = NEW_NOTHROW AC_AttitudeControl_Multi_6DoF(*ahrs_view, aparm, *motors);
@@ -442,10 +394,7 @@ void Copter::allocate_motors(void)
         attitude_control = NEW_NOTHROW AC_AttitudeControl_Multi(*ahrs_view, aparm, *motors);
         attitude_control_var_info = AC_AttitudeControl_Multi::var_info;
     }
-#else
-    attitude_control = NEW_NOTHROW AC_AttitudeControl_Heli(*ahrs_view, aparm, *motors);
-    attitude_control_var_info = AC_AttitudeControl_Heli::var_info;
-#endif
+
     if (attitude_control == nullptr) {
         AP_BoardConfig::allocation_error("AttitudeControl");
     }
@@ -473,13 +422,6 @@ void Copter::allocate_motors(void)
     }
     AP_Param::load_object_from_eeprom(loiter_nav, loiter_nav->var_info);
 
-#if MODE_CIRCLE_ENABLED
-    circle_nav = NEW_NOTHROW AC_Circle(*ahrs_view, *pos_control);
-    if (circle_nav == nullptr) {
-        AP_BoardConfig::allocation_error("CircleNav");
-    }
-    AP_Param::load_object_from_eeprom(circle_nav, circle_nav->var_info);
-#endif
 
     // reload lines from the defaults file that may now be accessible
     AP_Param::reload_defaults_file(true);
@@ -508,9 +450,7 @@ void Copter::allocate_motors(void)
     
     // upgrade parameters. This must be done after allocating the objects
     convert_pid_parameters();
-#if FRAME_CONFIG == HELI_FRAME
-    motors->heli_motors_param_conversions();
-#endif
+
 
 #if HAL_PROXIMITY_ENABLED
     // convert PRX to PRX1_ parameters
@@ -521,11 +461,3 @@ void Copter::allocate_motors(void)
     AP_Param::invalidate_count();
 }
 
-bool Copter::is_tradheli() const
-{
-#if FRAME_CONFIG == HELI_FRAME
-    return true;
-#else
-    return false;
-#endif
-}

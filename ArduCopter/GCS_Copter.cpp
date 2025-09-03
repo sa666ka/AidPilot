@@ -10,15 +10,6 @@ const char* GCS_Copter::frame_string() const
     return copter.motors->get_frame_string();
 }
 
-bool GCS_Copter::simple_input_active() const
-{
-    return copter.simple_mode == Copter::SimpleMode::SIMPLE;
-}
-
-bool GCS_Copter::supersimple_input_active() const
-{
-    return copter.simple_mode == Copter::SimpleMode::SUPERSIMPLE;
-}
 
 void GCS_Copter::update_vehicle_sensor_status_flags(void)
 {
