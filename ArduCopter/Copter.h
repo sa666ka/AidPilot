@@ -564,6 +564,9 @@ private:
     void do_failsafe_action(FailsafeAction action, ModeReason reason);
     void announce_failsafe(const char *type, const char *action_undertaken=nullptr);
 
+    // inertia.cpp
+    void read_inertia();
+
     // landing_detector.cpp
     void update_land_and_crash_detectors();
     void update_land_detector();
