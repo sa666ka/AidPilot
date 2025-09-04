@@ -391,14 +391,6 @@ private:
     AP_Param param_loader;
 
 
-    // ground effect detector
-    struct {
-        bool takeoff_expected;
-        bool touchdown_expected;
-        uint32_t takeoff_time_ms;
-        float takeoff_alt_m;
-    } gndeffect_state;
-
     bool standby_active;
 
     static const AP_Scheduler::Task scheduler_tasks[];
@@ -541,10 +533,6 @@ private:
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
     void run_custom_controller() { custom_control.update(); }
 #endif
-
-    // baro_ground_effect.cpp
-    void update_ground_effect_detector(void);
-    void update_ekf_terrain_height_stable();
 
     // commands.cpp
     void update_home_from_EKF();

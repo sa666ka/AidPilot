@@ -469,8 +469,6 @@ public:
     AP_Button *button_ptr;
 #endif
 
-    // ground effect compensation enable/disable
-    AP_Int8 gndeffect_comp_enabled;
 
 #if AP_TEMPCALIBRATION_ENABLED
     // temperature calibration handling

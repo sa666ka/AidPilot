@@ -286,10 +286,6 @@ void Copter::throttle_loop()
     // check auto_armed status
     update_auto_armed();
 
-
-    // compensate for ground effect (if enabled)
-    update_ground_effect_detector();
-    update_ekf_terrain_height_stable();
 }
 
 // update_batt_compass - read battery and compass
