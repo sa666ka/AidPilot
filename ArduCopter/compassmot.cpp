@@ -68,9 +68,6 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
         return MAV_RESULT_TEMPORARILY_REJECTED;
     }
 
-    // disable cpu failsafe
-    failsafe_disable();
-
     float current;
 
     // default compensation type to use current if possible
@@ -257,9 +254,6 @@ MAV_RESULT Copter::mavlink_compassmot(const GCS_MAVLINK &gcs_chan)
 
     // turn off notify leds
     AP_Notify::flags.esc_calibration = false;
-
-    // re-enable cpu failsafe
-    failsafe_enable();
 
     // re-enable failsafes
     g.failsafe_throttle.load();

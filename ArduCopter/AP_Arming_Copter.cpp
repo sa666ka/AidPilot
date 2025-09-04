@@ -525,9 +525,6 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
     AP::logger().set_vehicle_armed(true);
 #endif
 
-    // disable cpu failsafe because initialising everything takes a while
-    copter.failsafe_disable();
-
     // notify that arming will occur (we do this early to give plenty of warning)
     AP_Notify::flags.armed = true;
     // call notify update a few times to ensure the message gets out
@@ -579,8 +576,6 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
     AP::logger().Write_Mode((uint8_t)copter.flightmode->mode_number(), copter.control_mode_reason);
 #endif
 
-    // re-enable failsafe
-    copter.failsafe_enable();
 
     // perf monitor ignores delay due to arming
     AP::scheduler().perf_info.ignore_this_loop();

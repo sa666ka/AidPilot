@@ -580,10 +580,6 @@ private:
     void do_failsafe_action(FailsafeAction action, ModeReason reason);
     void announce_failsafe(const char *type, const char *action_undertaken=nullptr);
 
-    // failsafe.cpp
-    void failsafe_enable();
-    void failsafe_disable();
-
     // inertia.cpp
     void read_inertia();
 
@@ -753,8 +749,6 @@ private:
     bool started_rate_thread;
     bool using_rate_thread;
 
-public:
-    void failsafe_check();      // failsafe.cpp
 };
 
 extern Copter copter;

@@ -8,10 +8,6 @@
 *
 *****************************************************************************/
 
-static void failsafe_check_static()
-{
-    copter.failsafe_check();
-}
 
 void Copter::init_ardupilot()
 {
@@ -72,7 +68,6 @@ void Copter::init_ardupilot()
      *  setup the 'main loop is dead' check. Note that this relies on
      *  the RC library being initialised.
      */
-    hal.scheduler->register_timer_failsafe(failsafe_check_static, 1000);
 
     // Do GPS init
     gps.set_log_gps_bit(MASK_LOG_GPS);
@@ -109,8 +104,6 @@ void Copter::init_ardupilot()
     set_land_complete(true);
     set_land_complete_maybe(true);
 
-    // enable CPU failsafe
-    failsafe_enable();
 
     ins.set_log_raw_bit(MASK_LOG_IMU_RAW);
 
