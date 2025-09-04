@@ -890,11 +890,6 @@ void Copter::load_parameters(void)
 {
     AP_Vehicle::load_parameters(g.format_version, Parameters::k_format_version);
 
-    // PARAMETER_CONVERSION - Added: Mar-2022
-#if AP_FENCE_ENABLED
-    AP_Param::convert_class(g.k_param_fence_old, &fence, fence.var_info, 0, true);
-#endif
-
     // PARAMETER_CONVERSION - Added: July-2025 for ArduPilot-4.7
 #if AP_RPM_ENABLED
     AP_Param::convert_class(g.k_param_rpm_sensor_old, &rpm_sensor, rpm_sensor.var_info, 0, true, true);

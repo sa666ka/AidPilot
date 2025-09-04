@@ -331,15 +331,6 @@ void ModeGuided::angle_control_start()
 // else return false if the waypoint is outside the fence
 bool ModeGuided::set_pos_NEU_m(const Vector3f& pos_neu_m, bool use_yaw, float yaw_rad, bool use_yaw_rate, float yaw_rate_rads, bool relative_yaw, bool is_terrain_alt)
 {
-#if AP_FENCE_ENABLED
-    // reject destination if outside the fence
-    const Location dest_loc(pos_neu_m * 100.0, is_terrain_alt ? Location::AltFrame::ABOVE_TERRAIN : Location::AltFrame::ABOVE_ORIGIN);
-    if (!copter.fence.check_destination_within_fence(dest_loc)) {
-        LOGGER_WRITE_ERROR(LogErrorSubsystem::NAVIGATION, LogErrorCode::DEST_OUTSIDE_FENCE);
-        // failure is propagated to GCS with NAK
-        return false;
-    }
-#endif
 
     // if configured to use wpnav for position control
     if (use_wpnav_for_position_control()) {
@@ -430,15 +421,6 @@ bool ModeGuided::get_wp(Location& destination) const
 // or if the fence is enabled and guided waypoint is outside the fence
 bool ModeGuided::set_destination(const Location& dest_loc, bool use_yaw, float yaw_rad, bool use_yaw_rate, float yaw_rate_rads, bool relative_yaw)
 {
-#if AP_FENCE_ENABLED
-    // reject destination outside the fence.
-    // Note: there is a danger that a target specified as a terrain altitude might not be checked if the conversion to alt-above-home fails
-    if (!copter.fence.check_destination_within_fence(dest_loc)) {
-        LOGGER_WRITE_ERROR(LogErrorSubsystem::NAVIGATION, LogErrorCode::DEST_OUTSIDE_FENCE);
-        // failure is propagated to GCS with NAK
-        return false;
-    }
-#endif
 
     // if using wpnav for position control
     if (use_wpnav_for_position_control()) {
@@ -582,15 +564,7 @@ bool ModeGuided::set_pos_vel_NEU_m(const Vector3f& pos_neu_m, const Vector3f& ve
 // set_pos_vel_accel_NEU_m - set guided mode position, velocity and acceleration target
 bool ModeGuided::set_pos_vel_accel_NEU_m(const Vector3f& pos_neu_m, const Vector3f& vel_neu_ms, const Vector3f& accel_neu_mss, bool use_yaw, float yaw_rad, bool use_yaw_rate, float yaw_rate_rads, bool relative_yaw)
 {
-#if AP_FENCE_ENABLED
-    // reject destination if outside the fence
-    const Location dest_loc(pos_neu_m * 100.0, Location::AltFrame::ABOVE_ORIGIN);
-    if (!copter.fence.check_destination_within_fence(dest_loc)) {
-        LOGGER_WRITE_ERROR(LogErrorSubsystem::NAVIGATION, LogErrorCode::DEST_OUTSIDE_FENCE);
-        // failure is propagated to GCS with NAK
-        return false;
-    }
-#endif
+
 
     // check we are in position, velocity and acceleration control mode
     if (guided_mode != SubMode::PosVelAccel) {
@@ -685,9 +659,7 @@ void ModeGuided::takeoff_run()
     auto_takeoff.run();
     if (auto_takeoff.complete && !takeoff_complete) {
         takeoff_complete = true;
-#if AP_FENCE_ENABLED
-        copter.fence.auto_enable_fence_after_takeoff();
-#endif
+
 #if AP_LANDINGGEAR_ENABLED
         // optionally retract landing gear
         copter.landinggear.retract_after_takeoff();
