@@ -22,10 +22,6 @@ void Copter::update_land_and_crash_detectors()
 
     update_land_detector();
 
-
-    crash_check();
-    thrust_loss_check();
-    yaw_imbalance_check();
 }
 
 // update_land_detector - checks if we have landed and updates the ap.land_complete flag
