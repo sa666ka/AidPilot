@@ -81,17 +81,8 @@ void Copter::init_ardupilot()
     AP::compass().set_log_bit(MASK_LOG_COMPASS);
     AP::compass().init();
 
-#if AP_AIRSPEED_ENABLED
-    airspeed.set_log_bit(MASK_LOG_IMU);
-#endif
-
 
     attitude_control->parameter_sanity_check();
-
-#if AP_LANDINGGEAR_ENABLED
-    // initialise landing gear position
-    landinggear.init();
-#endif
 
     // read Baro pressure at ground
     //-----------------------------

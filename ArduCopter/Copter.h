@@ -55,7 +55,6 @@
 #include <AP_Declination/AP_Declination.h>  // ArduPilot Mega Declination Helper Library
 #include <AP_RCMapper/AP_RCMapper.h>        // RC input mapping library
 #include <AP_BattMonitor/AP_BattMonitor.h>  // Battery monitor library
-#include <AP_LandingGear/AP_LandingGear.h>  // Landing Gear library
 #include <AC_InputManager/AC_InputManager.h>        // Pilot input handling library
 #include <AC_InputManager/AC_InputManager_Heli.h>   // Heli specific pilot input handling library
 #include <AP_Arming/AP_Arming.h>            // ArduPilot motor arming library
@@ -378,10 +377,6 @@ private:
     // arm_time_ms - Records when vehicle was armed. Will be Zero if we are disarmed.
     uint32_t arm_time_ms;
 
-    // Landing Gear Controller
-#if AP_LANDINGGEAR_ENABLED
-    AP_LandingGear landinggear;
-#endif
 
 
 
@@ -645,10 +640,6 @@ private:
     void Log_LDET(uint16_t logging_flags, uint32_t land_detector_count);
 #endif
 
-#if AP_LANDINGGEAR_ENABLED
-    // landing_gear.cpp
-    void landinggear_update();
-#endif
  
     // standby.cpp
     void standby_update();

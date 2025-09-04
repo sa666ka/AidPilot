@@ -81,12 +81,7 @@ void Copter::update_land_detector()
         SET_LOG_FLAG(throttle_mix_at_min, LandDetectorLoggingFlag::THROTTLE_MIX_AT_MIN);
 
         uint8_t land_detector_scalar = 1;
-#if AP_LANDINGGEAR_ENABLED
-        if (landinggear.get_wow_state() != AP_LandingGear::LG_WOW_UNKNOWN) {
-            // we have a WoW sensor so lets loosen the strictness of the landing detector
-            land_detector_scalar = 2;
-        }
-#endif
+
 
         // check for aggressive flight requests - requested roll or pitch angle below 15 degrees
         const Vector3f& angle_target_rad = attitude_control->get_att_target_euler_rad();
@@ -113,11 +108,8 @@ void Copter::update_land_detector()
         SET_LOG_FLAG(rangefinder_check, LandDetectorLoggingFlag::RANGEFINDER_BELOW_2M);
 
         // if we have weight on wheels (WoW) or ambiguous unknown. never no WoW
-#if AP_LANDINGGEAR_ENABLED
-        const bool WoW_check = (landinggear.get_wow_state() == AP_LandingGear::LG_WOW || landinggear.get_wow_state() == AP_LandingGear::LG_WOW_UNKNOWN);
-#else
         const bool WoW_check = true;
-#endif
+
         SET_LOG_FLAG(WoW_check, LandDetectorLoggingFlag::WOW);
 
         if (motor_at_lower_limit && throttle_mix_at_min && !large_angle_request && !large_angle_error && accel_stationary && descent_rate_low && rangefinder_check && WoW_check) {

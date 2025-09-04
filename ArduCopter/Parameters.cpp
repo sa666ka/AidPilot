@@ -317,12 +317,6 @@ const AP_Param::Info Copter::var_info[] = {
 #endif
 
 
-#if AP_LANDINGGEAR_ENABLED
-    // @Group: LGR_
-    // @Path: ../libraries/AP_LandingGear/AP_LandingGear.cpp
-    GOBJECT(landinggear,    "LGR_", AP_LandingGear),
-#endif
-
 
     // @Group: COMPASS_
     // @Path: ../libraries/AP_Compass/AP_Compass.cpp
@@ -846,10 +840,6 @@ void Copter::load_parameters(void)
         { &stats, stats.var_info, 12 },
 #endif
 
-#if AP_GRIPPER_ENABLED
-    // PARAMETER_CONVERSION - Added: Feb-2024 for Copter-4.6
-        { &gripper, gripper.var_info, 13 },
-#endif
     };
 
     AP_Param::convert_g2_objects(&g2, g2_conversions, ARRAY_SIZE(g2_conversions));
