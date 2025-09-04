@@ -723,10 +723,6 @@ private:
 
     void convert_lgr_parameters(void);
 
-    // precision_landing.cpp
-    void init_precland();
-    void update_precland();
-
     // radio.cpp
     void default_dead_zones();
     void init_rc_in();
