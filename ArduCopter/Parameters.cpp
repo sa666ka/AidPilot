@@ -316,11 +316,6 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(relay,                  "RELAY", AP_Relay),
 #endif
 
-#if HAL_PARACHUTE_ENABLED
-    // @Group: CHUTE_
-    // @Path: ../libraries/AP_Parachute/AP_Parachute.cpp
-    GOBJECT(parachute, "CHUTE_", AP_Parachute),
-#endif
 
 #if AP_LANDINGGEAR_ENABLED
     // @Group: LGR_
@@ -428,24 +423,16 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(rangefinder,   "RNGFND", RangeFinder),
 #endif
 
-
-#if AP_OPTICALFLOW_ENABLED
-    // @Group: FLOW
-    // @Path: ../libraries/AP_OpticalFlow/AP_OpticalFlow.cpp
-    GOBJECT(optflow,   "FLOW", AP_OpticalFlow),
-#endif
-
-
     // @Group: NTF_
     // @Path: ../libraries/AP_Notify/AP_Notify.cpp
     GOBJECT(notify, "NTF_",  AP_Notify),
-/*
+
 #if OSD_ENABLED || OSD_PARAM_ENABLED
     // @Group: OSD
     // @Path: ../libraries/AP_OSD/AP_OSD.cpp
     GOBJECT(osd, "OSD", AP_OSD),
 #endif
-*/
+
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
     // @Group: CC
     // @Path: ../libraries/AC_CustomControl/AC_CustomControl.cpp

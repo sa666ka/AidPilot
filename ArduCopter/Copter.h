@@ -146,8 +146,6 @@ public:
     friend class Mode;
     friend class ModeAltHold;
 
-    friend class ModeAvoidADSB;
-
     friend class ModeGuided;
     friend class ModeLand;
     friend class ModeStabilize;
@@ -235,10 +233,6 @@ private:
     // Arming/Disarming management class
     AP_Arming_Copter arming;
 
-    // Optical flow sensor
-#if AP_OPTICALFLOW_ENABLED
-    AP_OpticalFlow optflow;
-#endif
  
     // external control library
 #if AP_EXTERNAL_CONTROL_ENABLED
@@ -401,11 +395,6 @@ private:
     // --------------
     // arm_time_ms - Records when vehicle was armed. Will be Zero if we are disarmed.
     uint32_t arm_time_ms;
-
-    // Parachute release
-#if HAL_PARACHUTE_ENABLED
-    AP_Parachute parachute;
-#endif
 
     // Landing Gear Controller
 #if AP_LANDINGGEAR_ENABLED

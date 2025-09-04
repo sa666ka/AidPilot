@@ -408,10 +408,6 @@ private:
 
 };
 
-#if HAL_PARACHUTE_ENABLED
-    void do_parachute(const AP_Mission::Mission_Command& cmd);
-#endif
-
 
 class ModeGuided : public Mode {
 

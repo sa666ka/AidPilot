@@ -211,11 +211,6 @@ bool Copter::ekf_has_relative_position() const
 
     // return immediately if neither optflow nor visual odometry is enabled and dead reckoning is inactive
     bool enabled = false;
-#if AP_OPTICALFLOW_ENABLED
-    if (optflow.enabled()) {
-        enabled = true;
-    }
-#endif
 #if HAL_VISUALODOM_ENABLED
     if (visual_odom.enabled()) {
         enabled = true;
