@@ -490,11 +490,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("DEV_OPTIONS", 7, ParametersG2, dev_options, 0),
 
-#if HAL_PROXIMITY_ENABLED
-    // @Group: PRX
-    // @Path: ../libraries/AP_Proximity/AP_Proximity.cpp
-    AP_SUBGROUPINFO(proximity, "PRX", 8, ParametersG2, AP_Proximity),
-#endif
 
     // ACRO_Y_EXPO (9) moved to Command Model Class
 
@@ -830,9 +825,6 @@ ParametersG2::ParametersG2(void) :
 #if AP_TEMPCALIBRATION_ENABLED
     , temp_calibration()
 #endif
-#if HAL_PROXIMITY_ENABLED
-    , proximity()
-#endif
     ,command_model_pilot_y(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
 {
     AP_Param::setup_object_defaults(this, var_info);
@@ -954,28 +946,3 @@ void Copter::convert_pid_parameters(void)
     SRV_Channels::upgrade_parameters();
 }
 
-#if HAL_PROXIMITY_ENABLED
-void Copter::convert_prx_parameters()
-{
-    // convert PRX to PRX1_ parameters for Copter-4.3
-    // PARAMETER_CONVERSION - Added: Aug-2022
-    static const AP_Param::ConversionInfo prx_conversion_info[] = {
-        { Parameters::k_param_g2, 72, AP_PARAM_INT8, "PRX1_TYPE" },
-        { Parameters::k_param_g2, 136, AP_PARAM_INT8, "PRX1_ORIENT" },
-        { Parameters::k_param_g2, 200, AP_PARAM_INT16, "PRX1_YAW_CORR" },
-        { Parameters::k_param_g2, 264, AP_PARAM_INT16, "PRX1_IGN_ANG1" },
-        { Parameters::k_param_g2, 328, AP_PARAM_INT8, "PRX1_IGN_WID1" },
-        { Parameters::k_param_g2, 392, AP_PARAM_INT16, "PRX1_IGN_ANG2" },
-        { Parameters::k_param_g2, 456, AP_PARAM_INT8, "PRX1_IGN_WID2" },
-        { Parameters::k_param_g2, 520, AP_PARAM_INT16, "PRX1_IGN_ANG3" },
-        { Parameters::k_param_g2, 584, AP_PARAM_INT8, "PRX1_IGN_WID3" },
-        { Parameters::k_param_g2, 648, AP_PARAM_INT16, "PRX1_IGN_ANG4" },
-        { Parameters::k_param_g2, 712, AP_PARAM_INT8, "PRX1_IGN_WID4" },
-        { Parameters::k_param_g2, 1224, AP_PARAM_FLOAT, "PRX1_MIN" },
-        { Parameters::k_param_g2, 1288, AP_PARAM_FLOAT, "PRX1_MAX" },
-    };
-    for (const auto &info : prx_conversion_info) {
-        AP_Param::convert_old_parameter(&info, 1.0);
-    }
-}
-#endif

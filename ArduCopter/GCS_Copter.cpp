@@ -46,19 +46,7 @@ void GCS_Copter::update_vehicle_sensor_status_flags(void)
         }
     }
 
-    // optional sensors, some of which are essentially always
-    // available in the firmware:
-#if HAL_PROXIMITY_ENABLED
-    if (copter.g2.proximity.sensor_present()) {
-        control_sensors_present |= MAV_SYS_STATUS_SENSOR_PROXIMITY;
-    }
-    if (copter.g2.proximity.sensor_enabled()) {
-        control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_PROXIMITY;
-    }
-    if (!copter.g2.proximity.sensor_failed()) {
-        control_sensors_health |= MAV_SYS_STATUS_SENSOR_PROXIMITY;
-    }
-#endif
+
 
 #if AP_RANGEFINDER_ENABLED
     const RangeFinder *rangefinder = RangeFinder::get_singleton();

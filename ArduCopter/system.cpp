@@ -103,11 +103,6 @@ void Copter::init_ardupilot()
     init_rangefinder();
 #endif
 
-#if HAL_PROXIMITY_ENABLED
-    // init proximity sensor
-    g2.proximity.init();
-#endif
-
 #if HAL_LOGGING_ENABLED
     // initialise AP_Logger library
     logger.setVehicle_Startup_Writer(FUNCTOR_BIND(&copter, &Copter::Log_Write_Vehicle_Startup_Messages, void));
@@ -409,11 +404,6 @@ void Copter::allocate_motors(void)
     // upgrade parameters. This must be done after allocating the objects
     convert_pid_parameters();
 
-
-#if HAL_PROXIMITY_ENABLED
-    // convert PRX to PRX1_ parameters
-    convert_prx_parameters();
-#endif
 
     // param count could have changed
     AP_Param::invalidate_count();

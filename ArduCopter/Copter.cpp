@@ -155,10 +155,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(read_rangefinder,      20,    100,  33),
 #endif
 
-#if HAL_PROXIMITY_ENABLED
-    SCHED_TASK_CLASS(AP_Proximity,         &copter.g2.proximity,        update,         200,  50,  36),
-#endif
-
     SCHED_TASK(update_altitude,       10,    100,  42),
     SCHED_TASK(run_nav_updates,       50,    100,  45),
     SCHED_TASK(update_throttle_hover,100,     90,  48),
@@ -378,9 +374,6 @@ void Copter::ten_hz_logging_loop()
         AP::ins().Write_Vibration();
     }
     if (should_log(MASK_LOG_CTUN)) {
-#if HAL_PROXIMITY_ENABLED
-        g2.proximity.log();  // Write proximity sensor distances
-#endif
 
     }
 

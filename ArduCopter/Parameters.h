@@ -477,11 +477,6 @@ public:
     AP_TempCalibration temp_calibration;
 #endif
 
-#if HAL_PROXIMITY_ENABLED
-    // proximity (aka object avoidance) library
-    AP_Proximity proximity;
-#endif
-
     // developer options
     AP_Int32 dev_options;
 

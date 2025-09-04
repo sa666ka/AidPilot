@@ -29,11 +29,6 @@ void Copter::read_rangefinder(void)
     rangefinder_state.update();
     rangefinder_up_state.update();
 
-#if HAL_PROXIMITY_ENABLED
-    if (rangefinder_state.enabled_and_healthy() || rangefinder_state.data_stale()) {
-        g2.proximity.set_rangefinder_alt(rangefinder_state.enabled, rangefinder_state.alt_healthy, rangefinder_state.alt_m_filt.get() * 100.0);
-    }
-#endif
 }
 #endif  // AP_RANGEFINDER_ENABLED
 

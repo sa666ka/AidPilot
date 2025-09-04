@@ -720,9 +720,7 @@ private:
     // Parameters.cpp
     void load_parameters(void) override;
     void convert_pid_parameters(void);
-#if HAL_PROXIMITY_ENABLED
-    void convert_prx_parameters();
-#endif
+
     void convert_lgr_parameters(void);
 
     // precision_landing.cpp
