@@ -32,41 +32,8 @@ private:
     Vector3p complete_pos_neu_m;   // target takeoff position as offset from ekf origin in m
 };
 
-#if AC_PAYLOAD_PLACE_ENABLED
-class PayloadPlace {
-public:
-    void run();
-    void start_descent();
-    bool verify();
-
-    enum class State : uint8_t {
-        FlyToLocation,
-        Descent_Start,
-        Descent,
-        Release,
-        Releasing,
-        Delay,
-        Ascent_Start,
-        Ascent,
-        Done,
-    };
-
-    // these are set by the Mission code:
-    State state = State::Descent_Start; // records state of payload place
-    float descent_max_m;
-
-private:
-
-    uint32_t descent_established_time_ms; // milliseconds
-    uint32_t place_start_time_ms; // milliseconds
-    float descent_thrust_level;
-    float descent_start_altitude_m;
-    float descent_speed_ms;
-};
-#endif
 
 class Mode {
-    friend class PayloadPlace;
 
 public:
 
@@ -210,10 +177,6 @@ protected:
         land_run_vertical_control(pause_descent);
     }
 
-#if AC_PAYLOAD_PLACE_ENABLED
-    // payload place flight behaviour:
-    static PayloadPlace payload_place;
-#endif
 
     // run normal or precision landing (if enabled)
     // pause_descent is true if vehicle should not descend
