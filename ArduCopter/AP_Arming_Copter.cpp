@@ -284,15 +284,9 @@ bool AP_Arming_Copter::rc_calibration_checks(bool display_failure)
 // performs pre_arm gps related checks and returns true if passed
 bool AP_Arming_Copter::gps_checks(bool display_failure)
 {
-    // check if fence requires GPS
-    bool fence_requires_gps = false;
-#if AP_FENCE_ENABLED
-    // if circular or polygon fence is enabled we need GPS
-    fence_requires_gps = (copter.fence.get_enabled_fences() & (AC_FENCE_TYPE_CIRCLE | AC_FENCE_TYPE_POLYGON)) > 0;
-#endif
 
     // check if flight mode requires GPS
-    bool mode_requires_gps = copter.flightmode->requires_GPS() || fence_requires_gps;
+    bool mode_requires_gps = copter.flightmode->requires_GPS();
 
     // call parent gps checks
     if (mode_requires_gps) {
@@ -370,23 +364,10 @@ bool AP_Arming_Copter::mandatory_gps_checks(bool display_failure)
         return false;
     }
 
-    // check if fence requires GPS
-    bool fence_requires_gps = false;
-#if AP_FENCE_ENABLED
-    // if circular or polygon fence is enabled we need GPS
-    fence_requires_gps = (copter.fence.get_enabled_fences() & (AC_FENCE_TYPE_CIRCLE | AC_FENCE_TYPE_POLYGON)) > 0;
-#endif
-
     if (mode_requires_gps || require_location == RequireLocation::YES) {
         if (!copter.position_ok()) {
             // vehicle level position estimate checks
             check_failed(display_failure, "Need Position Estimate");
-            return false;
-        }
-    } else if (fence_requires_gps) {
-        if (!copter.position_ok()) {
-            // clarify to user why they need GPS in non-GPS flight mode
-            check_failed(display_failure, "Fence enabled, need position estimate");
             return false;
         }
     } else {

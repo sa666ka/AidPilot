@@ -126,13 +126,7 @@
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
 #include <AC_CustomControl/AC_CustomControl.h>                  // Custom control library
 #endif
-/*
 
-#if AP_OAPATHPLANNER_ENABLED && !AP_FENCE_ENABLED
-  #error AP_OAPathPlanner relies on AP_FENCE_ENABLED which is disabled
-#endif
-
-*/
 
 
 // Local modules
@@ -696,24 +690,6 @@ private:
     void failsafe_enable();
     void failsafe_disable();
 
-
-    // fence.cpp
-#if AP_FENCE_ENABLED
-    void fence_check();
-    void fence_checks_async() override;
-#endif
-/*
-    // heli.cpp
-    void heli_init();
-    void check_dynamic_flight(void);
-    bool should_use_landing_swash() const;
-    void update_heli_control_dynamics(void);
-    void heli_update_landing_swash();
-    float get_pilot_desired_rotor_speed() const;
-    void heli_update_rotor_speed_targets();
-    void heli_update_autorotation();
-    void update_collective_low_flag(int16_t throttle_control);
-*/
     // inertia.cpp
     void read_inertia();
 
