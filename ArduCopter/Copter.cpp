@@ -151,7 +151,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
 
     SCHED_TASK(update_altitude,       10,    100,  42),
-    SCHED_TASK(run_nav_updates,       50,    100,  45),
     SCHED_TASK(update_throttle_hover,100,     90,  48),
 
 
@@ -428,69 +427,6 @@ void Copter::one_hz_loop()
 #endif
 }
 
-void Copter::init_simple_bearing()
-{
-    // capture current cos_yaw and sin_yaw values
-    simple_cos_yaw = ahrs.cos_yaw();
-    simple_sin_yaw = ahrs.sin_yaw();
-
-    // initialise super simple heading (i.e. heading towards home) to be 180 deg from simple mode heading
-    super_simple_last_bearing_rad = wrap_2PI(ahrs.get_yaw_rad() + radians(180.0));
-    super_simple_cos_yaw = simple_cos_yaw;
-    super_simple_sin_yaw = simple_sin_yaw;
-
-#if HAL_LOGGING_ENABLED
-    // log the simple bearing
-    if (should_log(MASK_LOG_ANY)) {
-        Log_Write_Data(LogDataID::INIT_SIMPLE_BEARING, ahrs.yaw_sensor);
-    }
-#endif
-}
-
-// update_simple_mode - rotates pilot input if we are in simple mode
-void Copter::update_simple_mode(void)
-{
-    float rollx, pitchx;
-
-    // exit immediately if no new radio frame or not in simple mode
-    if (!ap.new_radio_frame) {
-        return;
-    }
-
-    // mark radio frame as consumed
-    ap.new_radio_frame = false;
-
-    // avoid processing bind-time RC values:
-    if (!rc().has_valid_input()) {
-        return;
-    }
-    // rotate roll, pitch input by -super simple heading (reverse of heading to home)
-    rollx = channel_roll->get_control_in()*super_simple_cos_yaw - channel_pitch->get_control_in()*super_simple_sin_yaw;
-    pitchx = channel_roll->get_control_in()*super_simple_sin_yaw + channel_pitch->get_control_in()*super_simple_cos_yaw;
-
-    // rotate roll, pitch input from north facing to vehicle's perspective
-    channel_roll->set_control_in(rollx*ahrs.cos_yaw() + pitchx*ahrs.sin_yaw());
-    channel_pitch->set_control_in(-rollx*ahrs.sin_yaw() + pitchx*ahrs.cos_yaw());
-}
-
-// update_super_simple_bearing - adjusts simple bearing based on location
-// should be called after home_bearing_rad has been updated
-void Copter::update_super_simple_bearing(bool force_update)
-{
-
-    const float bearing_rad = home_bearing_rad();
-
-    // check the bearing to home has changed by at least 5 degrees
-    // todo: consider updating this continuously
-    if (fabsf(wrap_PI(super_simple_last_bearing_rad - bearing_rad)) < radians(5.0)) {
-        return;
-    }
-
-    super_simple_last_bearing_rad = bearing_rad;
-    const float angle_rad = super_simple_last_bearing_rad + radians(180.0);
-    super_simple_cos_yaw = cosf(angle_rad);
-    super_simple_sin_yaw = sinf(angle_rad);
-}
 
 void Copter::read_AHRS(void)
 {
@@ -564,8 +500,6 @@ Copter::Copter(void)
     pos_variance_filt(FS_EKF_FILT_DEFAULT),
     vel_variance_filt(FS_EKF_FILT_DEFAULT),
     flightmode(&mode_stabilize),
-    simple_cos_yaw(1.0f),
-    super_simple_cos_yaw(1.0),
     land_accel_ef_filter(LAND_DETECTOR_ACCEL_LPF_CUTOFF),
     rc_throttle_control_in_filter(1.0f),
     param_loader(var_info)

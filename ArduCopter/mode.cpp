@@ -479,8 +479,7 @@ void Mode::land_run_horizontal_control()
         }
 
         if (g.land_repositioning) {
-            // apply SIMPLE mode transform to pilot inputs
-            update_simple_mode();
+
 
             // convert pilot input to reposition velocity
             // use half maximum acceleration as the maximum velocity to ensure aircraft will
@@ -643,10 +642,6 @@ float Mode::get_pilot_desired_climb_rate_ms() const
 float Mode::get_non_takeoff_throttle() const
 {
     return copter.get_non_takeoff_throttle();
-}
-
-void Mode::update_simple_mode(void) {
-    copter.update_simple_mode();
 }
 
 bool Mode::set_mode(Mode::Number mode, ModeReason reason)

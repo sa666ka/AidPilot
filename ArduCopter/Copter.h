@@ -303,11 +303,6 @@ private:
     float _home_bearing_rad;
     float _home_distance_m;
 
-    float simple_cos_yaw;
-    float simple_sin_yaw;
-    float super_simple_last_bearing_rad;
-    float super_simple_cos_yaw;
-    float super_simple_sin_yaw;
 
     // Stores initial bearing when armed - initial simple bearing is modified in super simple mode so not suitable
     float initial_armed_bearing_rad;
@@ -455,9 +450,6 @@ private:
     void twentyfive_hz_logging();
     void three_hz_loop();
     void one_hz_loop();
-    void init_simple_bearing();
-    void update_simple_mode(void);
-    void update_super_simple_bearing(bool force_update);
     void read_AHRS(void);
     void update_altitude();
     bool get_wp_distance_m(float &distance) const override;
@@ -630,7 +622,6 @@ private:
     void lost_vehicle_check();
 
     // navigation.cpp
-    void run_nav_updates(void);
     float home_bearing_rad();
     float home_distance_m();
 

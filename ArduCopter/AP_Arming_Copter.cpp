@@ -538,8 +538,6 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
 
     // Remember Orientation
     // --------------------
-    copter.init_simple_bearing();
-
     auto &ahrs = AP::ahrs();
 
     copter.initial_armed_bearing_rad = ahrs.get_yaw_rad();
