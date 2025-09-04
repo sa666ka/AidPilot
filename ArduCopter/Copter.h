@@ -68,11 +68,6 @@
 #include "GCS_Copter.h"
 #include "AP_Arming_Copter.h"
 
-#include <AP_ExternalControl/AP_ExternalControl_config.h>
-#if AP_EXTERNAL_CONTROL_ENABLED
-#include "AP_ExternalControl_Copter.h"
-#endif
-
 
 
 #if AP_RANGEFINDER_ENABLED
@@ -104,9 +99,6 @@ public:
 
     friend class AP_Arming_Copter;
  
-#if AP_EXTERNAL_CONTROL_ENABLED
-    friend class AP_ExternalControl_Copter;
-#endif
 
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
@@ -201,11 +193,6 @@ private:
     // Arming/Disarming management class
     AP_Arming_Copter arming;
 
- 
-    // external control library
-#if AP_EXTERNAL_CONTROL_ENABLED
-    AP_ExternalControl_Copter external_control;
-#endif
  
 
     // system time in milliseconds of last recorded yaw reset from ekf
@@ -457,12 +444,6 @@ private:
     void get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
                              uint8_t &task_count,
                              uint32_t &log_bit) override;
-#if AP_EXTERNAL_CONTROL_ENABLED
-#if MODE_GUIDED_ENABLED
-    bool set_target_location(const Location& target_loc) override;
-    bool start_takeoff(const float alt_m) override;
-#endif // MODE_GUIDED_ENABLED
-#endif // AP_EXTERNAL_CONTROL_ENABLED
 
     bool is_landing() const override;
     bool is_taking_off() const override;

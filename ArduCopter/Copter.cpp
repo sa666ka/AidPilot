@@ -209,36 +209,6 @@ void Copter::get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
 constexpr int8_t Copter::_failsafe_priorities[7];
 
 
-#if AP_EXTERNAL_CONTROL_ENABLED
-#if MODE_GUIDED_ENABLED
-// set target location (for use by external control and scripting)
-bool Copter::set_target_location(const Location& target_loc)
-{
-    // exit if vehicle is not in Guided mode or Auto-Guided mode
-    if (!flightmode->in_guided_mode()) {
-        return false;
-    }
-
-    return mode_guided.set_destination(target_loc);
-}
-
-// start takeoff to given altitude (for use by scripting)
-bool Copter::start_takeoff(const float alt_m)
-{
-    // exit if vehicle is not in Guided mode or Auto-Guided mode
-    if (!flightmode->in_guided_mode()) {
-        return false;
-    }
-
-    if (mode_guided.do_user_takeoff_start_m(alt_m)) {
-        copter.set_auto_armed(true);
-        return true;
-    }
-    return false;
-}
-#endif // MODE_GUIDED_ENABLED
-#endif // AP_EXTERNAL_CONTROL_ENABLED
-
 // returns true if vehicle is landing.
 bool Copter::is_landing() const
 {

@@ -411,9 +411,6 @@ private:
 class ModeGuided : public Mode {
 
 public:
-#if AP_EXTERNAL_CONTROL_ENABLED
-    friend class AP_ExternalControl_Copter;
-#endif
 
     // inherit constructor
     using Mode::Mode;
