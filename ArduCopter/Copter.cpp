@@ -125,8 +125,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
      // run EKF state estimator (expensive)
     FAST_TASK(read_AHRS),
 
-    // Inertial Nav
-    FAST_TASK(read_inertia),
     // check if ekf has reset target heading or position
     FAST_TASK(check_ekf_reset),
     // run the attitude controllers
