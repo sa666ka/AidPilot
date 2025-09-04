@@ -68,9 +68,7 @@ bool AP_Arming_Copter::run_pre_arm_checks(bool display_failure)
 
     // bitwise & ensures all checks are run
     return parameter_checks(display_failure)
-        & oa_checks(display_failure)
         & gcs_failsafe_check(display_failure)
-        & winch_checks(display_failure)
         & rc_throttle_failsafe_checks(display_failure)
         & alt_checks(display_failure)
         & AP_Arming::pre_arm_checks(display_failure);
@@ -243,10 +241,6 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
     return true;
 }
 
-bool AP_Arming_Copter::oa_checks(bool display_failure)
-{
-    return true;
-}
 
 bool AP_Arming_Copter::rc_calibration_checks(bool display_failure)
 {
@@ -387,11 +381,6 @@ bool AP_Arming_Copter::gcs_failsafe_check(bool display_failure)
     return true;
 }
 
-// check winch
-bool AP_Arming_Copter::winch_checks(bool display_failure) const
-{
-    return true;
-}
 
 // performs altitude checks.  returns true if passed
 bool AP_Arming_Copter::alt_checks(bool display_failure)
