@@ -95,10 +95,6 @@ void Copter::init_ardupilot()
 #endif
 
     startup_INS_ground();
- 
-#if AC_CUSTOMCONTROL_MULTI_ENABLED
-    custom_control.init();
-#endif
 
     // set landed flags
     set_land_complete(true);

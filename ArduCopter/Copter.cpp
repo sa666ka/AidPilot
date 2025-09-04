@@ -116,10 +116,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     // run low level rate controllers that only require IMU data
     FAST_TASK(run_rate_controller_main),
 
-#if AC_CUSTOMCONTROL_MULTI_ENABLED
-    FAST_TASK(run_custom_controller),
-#endif
-
     // send outputs to the motors library immediately
     FAST_TASK(motors_output_main),
      // run EKF state estimator (expensive)
@@ -447,9 +443,6 @@ void Copter::one_hz_loop()
     }
     pos_control->get_accel_U_pid().set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
 
-#if AC_CUSTOMCONTROL_MULTI_ENABLED
-    custom_control.set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
-#endif
 
 #if AP_INERTIALSENSOR_FAST_SAMPLE_WINDOW_ENABLED
     // see if we should have a separate rate thread

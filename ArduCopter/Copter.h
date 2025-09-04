@@ -89,10 +89,6 @@
 
 #include <AP_RPM/AP_RPM.h>
 
-#if AC_CUSTOMCONTROL_MULTI_ENABLED
-#include <AC_CustomControl/AC_CustomControl.h>                  // Custom control library
-#endif
-
 
 
 // Local modules
@@ -356,10 +352,6 @@ private:
     AC_PosControl *pos_control;
     AC_WPNav *wp_nav;
 
-#if AC_CUSTOMCONTROL_MULTI_ENABLED
-    AC_CustomControl custom_control{ahrs_view, attitude_control, motors, scheduler.get_loop_period_s()};
-#endif
-
 
     // System Timers
     // --------------
@@ -518,10 +510,7 @@ private:
     void disable_fast_rate_loop(RateControllerRates& rates);
     void update_dynamic_notch_at_specified_rate_main();
     // endif AP_INERTIALSENSOR_FAST_SAMPLE_WINDOW_ENABLED
- 
-#if AC_CUSTOMCONTROL_MULTI_ENABLED
-    void run_custom_controller() { custom_control.update(); }
-#endif
+
 
     // commands.cpp
     void update_home_from_EKF();

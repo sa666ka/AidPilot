@@ -309,12 +309,6 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             }
             break;
 
-#if AC_CUSTOMCONTROL_MULTI_ENABLED
-        case AUX_FUNC::CUSTOM_CONTROLLER:
-            copter.custom_control.set_custom_controller(ch_flag == AuxSwitchPos::HIGH);
-            break;
-#endif
-
 #if AP_RC_TRANSMITTER_TUNING_ENABLED
     case AUX_FUNC::TRANSMITTER_TUNING:
     case AUX_FUNC::TRANSMITTER_TUNING2:
