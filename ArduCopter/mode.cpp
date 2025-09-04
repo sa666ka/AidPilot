@@ -462,38 +462,6 @@ void Mode::land_run_vertical_control(bool pause_descent)
         // Constrain the demanded vertical velocity so that it is between the configured maximum descent speed and the configured minimum descent speed.
         climb_rate_ms = constrain_float(climb_rate_ms, max_land_descent_vel_d_ms, -abs(g.land_speed_cms) * 0.01);
 
-#if AC_PRECLAND_ENABLED
-        const bool navigating = pos_control->is_active_NE();
-        bool doing_precision_landing = !copter.ap.land_repo_active && copter.precland.target_acquired() && navigating;
-
-        if (doing_precision_landing) {
-            // prec landing is active
-            Vector2f target_pos_ne_m;
-            float target_error_m = 0.0f;
-            if (copter.precland.get_target_position_m(target_pos_ne_m)) {
-                const Vector2f current_pos_ne_m = pos_control->get_pos_estimate_NEU_m().xy().tofloat();
-                // target is this many m away from the vehicle
-                target_error_m = (target_pos_ne_m - current_pos_ne_m).length();
-            }
-            // check if we should descend or not
-            const float max_horiz_pos_error_m = copter.precland.get_max_xy_error_before_descending_m();
-            Vector3f target_pos_meas_ned_m;
-            copter.precland.get_target_position_measurement_m(target_pos_meas_ned_m);
-            if (target_error_m > max_horiz_pos_error_m && !is_zero(max_horiz_pos_error_m)) {
-                // doing precland but too far away from the obstacle
-                // do not descend
-                climb_rate_ms = 0.0f;
-            } else if (target_pos_meas_ned_m.z > 0.35 && target_pos_meas_ned_m.z < 2.0 && !copter.precland.do_fast_descend()) {
-                // very close to the ground and doing prec land, lets slow down to make sure we land on target
-                // compute desired descent velocity
-                const float precland_acceptable_error_m = 0.15;
-                const float precland_min_descent_speed_ms = 0.1;
-                const float max_descent_speed_ms = abs(g.land_speed_cms) * 0.005;
-                const float land_slowdown_ms = MAX(0.0f, target_error_m * (max_descent_speed_ms / precland_acceptable_error_m));
-                climb_rate_ms = MIN(-precland_min_descent_speed_ms, -max_descent_speed_ms + land_slowdown_ms);
-            }
-        }
-#endif
     }
 
     // update altitude target and call position controller
@@ -536,41 +504,10 @@ void Mode::land_run_horizontal_control()
                     LOGGER_WRITE_EVENT(LogEvent::LAND_REPO_ACTIVE);
                 }
                 copter.ap.land_repo_active = true;
-#if AC_PRECLAND_ENABLED
-            } else {
-                // no override right now, check if we should allow precland
-                if (copter.precland.allow_precland_after_reposition()) {
-                    copter.ap.land_repo_active = false;
-                }
-#endif
             }
         }
     }
 
-    // this variable will be updated if prec land target is in sight and pilot isn't trying to reposition the vehicle
-    copter.ap.prec_land_active = false;
-#if AC_PRECLAND_ENABLED
-    copter.ap.prec_land_active = !copter.ap.land_repo_active && copter.precland.target_acquired();
-    // run precision landing
-    if (copter.ap.prec_land_active) {
-        Vector2f target_pos_ne_m, target_vel_ne_ms;
-        if (!copter.precland.get_target_position_m(target_pos_ne_m)) {
-            target_pos_ne_m = pos_control->get_pos_estimate_NEU_m().xy().tofloat();
-        }
-         // get the velocity of the target
-        copter.precland.get_target_velocity_ms(pos_control->get_vel_estimate_NEU_ms().xy(), target_vel_ne_ms);
-
-        Vector2f accel_zero;
-        Vector2p landing_pos_ne_m = target_pos_ne_m.topostype();
-        // target vel will remain zero if landing target is stationary
-        pos_control->input_pos_vel_accel_NE_m(landing_pos_ne_m, target_vel_ne_ms, accel_zero);
-    }
-#endif
-
-    if (!copter.ap.prec_land_active) {
-        Vector2f accel;
-        pos_control->input_vel_accel_NE_m(vel_correction_ms, accel);
-    }
 
     // run pos controller
     pos_control->update_NE_controller();
@@ -585,110 +522,10 @@ void Mode::land_run_horizontal_control()
 // pause_descent is true if vehicle should not descend
 void Mode::land_run_normal_or_precland(bool pause_descent)
 {
-#if AC_PRECLAND_ENABLED
-    if (pause_descent || !copter.precland.enabled()) {
-        // we don't want to start descending immediately or prec land is disabled
-        // in both cases just run simple land controllers
-        land_run_horiz_and_vert_control(pause_descent);
-    } else {
-        // prec land is enabled and we have not paused descent
-        // the state machine takes care of the entire prec landing procedure
-        precland_run();
-    }
-#else
     land_run_horiz_and_vert_control(pause_descent);
-#endif
+
 }
 
-#if AC_PRECLAND_ENABLED
-// Go towards a position commanded by prec land state machine in order to retry landing
-// The passed in location is expected to be NED and in m
-void Mode::precland_retry_position(const Vector3f &retry_pos_ned_m)
-{
-    if (rc().has_valid_input()) {
-        if ((g.throttle_behavior & THR_BEHAVE_HIGH_THROTTLE_CANCELS_LAND) != 0 && copter.rc_throttle_control_in_filter.get() > LAND_CANCEL_TRIGGER_THR){
-            LOGGER_WRITE_EVENT(LogEvent::LAND_CANCELLED_BY_PILOT);
-            // exit land if throttle is high
-            if (!set_mode(Mode::Number::LOITER, ModeReason::THROTTLE_LAND_ESCAPE)) {
-                set_mode(Mode::Number::ALT_HOLD, ModeReason::THROTTLE_LAND_ESCAPE);
-            }
-        }
-
-        // allow user to take control during repositioning. Note: copied from land_run_horizontal_control()
-        // To-Do: this code exists at several different places in slightly different forms and that should be fixed
-        if (g.land_repositioning) {
-            float target_roll_rad = 0.0f;
-            float target_pitch_rad = 0.0f;
-            // convert pilot input to lean angles
-            get_pilot_desired_lean_angles_rad(target_roll_rad, target_pitch_rad, loiter_nav->get_angle_max_rad(), attitude_control->get_althold_lean_angle_max_rad());
-
-            // record if pilot has overridden roll or pitch
-            if (!is_zero(target_roll_rad) || !is_zero(target_pitch_rad)) {
-                if (!copter.ap.land_repo_active) {
-                    LOGGER_WRITE_EVENT(LogEvent::LAND_REPO_ACTIVE);
-                }
-                // this flag will be checked by prec land state machine later and any further landing retires will be cancelled
-                copter.ap.land_repo_active = true;
-            }
-        }
-    }
-
-    Vector3p retry_pos_neu_m{retry_pos_ned_m.x, retry_pos_ned_m.y, -retry_pos_ned_m.z};
-    pos_control->input_pos_NEU_m(retry_pos_neu_m, 0.0f, 10.0);
-
-    // run position controllers
-    pos_control->update_NE_controller();
-    pos_control->update_U_controller();
-
-    // call attitude controller
-    attitude_control->input_thrust_vector_heading(pos_control->get_thrust_vector(), auto_yaw.get_heading());
-}
-
-// Run precland statemachine. This function should be called from any mode that wants to do precision landing.
-// This handles everything from prec landing, to prec landing failures, to retries and failsafe measures
-void Mode::precland_run()
-{
-    // if user is taking control, we will not run the statemachine, and simply land (may or may not be on target)
-    if (!copter.ap.land_repo_active) {
-        // This will get updated later to a retry pos if needed
-        Vector3f retry_pos_ned_m;
-
-        switch (copter.precland_statemachine.update(retry_pos_ned_m)) {
-        case AC_PrecLand_StateMachine::Status::RETRYING:
-            // we want to retry landing by going to another position
-            precland_retry_position(retry_pos_ned_m);
-            break;
-
-        case AC_PrecLand_StateMachine::Status::FAILSAFE: {
-            // we have hit a failsafe. Failsafe can only mean two things, we either want to stop permanently till user takes over or land
-            switch (copter.precland_statemachine.get_failsafe_actions()) {
-            case AC_PrecLand_StateMachine::FailSafeAction::DESCEND:
-                // descend normally, prec land target is definitely not in sight
-                land_run_horiz_and_vert_control();
-                break;
-            case AC_PrecLand_StateMachine::FailSafeAction::HOLD_POS:
-                // sending "true" in this argument will stop the descend
-                land_run_horiz_and_vert_control(true);
-                break;
-            }
-            break;
-        }
-        case AC_PrecLand_StateMachine::Status::ERROR:
-            // should never happen, is certainly a bug. Report then descend
-            INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
-            FALLTHROUGH;
-        case AC_PrecLand_StateMachine::Status::DESCEND:
-            // run land controller. This will descend towards the target if prec land target is in sight
-            // else it will just descend vertically
-            land_run_horiz_and_vert_control();
-            break;
-        }
-    } else {
-        // just land, since user has taken over controls, it does not make sense to run any retries or failsafe measures
-        land_run_horiz_and_vert_control();
-    }
-}
-#endif
 
 float Mode::throttle_hover() const
 {

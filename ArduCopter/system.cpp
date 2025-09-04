@@ -91,12 +91,6 @@ void Copter::init_ardupilot()
 
     attitude_control->parameter_sanity_check();
 
-/*
-#if AC_PRECLAND_ENABLED
-    // initialise precision landing
-    init_precland();
-#endif
-*/
 #if AP_LANDINGGEAR_ENABLED
     // initialise landing gear position
     landinggear.init();

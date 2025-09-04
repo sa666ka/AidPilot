@@ -96,10 +96,6 @@
  #include <AC_Avoidance/AP_OAPathPlanner.h>
 #endif
 
-#if AC_PRECLAND_ENABLED
- # include <AC_PrecLand/AC_PrecLand.h>
- # include <AC_PrecLand/AC_PrecLand_StateMachine.h>
-#endif
 
 #if AP_RANGEFINDER_ENABLED
  # include <AP_RangeFinder/AP_RangeFinder.h>
@@ -416,12 +412,6 @@ private:
     AP_LandingGear landinggear;
 #endif
 
-
-    // Precision Landing
-#if AC_PRECLAND_ENABLED
-    AC_PrecLand precland;
-    AC_PrecLand_StateMachine precland_statemachine;
-#endif
 
 
     // last valid RC input time

@@ -41,10 +41,6 @@ bool ModeLand::init(bool ignore_checks)
     copter.landinggear.deploy_for_landing();
 #endif
 
-#if AC_PRECLAND_ENABLED
-    // initialise precland state machine
-    copter.precland_statemachine.init();
-#endif
 
     return true;
 }
