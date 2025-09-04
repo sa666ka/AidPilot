@@ -300,9 +300,6 @@ private:
     MOTOR_CLASS *motors;
     const struct AP_Param::GroupInfo *motors_var_info;
 
-    float _home_bearing_rad;
-    float _home_distance_m;
-
 
     // Stores initial bearing when armed - initial simple bearing is modified in super simple mode so not suitable
     float initial_armed_bearing_rad;
@@ -620,10 +617,6 @@ private:
     void motors_output(bool full_push = true);
     void motors_output_main();
     void lost_vehicle_check();
-
-    // navigation.cpp
-    float home_bearing_rad();
-    float home_distance_m();
 
     // Parameters.cpp
     void load_parameters(void) override;
