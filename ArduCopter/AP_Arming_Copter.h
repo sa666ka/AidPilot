@@ -6,7 +6,6 @@ class AP_Arming_Copter : public AP_Arming
 {
 public:
     friend class Copter;
-    friend class ToyMode;
 
     AP_Arming_Copter() : AP_Arming()
     {

@@ -43,15 +43,12 @@
 #include <AP_Mission/AP_Mission_ChangeDetector.h>               // Mission command change detection library
 #include <AC_AttitudeControl/AC_AttitudeControl_Multi.h>        // Attitude control library
 #include <AC_AttitudeControl/AC_AttitudeControl_Multi_6DoF.h>   // 6DoF Attitude control library
-#include <AC_AttitudeControl/AC_AttitudeControl_Heli.h>         // Attitude control library for traditional helicopter
 #include <AC_AttitudeControl/AC_PosControl.h>                   // Position control library
 #include <AC_AttitudeControl/AC_CommandModel.h>                 // Command model library
 #include <AP_Motors/AP_Motors.h>            // AP Motors library
 #include <Filter/Filter.h>                  // Filter library
 #include <AP_Vehicle/AP_Vehicle.h>          // needed for AHRS build
 #include <AC_WPNav/AC_WPNav.h>              // ArduCopter waypoint navigation library
-#include <AC_WPNav/AC_Loiter.h>             // ArduCopter Loiter Mode Library
-#include <AC_WPNav/AC_Circle.h>             // circle navigation library
 #include <AP_Declination/AP_Declination.h>  // ArduPilot Mega Declination Helper Library
 #include <AP_RCMapper/AP_RCMapper.h>        // RC input mapping library
 #include <AP_BattMonitor/AP_BattMonitor.h>  // Battery monitor library
@@ -108,15 +105,13 @@ public:
     friend class GCS_Copter;
     friend class Parameters;
     friend class ParametersG2;
-    friend class AP_Avoidance_Copter;
 
     friend class AP_Arming_Copter;
  
 #if AP_EXTERNAL_CONTROL_ENABLED
     friend class AP_ExternalControl_Copter;
 #endif
-  
-    // friend class ToyMode;
+
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
 
@@ -223,7 +218,7 @@ private:
 
     // vibration check
     struct {
-        bool high_vibes;    // true while high vibration are detected
+        bool high_vibes = false;    // true while high vibration are detected
         uint32_t start_ms;  // system time high vibration were last detected
         uint32_t clear_ms;  // system time high vibrations stopped
     } vibration_check;
@@ -233,7 +228,6 @@ private:
     LowPassFilterFloat pos_variance_filt;
     LowPassFilterFloat vel_variance_filt;
     bool variances_valid;
-    uint32_t last_ekf_check_us;
 
     // takeoff check
     uint32_t takeoff_check_warning_ms;  // system time user was last warned of takeoff check failure
@@ -361,7 +355,6 @@ private:
     const struct AP_Param::GroupInfo *attitude_control_var_info;
     AC_PosControl *pos_control;
     AC_WPNav *wp_nav;
-    AC_Loiter *loiter_nav;
 
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
     AC_CustomControl custom_control{ahrs_view, attitude_control, motors, scheduler.get_loop_period_s()};
@@ -542,15 +535,6 @@ private:
     LowPassFilterFloat yaw_I_filt{0.05f};
     uint32_t last_yaw_warn_ms;
 
-    // ekf_check.cpp
-    void ekf_check();
-    bool ekf_over_threshold();
-    void failsafe_ekf_event();
-    void failsafe_ekf_off_event(void);
-    void failsafe_ekf_recheck();
-    void check_ekf_reset();
-    void check_vibration();
-
     // esc_calibration.cpp
     void esc_calibration_startup_check();
     void esc_calibration_passthrough();
@@ -637,7 +621,6 @@ private:
     void Log_Write_Data(LogDataID id, uint16_t value);
     void Log_Write_Data(LogDataID id, float value);
     void Log_Write_PTUN(uint8_t param, float tuning_val, float tune_min, float tune_max, float norm_in);
-    void Log_Video_Stabilisation();
     void Log_Write_Guided_Position_Target(ModeGuided::SubMode submode, const Vector3f& pos_target_m, bool is_terrain_alt, const Vector3f& vel_target_ms, const Vector3f& accel_target_mss);
     void Log_Write_Guided_Attitude_Target(ModeGuided::SubMode submode, float roll, float pitch, float yaw, const Vector3f &ang_vel, float thrust, float climb_rate);
     void Log_Write_SysID_Setup(uint8_t systemID_axis, float waveform_magnitude, float frequency_start, float frequency_stop, float time_fade_in, float time_const_freq, float time_record, float time_fade_out);

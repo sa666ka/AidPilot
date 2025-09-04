@@ -181,10 +181,6 @@ void Copter::tuning(const RC_Channel *tuning_ch, int8_t tuning_param, float tuni
     case TUNING_POS_CONTROL_ANGLE_MAX:
         pos_control->set_lean_angle_max_deg(tuning_value);
         break;
-
-    case TUNING_LOITER_MAX_XY_SPEED:
-        loiter_nav->set_speed_max_NE_cms(tuning_value);
-        break;
     }
 }
 

@@ -234,13 +234,6 @@ void Copter::Log_Write_PTUN(uint8_t param, float tuning_val, float tune_min, flo
     logger.WriteBlock(&pkt_tune, sizeof(pkt_tune));
 }
 
-void Copter::Log_Video_Stabilisation()
-{
-    if (!should_log(MASK_LOG_VIDEO_STABILISATION)) {
-        return;
-    }
-    ahrs.write_video_stabilisation();
-}
 
 struct PACKED log_SysIdD {
     LOG_PACKET_HEADER;

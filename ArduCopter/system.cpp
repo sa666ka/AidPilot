@@ -353,13 +353,6 @@ void Copter::allocate_motors(void)
     }
     AP_Param::load_object_from_eeprom(wp_nav, wp_nav->var_info);
 
-    loiter_nav = NEW_NOTHROW AC_Loiter(*ahrs_view, *pos_control, *attitude_control);
-    if (loiter_nav == nullptr) {
-        AP_BoardConfig::allocation_error("LoiterNav");
-    }
-    AP_Param::load_object_from_eeprom(loiter_nav, loiter_nav->var_info);
-
-
     // reload lines from the defaults file that may now be accessible
     AP_Param::reload_defaults_file(true);
     

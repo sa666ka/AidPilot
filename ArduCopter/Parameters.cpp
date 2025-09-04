@@ -323,11 +323,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AC_WPNav/AC_WPNav.cpp
     GOBJECTPTR(wp_nav, "WPNAV_",       AC_WPNav),
 
-    // @Group: LOIT_
-    // @Path: ../libraries/AC_WPNav/AC_Loiter.cpp
-    GOBJECTPTR(loiter_nav, "LOIT_", AC_Loiter),
-
-
     // @Group: ATC_
     // @Path: ../libraries/AC_AttitudeControl/AC_AttitudeControl.cpp,../libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp,../libraries/AC_AttitudeControl/AC_AttitudeControl_Heli.cpp
     GOBJECTVARPTR(attitude_control, "ATC_", &copter.attitude_control_var_info),
