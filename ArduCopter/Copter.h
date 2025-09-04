@@ -488,8 +488,6 @@ private:
     bool set_home_to_current_location(bool lock) override WARN_IF_UNUSED;
     bool set_home(const Location& loc, bool lock) override WARN_IF_UNUSED;
 
-    // compassmot.cpp
-    MAV_RESULT mavlink_compassmot(const GCS_MAVLINK &gcs_chan);
 
     LowPassFilterFloat yaw_I_filt{0.05f};
     uint32_t last_yaw_warn_ms;

@@ -372,10 +372,6 @@ void GCS_MAVLINK_Copter::handle_landing_target(const mavlink_landing_target_t &p
 
 MAV_RESULT GCS_MAVLINK_Copter::_handle_command_preflight_calibration(const mavlink_command_int_t &packet, const mavlink_message_t &msg)
 {
-    if (packet.y == 1) {
-        // compassmot calibration
-        return copter.mavlink_compassmot(*this);
-    }
 
     return GCS_MAVLINK::_handle_command_preflight_calibration(packet, msg);
 }
