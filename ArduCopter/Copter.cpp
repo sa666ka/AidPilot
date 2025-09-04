@@ -138,15 +138,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     // surface tracking update
     FAST_TASK(update_rangefinder_terrain_offset),
 
-#if HAL_MOUNT_ENABLED
-    // camera mount's fast update
-    FAST_TASK_CLASS(AP_Mount, &copter.camera_mount, update_fast),
-#endif
-/*
-#if HAL_LOGGING_ENABLED
-    FAST_TASK(Log_Video_Stabilisation),
-#endif
-*/
     SCHED_TASK(rc_loop,              250,    130,  3),
     SCHED_TASK(throttle_loop,         50,     75,  6),
 
@@ -203,12 +194,6 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_receive, 400, 180, 102),
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_send,    400, 550, 105),
 
-#if HAL_MOUNT_ENABLED
-    SCHED_TASK_CLASS(AP_Mount,             &copter.camera_mount,        update,          50,  75, 108),
-#endif
-#if AP_CAMERA_ENABLED
-    SCHED_TASK_CLASS(AP_Camera,            &copter.camera,              update,          50,  75, 111),
-#endif
 /*
 #if HAL_LOGGING_ENABLED
     SCHED_TASK(ten_hz_logging_loop,   10,    350, 114),
@@ -606,11 +591,6 @@ void Copter::ten_hz_logging_loop()
 
     }
 
-#if HAL_MOUNT_ENABLED
-    if (should_log(MASK_LOG_CAMERA)) {
-        camera_mount.write_log();
-    }
-#endif
 }
 
 // twentyfive_hz_logging - should be run at 25hz
@@ -649,8 +629,6 @@ void Copter::three_hz_loop()
     tuning();
 #endif  // AP_RC_TRANSMITTER_TUNING_ENABLED
 
-    // check if avoidance should be enabled based on alt
-    low_alt_avoidance();
 }
 
 // ap_value calculates a 32-bit bitmask representing various pieces of

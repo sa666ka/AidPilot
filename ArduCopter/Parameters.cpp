@@ -309,16 +309,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @User: Advanced
     GSCALAR(rc_speed, "RC_SPEED",              RC_FAST_SPEED),
 
-    // ACRO_RP_EXPO moved to Command Model class
-
-
-    // variables not in the g class which contain EEPROM saved variables
-
-#if AP_CAMERA_ENABLED
-    // @Group: CAM
-    // @Path: ../libraries/AP_Camera/AP_Camera.cpp
-    GOBJECT(camera, "CAM", AP_Camera),
-#endif
 
 #if AP_RELAY_ENABLED
     // @Group: RELAY
@@ -369,12 +359,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Group: AHRS_
     // @Path: ../libraries/AP_AHRS/AP_AHRS.cpp
     GOBJECT(ahrs,                   "AHRS_",    AP_AHRS),
-
-#if HAL_MOUNT_ENABLED
-    // @Group: MNT
-    // @Path: ../libraries/AP_Mount/AP_Mount.cpp
-    GOBJECT(camera_mount,           "MNT",  AP_Mount),
-#endif
 
     // @Group: BATT
     // @Path: ../libraries/AP_BattMonitor/AP_BattMonitor.cpp

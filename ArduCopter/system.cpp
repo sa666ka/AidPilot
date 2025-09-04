@@ -90,21 +90,7 @@ void Copter::init_ardupilot()
 #endif
 
     attitude_control->parameter_sanity_check();
-/* 
-#if AP_OPTICALFLOW_ENABLED
-    // initialise optical flow sensor
-    optflow.init(MASK_LOG_OPTFLOW);
-#endif      // AP_OPTICALFLOW_ENABLED
-*/
-#if HAL_MOUNT_ENABLED
-    // initialise camera mount
-    camera_mount.init();
-#endif
 
-#if AP_CAMERA_ENABLED
-    // initialise camera
-    camera.init();
-#endif
 /*
 #if AC_PRECLAND_ENABLED
     // initialise precision landing

@@ -224,10 +224,6 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
     gcs().send_message(MSG_HEARTBEAT);
 
 
-#if AP_CAMERA_ENABLED
-    camera.set_is_auto_mode(flightmode->mode_number() == Mode::Number::AUTO);
-#endif
-
     // set rate shaping time constants
 
     attitude_control->set_yaw_rate_tc(g2.command_model_pilot_y.get_rate_tc());

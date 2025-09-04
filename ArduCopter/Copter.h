@@ -105,10 +105,6 @@
  # include <AP_RangeFinder/AP_RangeFinder.h>
 #endif
 
-#include <AP_Mount/AP_Mount.h>
-
-#include <AP_Camera/AP_Camera.h>
-
 #if HAL_BUTTON_ENABLED
  # include <AP_Button/AP_Button.h>
 #endif
@@ -410,16 +406,6 @@ private:
     // arm_time_ms - Records when vehicle was armed. Will be Zero if we are disarmed.
     uint32_t arm_time_ms;
 
-    // Camera
-#if AP_CAMERA_ENABLED
-    AP_Camera camera{MASK_LOG_CAMERA};
-#endif
-
-    // Camera/Antenna mount tracking and stabilisation stuff
-#if HAL_MOUNT_ENABLED
-    AP_Mount camera_mount;
-#endif
-
     // Parachute release
 #if HAL_PARACHUTE_ENABLED
     AP_Parachute parachute;
@@ -621,9 +607,6 @@ private:
 #if AC_CUSTOMCONTROL_MULTI_ENABLED
     void run_custom_controller() { custom_control.update(); }
 #endif
-
-    // avoidance.cpp
-    void low_alt_avoidance();
 
     // baro_ground_effect.cpp
     void update_ground_effect_detector(void);
