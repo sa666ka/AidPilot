@@ -316,16 +316,6 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
 
     case MSG_ADSB_VEHICLE: {
 
-#if AP_OAPATHPLANNER_ENABLED
-        AP_OADatabase *oadb = AP_OADatabase::get_singleton();
-        if (oadb != nullptr) {
-            CHECK_PAYLOAD_SIZE(ADSB_VEHICLE);
-            uint16_t interval_ms = 0;
-            if (get_ap_message_interval(id, interval_ms)) {
-                oadb->send_adsb_vehicle(chan, interval_ms);
-            }
-        }
-#endif
         break;
     }
 

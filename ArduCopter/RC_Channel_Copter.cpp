@@ -233,15 +233,6 @@ bool RC_Channel_Copter::do_aux_function(const AuxFuncTrigger &trigger)
             break;
 
 
-/*
-#if MODE_FLOWHOLD_ENABLED
-        case AUX_FUNC::FLOWHOLD:
-            do_aux_function_change_mode(Mode::Number::FLOWHOLD, ch_flag);
-            break;
-#endif
-*/
-
-
         case AUX_FUNC::STANDBY: {
             switch (ch_flag) {
                 case AuxSwitchPos::HIGH:

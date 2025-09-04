@@ -85,9 +85,6 @@ void Copter::init_ardupilot()
     airspeed.set_log_bit(MASK_LOG_IMU);
 #endif
 
-#if AP_OAPATHPLANNER_ENABLED
-    g2.oa.init();
-#endif
 
     attitude_control->parameter_sanity_check();
 
@@ -370,11 +367,8 @@ void Copter::allocate_motors(void)
     }
     AP_Param::load_object_from_eeprom(pos_control, pos_control->var_info);
 
-#if AP_OAPATHPLANNER_ENABLED
-    wp_nav = NEW_NOTHROW AC_WPNav_OA(*ahrs_view, *pos_control, *attitude_control);
-#else
     wp_nav = NEW_NOTHROW AC_WPNav(*ahrs_view, *pos_control, *attitude_control);
-#endif
+
     if (wp_nav == nullptr) {
         AP_BoardConfig::allocation_error("WPNav");
     }

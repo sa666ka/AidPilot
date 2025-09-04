@@ -548,13 +548,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Increment: 10
     // @User: Advanced
     AP_GROUPINFO("LAND_ALT_LOW", 25, ParametersG2, land_alt_low_cm, 1000),
-/*
-#if MODE_FLOWHOLD_ENABLED
-    // @Group: FHLD
-    // @Path: mode_flowhold.cpp
-    AP_SUBGROUPPTR(mode_flowhold_ptr, "FHLD", 26, ParametersG2, ModeFlowHold),
-#endif
-*/
 
 
 
@@ -574,11 +567,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_GROUPINFO("TUNE_MAX", 32, ParametersG2, rc_tuning_max, 0),
 #endif  // AP_RC_TRANSMITTER_TUNING_ENABLED
 
-#if AP_OAPATHPLANNER_ENABLED
-    // @Group: OA_
-    // @Path: ../libraries/AC_Avoidance/AP_OAPathPlanner.cpp
-    AP_SUBGROUPINFO(oa, "OA_", 33, ParametersG2, AP_OAPathPlanner),
-#endif
 
     // @Param: FS_VIBE_ENABLE
     // @DisplayName: Vibration Failsafe enable

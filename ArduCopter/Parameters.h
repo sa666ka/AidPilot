@@ -501,25 +501,12 @@ public:
 
     // Land alt final stage
     AP_Int16 land_alt_low_cm;
-/*
 
-
-#if MODE_FLOWHOLD_ENABLED
-    // we need a pointer to the mode for the G2 table
-    void *mode_flowhold_ptr;
-#endif
-
-
- */
 #if AP_RC_TRANSMITTER_TUNING_ENABLED
     AP_Float rc_tuning_min;
     AP_Float rc_tuning_max;
 #endif  // AP_RC_TRANSMITTER_TUNING_ENABLED
 
-#if AP_OAPATHPLANNER_ENABLED
-    // object avoidance path planning
-    AP_OAPathPlanner oa;
-#endif
     // vibration failsafe enable/disable
     AP_Int8 fs_vibe_enabled;
 

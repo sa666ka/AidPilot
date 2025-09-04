@@ -59,18 +59,9 @@
 #include <AC_InputManager/AC_InputManager.h>        // Pilot input handling library
 #include <AC_InputManager/AC_InputManager_Heli.h>   // Heli specific pilot input handling library
 #include <AP_Arming/AP_Arming.h>            // ArduPilot motor arming library
-#include <AP_SmartRTL/AP_SmartRTL.h>        // ArduPilot Smart Return To Launch Mode (SRTL) library
 #include <AP_TempCalibration/AP_TempCalibration.h>  // temperature calibration library
-#include <AC_AutoTune/AC_AutoTune_Multi.h>  // ArduCopter autotune library. support for autotune of multirotors.
-#include <AC_AutoTune/AC_AutoTune_Heli.h>   // ArduCopter autotune library. support for autotune of helicopters.
-#include <AP_Parachute/AP_Parachute.h>      // ArduPilot parachute release library
-#include <AC_Sprayer/AC_Sprayer.h>          // Crop sprayer library
-#include <AP_Avoidance/AP_Avoidance.h>      // "ADSB" avoidance library
-#include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
-#include <AC_PrecLand/AC_PrecLand_config.h>
-#include <AP_OpticalFlow/AP_OpticalFlow.h>
-#include <AP_Winch/AP_Winch_config.h>
+
 #include <AP_SurfaceDistance/AP_SurfaceDistance.h>
 
 // Configuration
@@ -90,11 +81,6 @@
 #include "AP_ExternalControl_Copter.h"
 #endif
 
-
-#if AP_OAPATHPLANNER_ENABLED
- #include <AC_WPNav/AC_WPNav_OA.h>
- #include <AC_Avoidance/AP_OAPathPlanner.h>
-#endif
 
 
 #if AP_RANGEFINDER_ENABLED

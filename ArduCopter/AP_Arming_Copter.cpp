@@ -248,21 +248,7 @@ bool AP_Arming_Copter::parameter_checks(bool display_failure)
 
 bool AP_Arming_Copter::oa_checks(bool display_failure)
 {
-#if AP_OAPATHPLANNER_ENABLED
-    char failure_msg[100] = {};
-    if (copter.g2.oa.pre_arm_check(failure_msg, ARRAY_SIZE(failure_msg))) {
-        return true;
-    }
-    // display failure
-    if (strlen(failure_msg) == 0) {
-        check_failed(display_failure, "%s", "Check Object Avoidance");
-    } else {
-        check_failed(display_failure, "%s", failure_msg);
-    }
-    return false;
-#else
     return true;
-#endif
 }
 
 bool AP_Arming_Copter::rc_calibration_checks(bool display_failure)
