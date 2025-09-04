@@ -505,12 +505,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
     // 18 was used by AP_VisualOdom
 
-#if AP_TEMPCALIBRATION_ENABLED
-    // @Group: TCAL
-    // @Path: ../libraries/AP_TempCalibration/AP_TempCalibration.cpp
-    AP_SUBGROUPINFO(temp_calibration, "TCAL", 19, ParametersG2, AP_TempCalibration),
-#endif
-
 
     // @Param: PILOT_SPEED_DN
     // @DisplayName: Pilot maximum vertical speed descending
@@ -807,9 +801,6 @@ ParametersG2::ParametersG2(void) :
     unused_integer{17}
 #if HAL_BUTTON_ENABLED
     ,button_ptr(&copter.button)
-#endif
-#if AP_TEMPCALIBRATION_ENABLED
-    , temp_calibration()
 #endif
     ,command_model_pilot_y(PILOT_Y_RATE_DEFAULT, PILOT_Y_EXPO_DEFAULT, 0.0f)
 {

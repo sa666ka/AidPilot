@@ -55,11 +55,7 @@
 #include <AP_Declination/AP_Declination.h>  // ArduPilot Mega Declination Helper Library
 #include <AP_RCMapper/AP_RCMapper.h>        // RC input mapping library
 #include <AP_BattMonitor/AP_BattMonitor.h>  // Battery monitor library
-#include <AC_InputManager/AC_InputManager.h>        // Pilot input handling library
-#include <AC_InputManager/AC_InputManager_Heli.h>   // Heli specific pilot input handling library
 #include <AP_Arming/AP_Arming.h>            // ArduPilot motor arming library
-#include <AP_TempCalibration/AP_TempCalibration.h>  // temperature calibration library
-#include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
 
 #include <AP_SurfaceDistance/AP_SurfaceDistance.h>
 

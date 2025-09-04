@@ -469,12 +469,6 @@ public:
     AP_Button *button_ptr;
 #endif
 
-
-#if AP_TEMPCALIBRATION_ENABLED
-    // temperature calibration handling
-    AP_TempCalibration temp_calibration;
-#endif
-
     // developer options
     AP_Int32 dev_options;
 
