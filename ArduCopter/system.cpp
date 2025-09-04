@@ -337,16 +337,8 @@ void Copter::allocate_motors(void)
             motors_var_info = AP_MotorsTailsitter::var_info;
             break;
         case AP_Motors::MOTOR_FRAME_6DOF_SCRIPTING:
-#if AP_SCRIPTING_ENABLED
-            motors = NEW_NOTHROW AP_MotorsMatrix_6DoF_Scripting(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsMatrix_6DoF_Scripting::var_info;
-#endif // AP_SCRIPTING_ENABLED
             break;
         case AP_Motors::MOTOR_FRAME_DYNAMIC_SCRIPTING_MATRIX:
-#if AP_SCRIPTING_ENABLED
-            motors = NEW_NOTHROW AP_MotorsMatrix_Scripting_Dynamic(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsMatrix_Scripting_Dynamic::var_info;
-#endif // AP_SCRIPTING_ENABLED
             break;
     }
     if (motors == nullptr) {
@@ -361,10 +353,7 @@ void Copter::allocate_motors(void)
 
 
     if ((AP_Motors::motor_frame_class)g2.frame_class.get() == AP_Motors::MOTOR_FRAME_6DOF_SCRIPTING) {
-#if AP_SCRIPTING_ENABLED
-        attitude_control = NEW_NOTHROW AC_AttitudeControl_Multi_6DoF(*ahrs_view, aparm, *motors);
-        attitude_control_var_info = AC_AttitudeControl_Multi_6DoF::var_info;
-#endif // AP_SCRIPTING_ENABLED
+        
     } else {
         attitude_control = NEW_NOTHROW AC_AttitudeControl_Multi(*ahrs_view, aparm, *motors);
         attitude_control_var_info = AC_AttitudeControl_Multi::var_info;

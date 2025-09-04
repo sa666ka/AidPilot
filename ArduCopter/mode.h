@@ -556,30 +556,6 @@ private:
     static bool _paused;
 };
 
-#if AP_SCRIPTING_ENABLED
-// Mode which behaves as guided with custom mode number and name
-class ModeGuidedCustom : public ModeGuided {
-public:
-    // constructor registers custom number and names
-    ModeGuidedCustom(const Number _number, const char* _full_name, const char* _short_name);
-
-    bool init(bool ignore_checks) override;
-
-    Number mode_number() const override { return number; }
-
-    const char *name() const override { return full_name; }
-    const char *name4() const override { return short_name; }
-
-    // State object which can be edited by scripting
-    AP_Vehicle::custom_mode_state state;
-
-private:
-    const Number number;
-    const char* full_name;
-    const char* short_name;
-};
-#endif
-
 class ModeGuidedNoGPS : public ModeGuided {
 
 public:

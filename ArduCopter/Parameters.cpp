@@ -865,10 +865,7 @@ void Copter::load_parameters(void)
     // PARAMETER_CONVERSION - Added: Jan-2024 for Copter-4.6
         { &stats, stats.var_info, 12 },
 #endif
-#if AP_SCRIPTING_ENABLED
-    // PARAMETER_CONVERSION - Added: Jan-2024 for Copter-4.6
-        { &scripting, scripting.var_info, 30 },
-#endif
+
 #if AP_GRIPPER_ENABLED
     // PARAMETER_CONVERSION - Added: Feb-2024 for Copter-4.6
         { &gripper, gripper.var_info, 13 },

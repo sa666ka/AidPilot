@@ -1237,14 +1237,6 @@ uint8_t GCS_MAVLINK_Copter::send_available_mode(uint8_t index) const
     const uint8_t base_mode_count = ARRAY_SIZE(modes);
     uint8_t mode_count = base_mode_count;
 
-#if AP_SCRIPTING_ENABLED
-    for (uint8_t i = 0; i < ARRAY_SIZE(copter.mode_guided_custom); i++) {
-        if (copter.mode_guided_custom[i] != nullptr) {
-            mode_count += 1;
-        }
-    }
-#endif
-
     // Convert to zero indexed
     const uint8_t index_zero = index - 1;
     if (index_zero >= mode_count) {
@@ -1261,18 +1253,8 @@ uint8_t GCS_MAVLINK_Copter::send_available_mode(uint8_t index) const
         mode_number = (uint8_t)modes[index_zero]->mode_number();
 
     } else {
-#if AP_SCRIPTING_ENABLED
-        const uint8_t custom_index = index_zero - base_mode_count;
-        if (copter.mode_guided_custom[custom_index] == nullptr) {
-            // Invalid index, should not happen
-            return mode_count;
-        }
-        name = copter.mode_guided_custom[custom_index]->name();
-        mode_number = (uint8_t)copter.mode_guided_custom[custom_index]->mode_number();
-#else
         // Should not endup here
         return mode_count;
-#endif
     }
 
 
