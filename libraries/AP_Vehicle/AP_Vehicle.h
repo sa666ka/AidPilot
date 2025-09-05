@@ -29,56 +29,23 @@
 
 #include "ModeReason.h" // reasons can't be defined in this header due to circular loops
 
-#include <AP_AHRS/AP_AHRS.h>
-#include <AP_AccelCal/AP_AccelCal.h>
-#include <AP_Airspeed/AP_Airspeed.h>
-#include <AP_Baro/AP_Baro.h>
+
 #include <AP_BoardConfig/AP_BoardConfig.h>     // board configuration library
-#include <AP_CANManager/AP_CANManager.h>
-#include <AP_Button/AP_Button.h>
-#include <AP_Compass/AP_Compass.h>
 #include <AP_EFI/AP_EFI.h>
-#include <AP_ExternalControl/AP_ExternalControl_config.h>
-#include <AP_GPS/AP_GPS.h>
-#include <AP_Generator/AP_Generator.h>
 #include <AP_Logger/AP_Logger.h>
-#include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_Notify/AP_Notify.h>                    // Notify library
 #include <AP_Param/AP_Param.h>
-#include <AP_RangeFinder/AP_RangeFinder.h>
-#include <AP_Relay/AP_Relay.h>                      // APM relay
 #include <AP_RSSI/AP_RSSI.h>                        // RSSI Library
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
-#include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
-#include <AP_OpenDroneID/AP_OpenDroneID.h>
-#include <AP_Hott_Telem/AP_Hott_Telem.h>
-#include <AP_ESC_Telem/AP_ESC_Telem.h>
-#include <AP_Servo_Telem/AP_Servo_Telem.h>
-#include <AP_GyroFFT/AP_GyroFFT.h>
 #include <AP_Networking/AP_Networking.h>
-#include <AP_VisualOdom/AP_VisualOdom.h>
-#include <AP_VideoTX/AP_VideoTX.h>
-#include <AP_MSP/AP_MSP.h>
-#include <AP_Frsky_Telem/AP_Frsky_Parameters.h>
-#include <AP_ExternalAHRS/AP_ExternalAHRS.h>
-#include <AP_VideoTX/AP_SmartAudio.h>
-#include <AP_VideoTX/AP_Tramp.h>
-#include <AP_TemperatureSensor/AP_TemperatureSensor.h>
 #include <SITL/SITL.h>
-#include <AP_CustomRotations/AP_CustomRotations.h>
-#include <AP_AIS/AP_AIS.h>
-#include <AP_NMEA_Output/AP_NMEA_Output.h>
 #include <AP_CheckFirmware/AP_CheckFirmware.h>
 #include <Filter/LowPassFilter.h>
-#include <AP_KDECAN/AP_KDECAN.h>
 #include <Filter/AP_Filter.h>
 #include <AP_Stats/AP_Stats.h>              // statistics library
 #include <AP_DDS/AP_DDS_config.h>
 
-
-
-#include <AP_IBus_Telem/AP_IBus_Telem.h>
 
 class AP_DDS_Client;
 
@@ -169,14 +136,6 @@ public:
     // returns true if the vehicle has crashed
     virtual bool is_crashed() const;
 
-#if AP_EXTERNAL_CONTROL_ENABLED
-    // Method to takeoff for use by external control
-    virtual bool start_takeoff(const float alt_m) { return false; }
-    // Method to control vehicle position for use by external control
-    virtual bool set_target_location(const Location& target_loc) { return false; }
-    // Get target location for use by external control
-    virtual bool get_target_location(Location& target_loc) { return false; }
-#endif // AP_EXTERNAL_CONTROL_ENABLED
 
     // returns true if vehicle is in the process of landing
     virtual bool is_landing() const { return false; }
@@ -209,10 +168,6 @@ public:
      */
     virtual bool get_wp_crosstrack_error_m(float &xtrack_error) const { return false; }
 
-#if HAL_WITH_FRSKY_TELEM_BIDIRECTIONAL
-    AP_Frsky_Parameters frsky_parameters;
-#endif
-
     /*
       Returns the pan and tilt for use by onvif camera in scripting
      */
@@ -226,10 +181,6 @@ public:
      */
     virtual bool get_rate_ef_targets(Vector3f& rate_ef_targets) const { return false; }
 
-#if AP_AHRS_ENABLED
-    virtual bool set_home_to_current_location(bool lock) WARN_IF_UNUSED { return false; }
-    virtual bool set_home(const Location& loc, bool lock) WARN_IF_UNUSED { return false; }
-#endif
 
 protected:
 
@@ -242,37 +193,12 @@ protected:
     // board specific config
     AP_BoardConfig BoardConfig;
 
-#if HAL_CANMANAGER_ENABLED
-    // board specific config for CAN bus
-    AP_CANManager can_mgr;
-#endif
 
 #if AP_SCHEDULER_ENABLED
     // main loop scheduler
     AP_Scheduler scheduler;
 #endif
 
-    // IMU variables
-    // Integration time; time last loop took to run
-    float G_Dt;
-
-    // sensor drivers
-#if AP_GPS_ENABLED
-    AP_GPS gps;
-#endif
-    AP_Baro barometer;
-#if AP_COMPASS_ENABLED
-    Compass compass;
-#endif
-#if AP_INERTIALSENSOR_ENABLED
-    AP_InertialSensor ins;
-#endif
-#if HAL_BUTTON_ENABLED
-    AP_Button button;
-#endif
-#if AP_RANGEFINDER_ENABLED
-    RangeFinder rangefinder;
-#endif
 
 #if HAL_LOGGING_ENABLED
     AP_Logger logger;
@@ -291,73 +217,14 @@ protected:
     AP_RSSI rssi;
 #endif
 
-#if HAL_GYROFFT_ENABLED
-    AP_GyroFFT gyro_fft;
-#endif
-#if AP_VIDEOTX_ENABLED
-    AP_VideoTX vtx;
-#endif
 
 #if AP_SERIALMANAGER_ENABLED
     AP_SerialManager serial_manager;
 #endif
 
-#if AP_RELAY_ENABLED
-    AP_Relay relay;
-#endif
-
-#if AP_SERVORELAYEVENTS_ENABLED
-    AP_ServoRelayEvents ServoRelayEvents;
-#endif
-
     // notification object for LEDs, buzzers etc (parameter set to
     // false disables external leds)
     AP_Notify notify;
-
-#if AP_AHRS_ENABLED
-    // Inertial Navigation EKF
-    AP_AHRS ahrs;
-#endif
-
-#if HAL_HOTT_TELEM_ENABLED
-    AP_Hott_Telem hott_telem;
-#endif
-
-#if HAL_VISUALODOM_ENABLED
-    AP_VisualOdom visual_odom;
-#endif
-
-#if HAL_WITH_ESC_TELEM
-    AP_ESC_Telem esc_telem;
-#endif
-
-#if AP_SERVO_TELEM_ENABLED
-    AP_Servo_Telem servo_telem;
-#endif
-
-#if AP_OPENDRONEID_ENABLED
-    AP_OpenDroneID opendroneid;
-#endif
-
-#if HAL_MSP_ENABLED
-    AP_MSP msp;
-#endif
-
-#if HAL_GENERATOR_ENABLED
-    AP_Generator generator;
-#endif
-
-#if AP_EXTERNAL_AHRS_ENABLED
-    AP_ExternalAHRS externalAHRS;
-#endif
-
-#if AP_SMARTAUDIO_ENABLED
-    AP_SmartAudio smartaudio;
-#endif
-
-#if AP_TRAMP_ENABLED
-    AP_Tramp tramp;
-#endif
 
 #if AP_NETWORKING_ENABLED
     AP_Networking networking;
@@ -368,32 +235,12 @@ protected:
     AP_EFI efi;
 #endif
 
-#if AP_AIRSPEED_ENABLED
-    AP_Airspeed airspeed;
-#endif
 
 #if AP_STATS_ENABLED
     // vehicle statistics
     AP_Stats stats;
 #endif
 
-#if AP_AIS_ENABLED
-    // Automatic Identification System - for tracking sea-going vehicles
-    AP_AIS ais;
-#endif
-
-#if HAL_NMEA_OUTPUT_ENABLED
-    AP_NMEA_Output nmea;
-#endif
-
-#if AP_KDECAN_ENABLED
-    AP_KDECAN kdecan;
-#endif
-
-
-#if AP_TEMPERATURE_SENSOR_ENABLED
-    AP_TemperatureSensor temperature_sensor;
-#endif
 
     static const struct AP_Param::GroupInfo var_info[];
 #if AP_SCHEDULER_ENABLED
@@ -403,12 +250,6 @@ protected:
 #if OSD_ENABLED
     void publish_osd_info();
 #endif
-
-#if HAL_INS_ACCELCAL_ENABLED
-    // update accel calibration
-    void accel_cal_update();
-#endif
-
     // call the arming library's update function
     void update_arming();
 
@@ -430,12 +271,6 @@ protected:
     // Check if this mode can be entered from the GCS
     bool block_GCS_mode_change(uint8_t mode_num, const uint8_t *mode_list, uint8_t mode_list_length) const;
 
-#if AP_INERTIALSENSOR_HARMONICNOTCH_ENABLED
-    // update the harmonic notch
-    void update_dynamic_notch(AP_InertialSensor::HarmonicNotch &notch);
-    // run notch update at either loop rate or 200Hz
-    void update_dynamic_notch_at_specified_rate();
-#endif // AP_INERTIALSENSOR_HARMONICNOTCH_ENABLED
 
 private:
 
@@ -448,10 +283,6 @@ private:
     // statustext:
     void send_watchdog_reset_statustext();
 
-#if AP_INERTIALSENSOR_HARMONICNOTCH_ENABLED
-    // update the harmonic notch for throttle based notch
-    void update_throttle_notch(AP_InertialSensor::HarmonicNotch &notch);
-#endif // AP_INERTIALSENSOR_HARMONICNOTCH_ENABLED
 
     // decimation for 1Hz update
     uint8_t one_Hz_counter;
@@ -459,25 +290,14 @@ private:
 
     bool likely_flying;         // true if vehicle is probably flying
     uint32_t _last_flying_ms;   // time when likely_flying last went true
-#if AP_INERTIALSENSOR_HARMONICNOTCH_ENABLED
-    uint32_t _last_notch_update_ms[HAL_INS_NUM_HARMONIC_NOTCH_FILTERS]; // last time update_dynamic_notch() was run
-#endif
+
 
     static AP_Vehicle *_singleton;
-
-#if HAL_GYROFFT_ENABLED && HAL_WITH_ESC_TELEM
-    LowPassFilterFloat esc_noise[ESC_TELEM_MAX_ESCS];
-    uint32_t last_motor_noise_ms;
-#endif
 
     bool done_safety_init;
 
 
     uint32_t _last_internal_errors;  // backup of AP_InternalError::internal_errors bitmask
-
-#if AP_CUSTOMROTATIONS_ENABLED
-    AP_CustomRotations custom_rotations;
-#endif
 
 #if AP_FILTER_ENABLED
     AP_Filters filters;

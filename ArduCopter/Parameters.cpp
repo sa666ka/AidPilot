@@ -344,11 +344,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_BoardConfig/AP_BoardConfig.cpp
     GOBJECT(BoardConfig,            "BRD_",       AP_BoardConfig),
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-    // @Group: CAN_
-    // @Path: ../libraries/AP_CANManager/AP_CANManager.cpp
-    GOBJECT(can_mgr,        "CAN_",       AP_CANManager),
-#endif
 
 #if AP_SIM_ENABLED
     // @Group: SIM_
@@ -413,7 +408,6 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_OSD/AP_OSD.cpp
     GOBJECT(osd, "OSD", AP_OSD),
 #endif
-
     // @Group:
     // @Path: Parameters.cpp
     GOBJECT(g2, "",  ParametersG2),

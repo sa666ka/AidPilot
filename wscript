@@ -590,7 +590,7 @@ def configure(cfg):
     else:
         cfg.end_msg('maybe')
 
-    cfg.recurse('libraries/AP_GPS')
+    # cfg.recurse('libraries/AP_GPS')
     cfg.recurse('libraries/AP_HAL_SITL')
     cfg.recurse('libraries/SITL')
 
@@ -691,7 +691,8 @@ def list_ap_periph_boards(ctx):
 def ap_periph_boards(ctx):
     return boards.get_ap_periph_boards()
 
-vehicles = ['antennatracker', 'blimp', 'copter', 'heli', 'plane', 'rover', 'sub']
+# vehicles = ['antennatracker', 'blimp', 'copter', 'heli', 'plane', 'rover', 'sub']
+vehicles = ['copter']
 
 def generate_tasklist(ctx, do_print=True):
     boardlist = boards.get_boards_names()
@@ -757,30 +758,6 @@ def _build_dynamic_sources(bld):
             bld.bldnode.make_node('libraries/GCS_MAVLink').abspath(),
             ],
             )
-
-    if (bld.get_board().with_can or bld.env.HAL_NUM_CAN_IFACES) and not bld.env.AP_PERIPH:
-        bld(
-            features='dronecangen',
-            source=bld.srcnode.ant_glob('modules/DroneCAN/DSDL/[a-z]* libraries/AP_DroneCAN/dsdl/[a-z]*', dir=True, src=False),
-            output_dir='modules/DroneCAN/libcanard/dsdlc_generated/',
-            name='dronecan',
-            export_includes=[
-                bld.bldnode.make_node('modules/DroneCAN/libcanard/dsdlc_generated/include').abspath(),
-                bld.srcnode.find_dir('modules/DroneCAN/libcanard/').abspath(),
-                bld.srcnode.find_dir('libraries/AP_DroneCAN/canard/').abspath(),
-                ]
-            )
-    elif bld.env.AP_PERIPH:
-        bld(
-            features='dronecangen',
-            source=bld.srcnode.ant_glob('modules/DroneCAN/DSDL/* libraries/AP_DroneCAN/dsdl/*', dir=True, src=False),
-            output_dir='modules/DroneCAN/libcanard/dsdlc_generated/',
-            name='dronecan',
-            export_includes=[
-                bld.bldnode.make_node('modules/DroneCAN/libcanard/dsdlc_generated/include').abspath(),
-                bld.srcnode.find_dir('modules/DroneCAN/libcanard/').abspath(),
-            ]
-        )
 
     bld.recurse("libraries/AP_DDS")
 
@@ -925,7 +902,7 @@ def build(bld):
 
     bld.add_group('build')
     bld.get_board().build(bld)
-    _build_common_taskgens(bld)
+    # _build_common_taskgens(bld)
 
     _build_recursion(bld)
 

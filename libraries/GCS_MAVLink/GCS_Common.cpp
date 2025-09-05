@@ -44,7 +44,7 @@
 #include <AP_RTC/AP_RTC.h>
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>
-#include <AP_RCTelemetry/AP_Spektrum_Telem.h>
+// #include <AP_RCTelemetry/AP_Spektrum_Telem.h>
 #include <AP_Mount/AP_Mount.h>
 #include <AP_Common/AP_FWVersion.h>
 #include <AP_VisualOdom/AP_VisualOdom.h>
@@ -56,7 +56,7 @@
 #include <AP_Mission/AP_Mission.h>
 #include <AP_OpenDroneID/AP_OpenDroneID.h>
 #include <AP_OSD/AP_OSD.h>
-#include <AP_RCTelemetry/AP_CRSF_Telem.h>
+// #include <AP_RCTelemetry/AP_CRSF_Telem.h>
 #include <AP_RPM/AP_RPM.h>
 #include <AP_AIS/AP_AIS.h>
 #include <AP_Filesystem/AP_Filesystem.h>
@@ -85,13 +85,6 @@
 #include <SITL/SITL.h>
 #endif
 
-#if HAL_MAX_CAN_PROTOCOL_DRIVERS
-  #include <AP_CANManager/AP_CANManager.h>
-  #include <AP_Common/AP_Common.h>
-
-  #include <AP_PiccoloCAN/AP_PiccoloCAN.h>
-  #include <AP_DroneCAN/AP_DroneCAN.h>
-#endif
 
 #include <AP_BattMonitor/AP_BattMonitor_config.h>
 #if AP_BATTERY_ENABLED
@@ -4181,24 +4174,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_mag_cal(const mavlink_command_int_t &pack
 }
 #endif  // COMPASS_CAL_ENABLED
 
-#if HAL_CANMANAGER_ENABLED
-/*
-  handle MAV_CMD_CAN_FORWARD
- */
-MAV_RESULT GCS_MAVLINK::handle_can_forward(const mavlink_command_int_t &packet, const mavlink_message_t &msg)
-{
-    return AP::can().handle_can_forward(chan, packet, msg) ? MAV_RESULT_ACCEPTED : MAV_RESULT_FAILED;
-}
-
-/*
-  handle CAN_FRAME messages
- */
-void GCS_MAVLINK::handle_can_frame(const mavlink_message_t &msg) const
-{
-    AP::can().handle_can_frame(msg);
-}
-#endif  // HAL_CANMANAGER_ENABLED
-
 void GCS_MAVLINK::handle_distance_sensor(const mavlink_message_t &msg)
 {
 #if AP_RANGEFINDER_ENABLED
@@ -4244,15 +4219,6 @@ void GCS_MAVLINK::handle_adsb_message(const mavlink_message_t &msg)
 }
 #endif
 
-#if OSD_PARAM_ENABLED
-void GCS_MAVLINK::handle_osd_param_config(const mavlink_message_t &msg) const
-{
-    AP_OSD *osd = AP::osd();
-    if (osd != nullptr) {
-        osd->handle_msg(msg, *this);
-    }
-}
-#endif
 
 void GCS_MAVLINK::handle_heartbeat(const mavlink_message_t &msg)
 {
@@ -4522,12 +4488,6 @@ void GCS_MAVLINK::handle_message(const mavlink_message_t &msg)
         break;
 #endif
 
-#if OSD_PARAM_ENABLED
-    case MAVLINK_MSG_ID_OSD_PARAM_CONFIG:
-    case MAVLINK_MSG_ID_OSD_PARAM_SHOW_CONFIG:
-        handle_osd_param_config(msg);
-        break;
-#endif
 
 #if HAL_ADSB_ENABLED
     case MAVLINK_MSG_ID_ADSB_VEHICLE:
@@ -4547,18 +4507,6 @@ void GCS_MAVLINK::handle_message(const mavlink_message_t &msg)
         handle_named_value(msg);
         break;
 
-#if HAL_CANMANAGER_ENABLED
-    case MAVLINK_MSG_ID_CAN_FRAME:
-    case MAVLINK_MSG_ID_CANFD_FRAME:
-        handle_can_frame(msg);
-        break;
-#endif
-
-#if HAL_CANMANAGER_ENABLED
-    case MAVLINK_MSG_ID_CAN_FILTER_MODIFY:
-        AP::can().handle_can_filter_modify(msg);
-        break;
-#endif
 
 #if AP_OPENDRONEID_ENABLED
     case MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS:
@@ -5563,10 +5511,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_int_packet(const mavlink_command_int_t &p
         return handle_command_battery_reset(packet);
 #endif
 
-#if HAL_CANMANAGER_ENABLED
-    case MAV_CMD_CAN_FORWARD:
-        return handle_can_forward(packet, msg);
-#endif
 
 #if HAL_HIGH_LATENCY2_ENABLED
     case MAV_CMD_CONTROL_HIGH_LATENCY:

@@ -16,40 +16,16 @@ void Copter::init_ardupilot()
     notify.init();
     notify_flight_mode();
 
-    // initialise battery monitor
-    battery.init();
-
-#if AP_RSSI_ENABLED
-    // Init RSSI
-    rssi.init();
-#endif
-
-    barometer.init();
-
     // setup telem slots with serial ports
     gcs().setup_uarts();
 
-#if OSD_ENABLED
-    osd.init();
-#endif
  
     // update motor interlock state
     update_using_interlock();
 
-    init_rc_in();               // sets up rc channels from radio
-
-#if AP_RANGEFINDER_ENABLED
-    // initialise surface to be tracked in SurfaceTracking
-    // must be before rc init to not override initial switch position
-    surface_tracking.init((SurfaceTracking::Surface)copter.g2.surftrak_mode.get());
-#endif
-
     // allocate the motors class
     allocate_motors();
 
-    // initialise rc channels including setting mode
-    rc().convert_options(RC_Channel::AUX_FUNC::ARMDISARM_UNUSED, RC_Channel::AUX_FUNC::ARMDISARM_AIRMODE);
-    rc().init();
 
     // sets up motors and output to escs
     init_rc_out();
@@ -60,34 +36,6 @@ void Copter::init_ardupilot()
     // motors initialised so parameters can be sent
     ap.initialised_params = true;
 
-#if AP_RELAY_ENABLED
-    relay.init();
-#endif
-
-    /*
-     *  setup the 'main loop is dead' check. Note that this relies on
-     *  the RC library being initialised.
-     */
-
-    // Do GPS init
-    gps.set_log_gps_bit(MASK_LOG_GPS);
-    gps.init();
-
-    AP::compass().set_log_bit(MASK_LOG_COMPASS);
-    AP::compass().init();
-
-
-    attitude_control->parameter_sanity_check();
-
-    // read Baro pressure at ground
-    //-----------------------------
-    barometer.set_log_baro_bit(MASK_LOG_IMU);
-    barometer.calibrate();
-
-#if AP_RANGEFINDER_ENABLED
-    // initialise rangefinder
-    init_rangefinder();
-#endif
 
 #if HAL_LOGGING_ENABLED
     // initialise AP_Logger library
@@ -105,14 +53,9 @@ void Copter::init_ardupilot()
 
     motors->output_min();  // output lowest possible value to motors
 
-    // attempt to set the initial_mode, else set to STABILIZE
-    if (!set_mode((enum Mode::Number)g.initial_mode.get(), ModeReason::INITIALISED)) {
-        // set mode to STABILIZE will trigger mode change notification to pilot
-        set_mode(Mode::Number::STABILIZE, ModeReason::UNAVAILABLE);
-    }
 
-    pos_variance_filt.set_cutoff_frequency(g2.fs_ekf_filt_hz);
-    vel_variance_filt.set_cutoff_frequency(g2.fs_ekf_filt_hz);
+
+    set_mode(0, ModeReason::UNAVAILABLE);
 
     // flag that initialisation has completed
     ap.initialised = true;

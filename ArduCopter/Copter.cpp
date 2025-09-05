@@ -75,7 +75,6 @@
  */
 
 #include "Copter.h"
-#include <AP_InertialSensor/AP_InertialSensor_rate_config.h>
 
 #define FORCE_VERSION_H_INCLUDE
 #include "version.h"
@@ -111,53 +110,16 @@ SCHED_TASK_CLASS arguments:
 
  */
 const AP_Scheduler::Task Copter::scheduler_tasks[] = {
-// update INS immediately to get current gyro data populated
-    FAST_TASK_CLASS(AP_InertialSensor, &copter.ins, update),
-    // run low level rate controllers that only require IMU data
-    FAST_TASK(run_rate_controller_main),
-
     // send outputs to the motors library immediately
     FAST_TASK(motors_output_main),
-     // run EKF state estimator (expensive)
-    FAST_TASK(read_AHRS),
-
-    // Inertial Nav
-    FAST_TASK(read_inertia),
-
-    // run the attitude controllers
-    FAST_TASK(update_flight_mode),
-    // update home from EKF if necessary
-    FAST_TASK(update_home_from_EKF),
-    // check if we've landed or crashed
-    FAST_TASK(update_land_and_crash_detectors),
-    // surface tracking update
-    FAST_TASK(update_rangefinder_terrain_offset),
-
-    SCHED_TASK(rc_loop,              250,    130,  3),
-    SCHED_TASK(throttle_loop,         50,     75,  6),
-
-    SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
-
-    SCHED_TASK(update_batt_compass,   10,    120, 15),
-    SCHED_TASK_CLASS(RC_Channels, (RC_Channels*)&copter.g2.rc_channels, read_aux_all,    10,  50,  18),
 
     SCHED_TASK(auto_disarm_check,     10,     50,  27),
-#if AP_COPTER_AHRS_AUTO_TRIM_ENABLED
-    SCHED_TASK_CLASS(RC_Channels_Copter,   &copter.g2.rc_channels,      auto_trim_run,   10,  75,  30),
-#endif
 
-#if AP_RANGEFINDER_ENABLED
-    SCHED_TASK(read_rangefinder,      20,    100,  33),
-#endif
-
-    SCHED_TASK(update_altitude,       10,    100,  42),
     SCHED_TASK(update_throttle_hover,100,     90,  48),
 
 
     SCHED_TASK(three_hz_loop,          3,     75, 57),
-#if AP_SERVORELAYEVENTS_ENABLED
-    SCHED_TASK_CLASS(AP_ServoRelayEvents,  &copter.ServoRelayEvents,      update_events, 50,  75,  60),
-#endif
+
 
 
 #if HAL_LOGGING_ENABLED
@@ -165,10 +127,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
 
     SCHED_TASK(one_hz_loop,            1,    100,  81),
-    SCHED_TASK(gpsglitch_check,       10,     50,  90),
-    SCHED_TASK(takeoff_check,         50,     50,  91),
 
-    SCHED_TASK(standby_update,        100,    75,  96),
     SCHED_TASK(lost_vehicle_check,    10,     50,  99),
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_receive, 400, 180, 102),
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_send,    400, 550, 105),
@@ -180,18 +139,8 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK_CLASS(AP_Logger,            &copter.logger,              periodic_tasks, 400, 300, 120),
 #endif
 
-    SCHED_TASK_CLASS(AP_InertialSensor,    &copter.ins,                 periodic,       400,  50, 123),
-
 #if HAL_LOGGING_ENABLED
     SCHED_TASK_CLASS(AP_Scheduler,         &copter.scheduler,           update_logging, 0.1,  75, 126),
-#endif
-
-#if HAL_BUTTON_ENABLED
-    SCHED_TASK_CLASS(AP_Button,            &copter.button,              update,           5, 100, 168),
-#endif
-#if AP_INERTIALSENSOR_FAST_SAMPLE_WINDOW_ENABLED
-    // don't delete this, there is an equivalent (virtual) in AP_Vehicle for the non-rate loop case
-    SCHED_TASK(update_dynamic_notch_at_specified_rate_main,                       LOOP_RATE, 200, 215),
 #endif
 
 };
@@ -247,20 +196,6 @@ void Copter::throttle_loop()
 
 }
 
-// update_batt_compass - read battery and compass
-// should be called at 10hz
-void Copter::update_batt_compass(void)
-{
-    // read battery before compass because it may be used for motor interference compensation
-    battery.read();
-
-    if(AP::compass().available()) {
-        // update compass with throttle value - used for compassmot
-        compass.set_throttle(motors->get_throttle());
-        compass.set_voltage(battery.voltage());
-        compass.read();
-    }
-}
 
 #if HAL_LOGGING_ENABLED
 // Full rate logging of attitude, rate and pid loops
@@ -428,80 +363,13 @@ void Copter::one_hz_loop()
 }
 
 
-void Copter::read_AHRS(void)
-{
-    // we tell AHRS to skip INS update as we have already done it in FAST_TASK.
-    ahrs.update(true);
-}
-
-// read baro and log control tuning
-void Copter::update_altitude()
-{
-    // read in baro altitude
-    read_barometer();
-
-#if HAL_LOGGING_ENABLED
-    if (should_log(MASK_LOG_CTUN)) {
-        Log_Write_Control_Tuning();
-        if (!should_log(MASK_LOG_FTN_FAST)) {
-#if AP_INERTIALSENSOR_HARMONICNOTCH_ENABLED
-            AP::ins().write_notch_log_messages();
-#endif
-#if HAL_GYROFFT_ENABLED
-            gyro_fft.write_log_messages();
-#endif
-        }
-    }
-#endif
-}
-
-// vehicle specific waypoint info helpers
-bool Copter::get_wp_distance_m(float &distance) const
-{
-    // see GCS_MAVLINK_Copter::send_nav_controller_output()
-    distance = flightmode->wp_distance_m();
-    return true;
-}
-
-// vehicle specific waypoint info helpers
-bool Copter::get_wp_bearing_deg(float &bearing) const
-{
-    // see GCS_MAVLINK_Copter::send_nav_controller_output()
-    bearing = flightmode->wp_bearing_deg();
-    return true;
-}
-
-// vehicle specific waypoint info helpers
-bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
-{
-    // see GCS_MAVLINK_Copter::send_nav_controller_output()
-    xtrack_error = flightmode->crosstrack_error_m() * 0.01;
-    return true;
-}
-
-// get the target earth-frame angular velocities in rad/s (Z-axis component used by some gimbals)
-bool Copter::get_rate_ef_targets(Vector3f& rate_ef_targets) const
-{
-    // always returns zero vector if landed or disarmed
-    if (copter.ap.land_complete) {
-        rate_ef_targets.zero();
-    } else {
-        rate_ef_targets = attitude_control->get_rate_ef_targets();
-    }
-    return true;
-}
-
 /*
   constructor for main Copter class
  */
 Copter::Copter(void)
     :
     flight_modes(&g.flight_mode1),
-    pos_variance_filt(FS_EKF_FILT_DEFAULT),
-    vel_variance_filt(FS_EKF_FILT_DEFAULT),
     flightmode(&mode_stabilize),
-    land_accel_ef_filter(LAND_DETECTOR_ACCEL_LPF_CUTOFF),
-    rc_throttle_control_in_filter(1.0f),
     param_loader(var_info)
 {
 }

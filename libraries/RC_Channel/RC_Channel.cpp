@@ -48,7 +48,7 @@ extern const AP_HAL::HAL& hal;
 #include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_Arming/AP_Arming.h>
-#include <AP_Avoidance/AP_Avoidance.h>
+// #include <AP_Avoidance/AP_Avoidance.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AC_Fence/AC_Fence.h>
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
@@ -1031,56 +1031,9 @@ void RC_Channel::do_aux_function_armdisarm(const AuxSwitchPos ch_flag)
     }
 }
 
-#if AP_ADSB_AVOIDANCE_ENABLED
-void RC_Channel::do_aux_function_avoid_adsb(const AuxSwitchPos ch_flag)
-{
-    AP_Avoidance *avoidance = AP::ap_avoidance();
-    if (avoidance == nullptr) {
-        return;
-    }
-    if (ch_flag == AuxSwitchPos::HIGH) {
-        AP_ADSB *adsb = AP::ADSB();
-        if (adsb == nullptr) {
-            return;
-        }
-        // try to enable AP_Avoidance
-        if (!adsb->enabled() || !adsb->healthy()) {
-            GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "ADSB not available");
-            return;
-        }
-        avoidance->enable();
-        LOGGER_WRITE_EVENT(LogEvent::AVOIDANCE_ADSB_ENABLE);
-        GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "ADSB Avoidance Enabled");
-        return;
-    }
-
-    // disable AP_Avoidance
-    avoidance->disable();
-    LOGGER_WRITE_EVENT(LogEvent::AVOIDANCE_ADSB_DISABLE);
-    GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "ADSB Avoidance Disabled");
-}
-#endif  // AP_ADSB_AVOIDANCE_ENABLED
-
 void RC_Channel::do_aux_function_avoid_proximity(const AuxSwitchPos ch_flag)
 {
-#if AP_AVOIDANCE_ENABLED && !APM_BUILD_TYPE(APM_BUILD_ArduPlane)
-    AC_Avoid *avoid = AP::ac_avoid();
-    if (avoid == nullptr) {
-        return;
-    }
 
-    switch (ch_flag) {
-    case AuxSwitchPos::HIGH:
-        avoid->proximity_avoidance_enable(true);
-        break;
-    case AuxSwitchPos::MIDDLE:
-        // nothing
-        break;
-    case AuxSwitchPos::LOW:
-        avoid->proximity_avoidance_enable(false);
-        break;
-    }
-#endif // !APM_BUILD_ArduPlane
 }
 
 #if AP_CAMERA_ENABLED
@@ -1521,11 +1474,6 @@ bool RC_Channel::do_aux_function(const AuxFuncTrigger &trigger)
         break;
 #endif
 
-#if AP_ADSB_AVOIDANCE_ENABLED
-    case AUX_FUNC::AVOID_ADSB:
-        do_aux_function_avoid_adsb(ch_flag);
-        break;
-#endif  // AP_ADSB_AVOIDANCE_ENABLED
 
     case AUX_FUNC::FFT_NOTCH_TUNE:
         do_aux_function_fft_notch_tune(ch_flag);

@@ -165,22 +165,11 @@ class Board:
         else:
             cfg.msg("GPS Debug Logging", 'no', color='YELLOW')
 
-        # allow enable of custom controller for any board
-        # enabled on sitl by default
-        if (cfg.options.enable_custom_controller or self.get_name() == "sitl") and not cfg.options.no_gcs:
-            env.ENABLE_CUSTOM_CONTROLLER = True
-            env.DEFINES.update(
-                AP_CUSTOMCONTROL_ENABLED=1,
-            )
-            env.AP_LIBRARIES += [
-                'AC_CustomControl'
-            ]
-            cfg.msg("Enabled custom controller", 'yes')
-        else:
-            env.DEFINES.update(
-                AP_CUSTOMCONTROL_ENABLED=0,
-            )
-            cfg.msg("Enabled custom controller", 'no', color='YELLOW')
+
+        env.DEFINES.update(
+            AP_CUSTOMCONTROL_ENABLED=0,
+        )
+        cfg.msg("Enabled custom controller", 'no', color='YELLOW')
 
         # support enabling any option in build_options.py
         for opt in build_options.BUILD_OPTIONS:
@@ -506,25 +495,6 @@ class Board:
                 '-fno-exceptions',
                 '-Wl,--gc-sections',
             ]
-
-        if self.with_can:
-            # for both AP_Perip and main fw enable deadlines
-            env.DEFINES.update(CANARD_ENABLE_DEADLINE = 1)
-
-            if not cfg.env.AP_PERIPH:
-                env.AP_LIBRARIES += [
-                    'AP_DroneCAN',
-                    'modules/DroneCAN/libcanard/*.c',
-                    ]
-                if cfg.options.enable_dronecan_tests:
-                    env.DEFINES.update(AP_TEST_DRONECAN_DRIVERS = 1)
-
-                env.DEFINES.update(
-                    DRONECAN_CXX_WRAPPERS = 1,
-                    USE_USER_HELPERS = 1,
-                    CANARD_ALLOCATE_SEM=1
-                )
-
 
 
         if cfg.options.build_dates:

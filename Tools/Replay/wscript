@@ -13,13 +13,12 @@ def build(bld):
         return
 
     vehicle = bld.path.name
-
     bld.ap_stlib(
         name=vehicle + '_libs',
         ap_vehicle=vehicle,
         ap_libraries=bld.ap_common_vehicle_libraries() + [
             'AP_OSD',
-            'AP_Avoidance',
+            # 'AP_Avoidance',
         ],
     )
 
