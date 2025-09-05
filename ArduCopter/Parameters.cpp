@@ -1,6 +1,5 @@
 #include "Copter.h"
 
-#include <AP_Gripper/AP_Gripper.h>
 #include <AP_InertialSensor/AP_InertialSensor_rate_config.h>
 
 /*
@@ -467,8 +466,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
     // 12 was AP_Stats
 
-    // 13 was AP_Gripper
-
     // @Param: FRAME_CLASS
     // @DisplayName: Frame Class
     // @Description: Controls major frame class for multicopter component
@@ -793,11 +790,6 @@ ParametersG2::ParametersG2(void) :
 void Copter::load_parameters(void)
 {
     AP_Vehicle::load_parameters(g.format_version, Parameters::k_format_version);
-
-    // PARAMETER_CONVERSION - Added: July-2025 for ArduPilot-4.7
-#if AP_RPM_ENABLED
-    AP_Param::convert_class(g.k_param_rpm_sensor_old, &rpm_sensor, rpm_sensor.var_info, 0, true, true);
-#endif
 
     static const AP_Param::G2ObjectConversion g2_conversions[] {
 #if AP_STATS_ENABLED

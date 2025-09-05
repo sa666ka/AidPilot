@@ -82,8 +82,6 @@
  #include <AP_OSD/AP_OSD.h>
 #endif
 
-#include <AP_RPM/AP_RPM.h>
-
 
 
 // Local modules
