@@ -398,26 +398,6 @@ public:
         // inputs 248-249 are reserved for the Skybrush fork at
         // https://github.com/skybrush-io/ardupilot
 
-#if AP_SCRIPTING_ENABLED
-        // inputs for the use of onboard lua scripting
-        SCRIPTING_1 =        300,
-        SCRIPTING_2 =        301,
-        SCRIPTING_3 =        302,
-        SCRIPTING_4 =        303,
-        SCRIPTING_5 =        304,
-        SCRIPTING_6 =        305,
-        SCRIPTING_7 =        306,
-        SCRIPTING_8 =        307,
-        SCRIPTING_9 =        308,
-        SCRIPTING_10 =       309,
-        SCRIPTING_11 =       310,
-        SCRIPTING_12 =       311,
-        SCRIPTING_13 =       312,
-        SCRIPTING_14 =       313,
-        SCRIPTING_15 =       314,
-        SCRIPTING_16 =       315,
-        STOP_RESTART_SCRIPTING =     316,   // emergency scripting disablement
-#endif  // AP_SCRIPTING_ENABLED
 
         // this must be higher than any aux function above
         AUX_FUNCTION_MAX =   317,
@@ -736,10 +716,6 @@ public:
     void calibrating(bool b) { gcs_is_calibrating = b; }
     bool calibrating() { return gcs_is_calibrating; }
 
-#if AP_SCRIPTING_ENABLED
-    // get last aux cached value for scripting. Returns false if never set, otherwise 0,1,2
-    bool get_aux_cached(RC_Channel::AUX_FUNC aux_fn, uint8_t &pos);
-#endif
 
     // returns true if we've ever seen RC input, via overrides or via
     // AP_RCProtocol
@@ -793,14 +769,6 @@ private:
     // true if GCS is performing a RC calibration
     bool gcs_is_calibrating;
 
-#if AP_SCRIPTING_ENABLED
-    // bitmask of last aux function value, 2 bits per function
-    // value 0 means never set, otherwise level+1
-    HAL_Semaphore aux_cache_sem;
-    Bitmask<unsigned(RC_Channel::AUX_FUNC::AUX_FUNCTION_MAX)*2> aux_cached;
-
-    void set_aux_cached(RC_Channel::AUX_FUNC aux_fn, RC_Channel::AuxSwitchPos pos);
-#endif
 
     RC_Channel &get_rcmap_channel_nonnull(uint8_t rcmap_number) const;
 

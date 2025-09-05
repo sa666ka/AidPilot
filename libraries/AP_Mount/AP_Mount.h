@@ -111,9 +111,7 @@ public:
 #if HAL_MOUNT_SIYI_ENABLED
         Siyi = 8,            /// Siyi gimbal using custom serial protocol
 #endif
-#if HAL_MOUNT_SCRIPTING_ENABLED
-        Scripting = 9,       /// Scripting gimbal driver
-#endif
+
 #if HAL_MOUNT_XACTI_ENABLED
         Xacti = 10,          /// Xacti DroneCAN gimbal driver
 #endif

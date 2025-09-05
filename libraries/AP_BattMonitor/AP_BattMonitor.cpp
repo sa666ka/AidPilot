@@ -27,7 +27,6 @@
 #include "AP_BattMonitor_FuelLevel_Analog.h"
 #include "AP_BattMonitor_Synthetic_Current.h"
 #include "AP_BattMonitor_AD7091R5.h"
-#include "AP_BattMonitor_Scripting.h"
 
 #include <AP_HAL/AP_HAL.h>
 
@@ -697,11 +696,7 @@ AP_BattMonitor::init()
                 drivers[instance] = NEW_NOTHROW AP_BattMonitor_AD7091R5(*this, state[instance], _params[instance]);
                 break;
 #endif// AP_BATTERY_AD7091R5_ENABLED
-#if AP_BATTERY_SCRIPTING_ENABLED
-            case Type::Scripting:
-                drivers[instance] = NEW_NOTHROW AP_BattMonitor_Scripting(*this, state[instance], _params[instance]);
-                break;
-#endif // AP_BATTERY_SCRIPTING_ENABLED
+
 #if AP_BATTERY_INA3221_ENABLED
             case Type::INA3221:
                 drivers[instance] = NEW_NOTHROW AP_BattMonitor_INA3221(*this, state[instance], _params[instance]);
@@ -1236,21 +1231,6 @@ bool AP_BattMonitor::healthy() const
     return true;
 }
 
-#if AP_BATTERY_SCRIPTING_ENABLED
-/*
-  handle state update from a lua script
- */
-bool AP_BattMonitor::handle_scripting(uint8_t idx, const BattMonitorScript_State &_state)
-{
-    if (idx >= _num_instances) {
-        return false;
-    }
-    if (drivers[idx] == nullptr) {
-        return false;
-    }
-    return drivers[idx]->handle_scripting(_state);
-}
-#endif
 
 namespace AP {
 

@@ -76,9 +76,7 @@ public:
 #if AP_NOTIFY_PROFILED_ENABLED
         Notify_LED_ProfiLED                 = (1 << 9), // ProfiLED
 #endif
-#if AP_NOTIFY_SCRIPTING_LED_ENABLED
-        Notify_LED_Scripting                = (1 << 10),// Colour accessor for scripting
-#endif
+
 #if AP_NOTIFY_DSHOT_LED_ENABLED
         Notify_LED_DShot                    = (1 << 11),// Use dshot commands to set ESC LEDs
 #endif
@@ -213,11 +211,6 @@ public:
     const char* get_text() const { return _send_text; }
     uint32_t get_text_updated_millis() const {return _send_text_updated_millis; }
  
-#if AP_SCRIPTING_ENABLED
-    // send text to the display using scripting
-    void send_text_scripting(const char *str, uint8_t r);
-    void release_text_scripting(uint8_t r);
-#endif
 
     static const struct AP_Param::GroupInfo var_info[];
     int8_t get_buzz_pin() const  { return _buzzer_pin; }

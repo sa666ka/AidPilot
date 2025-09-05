@@ -72,9 +72,7 @@ public:
 #if AP_CAMERA_MAVLINKCAMV2_ENABLED
         MAVLINK_CAMV2 = 6,  // MAVLink camera v2
 #endif
-#if AP_CAMERA_SCRIPTING_ENABLED
-        SCRIPTING = 7,  // Scripting backend
-#endif
+
 #if AP_CAMERA_RUNCAM_ENABLED
         RUNCAM = 8,  // RunCam backend
 #endif
@@ -169,35 +167,6 @@ public:
     // set if vehicle is in AUTO mode
     void set_is_auto_mode(bool enable) { _is_in_auto_mode = enable; }
 
-#if AP_CAMERA_SCRIPTING_ENABLED
-    // structure and accessors for use by scripting backends
-    typedef struct {
-        uint16_t take_pic_incr; // incremented each time camera is requested to take a picture
-        bool recording_video;   // true when recording video
-        uint8_t zoom_type;      // see ZoomType enum (1:Rate or 2:Pct)
-        float zoom_value;       // percentage or zoom out = -1, hold = 0, zoom in = 1
-        uint8_t focus_type;     // see FocusType enum (1:Rate, 2:Pct, 4:Auto)
-        float focus_value;      // If Rate, focus in = -1, focus hold = 0, focus out = 1.  If PCT 0 to 100
-        uint8_t tracking_type;  // see TrackingType enum (0:NONE, 1:POINT, 2:RECTANGLE)
-        Vector2f tracking_p1;   // center or top-left tracking point. x left-right, y is top-bottom. range is 0 to 1
-        Vector2f tracking_p2;   // bottom-right tracking point. x left-right, y is top-bottom. range is 0 to 1
-    } camera_state_t;
-
-    // accessor to allow scripting backend to retrieve state
-    // returns true on success and cam_state is filled in
-    bool get_state(uint8_t instance, camera_state_t& cam_state);
-
-    // change camera settings not normally used by autopilot
-    bool change_setting(uint8_t instance, CameraSetting setting, float value);
-#endif
-
-#if AP_CAMERA_INFO_FROM_SCRIPT_ENABLED
-    void set_camera_information(mavlink_camera_information_t camera_info);
-    void set_camera_information(uint8_t instance, mavlink_camera_information_t camera_info);
-
-    void set_stream_information(mavlink_video_stream_information_t camera_info);
-    void set_stream_information(uint8_t instance, mavlink_video_stream_information_t camera_info);
-#endif // AP_CAMERA_INFO_FROM_SCRIPT_ENABLED
 
     // Return true and the relay index if relay camera backend is selected, used for conversion to relay functions
     bool get_legacy_relay_index(int8_t &index) const;

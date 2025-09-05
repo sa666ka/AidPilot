@@ -1,13 +1,9 @@
 #pragma once
 
 #include <AP_HAL/AP_HAL_Boards.h>
-#include <AP_Scripting/AP_Scripting_config.h>
 #include <SRV_Channel/SRV_Channel_config.h>
 
 #ifndef AP_MOTORS_MAX_NUM_MOTORS
-#if AP_SCRIPTING_ENABLED
-#define AP_MOTORS_MAX_NUM_MOTORS 32
-#else
 #define AP_MOTORS_MAX_NUM_MOTORS 12
 #endif
 
@@ -26,8 +22,6 @@
 #undef AP_MOTORS_MAX_NUM_MOTORS
 #define AP_MOTORS_MAX_NUM_MOTORS 12
 #endif
-
-#endif  // defined (AP_MOTORS_MAX_NUM_MOTORS)
 
 #ifndef AP_MOTORS_TRI_ENABLED
 #define AP_MOTORS_TRI_ENABLED 1

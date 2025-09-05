@@ -58,9 +58,6 @@ void AP_Motors::get_frame_and_type_string(char *buffer, uint8_t buflen) const
     const char *frame_str = get_frame_string();
     const char *type_str = get_type_string();
     if (type_str != nullptr && strlen(type_str)
-#if AP_SCRIPTING_ENABLED
-        && custom_frame_string == nullptr
-#endif
     ) {
         hal.util->snprintf(buffer, buflen, "Frame: %s/%s", frame_str, type_str);
     } else {
@@ -225,17 +222,6 @@ void AP_Motors::add_motor_num(int8_t motor_num)
     }
 }
 
-#if AP_SCRIPTING_ENABLED
-void AP_Motors::set_external_limits(bool roll, bool pitch, bool yaw, bool throttle_lower, bool throttle_upper)
-{
-    external_limits.roll = roll;
-    external_limits.pitch = pitch;
-    external_limits.yaw = yaw;
-    external_limits.throttle_lower = throttle_lower;
-    external_limits.throttle_upper = throttle_upper;
-}
-#endif
-
 // returns true if the configured PWM type is digital and should have fixed endpoints
 bool AP_Motors::is_digital_pwm_type() const
 {
@@ -259,27 +245,9 @@ bool AP_Motors::is_digital_pwm_type() const
 // return string corresponding to frame_class
 const char* AP_Motors::get_frame_string() const
 {
-#if AP_SCRIPTING_ENABLED
-    if (custom_frame_string != nullptr) {
-        return custom_frame_string;
-    }
-#endif
     return _get_frame_string();
 }
 
-#if AP_SCRIPTING_ENABLED
-// set custom frame string
-void AP_Motors::set_frame_string(const char * str) {
-    if (custom_frame_string != nullptr) {
-        return;
-    }
-    const size_t len = strlen(str)+1;
-    custom_frame_string = NEW_NOTHROW char[len];
-    if (custom_frame_string != nullptr) {
-        strncpy(custom_frame_string, str, len);
-    }
-}
-#endif
 
 // output_test_seq - spin a motor at the pwm value specified
 //  motor_seq is the motor's sequence number from 1 to the number of motors on the frame

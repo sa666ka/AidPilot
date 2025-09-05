@@ -120,10 +120,6 @@ public:
     virtual void send_video_stream_information(mavlink_channel_t chan) const;
 #endif // AP_MAVLINK_MSG_VIDEO_STREAM_INFORMATION_ENABLED
 
-#if AP_CAMERA_INFO_FROM_SCRIPT_ENABLED
-    void set_camera_information(mavlink_camera_information_t camera_info);
-    void set_stream_information(mavlink_video_stream_information_t stream_info);
-#endif // AP_CAMERA_INFO_FROM_SCRIPT_ENABLED
 
     // send camera settings message to GCS
     virtual void send_camera_settings(mavlink_channel_t chan) const;
@@ -141,14 +137,6 @@ public:
     virtual void send_camera_thermal_range(mavlink_channel_t chan) const {};
 #endif
 
-#if AP_CAMERA_SCRIPTING_ENABLED
-    // accessor to allow scripting backend to retrieve state
-    // returns true on success and cam_state is filled in
-    virtual bool get_state(AP_Camera::camera_state_t& cam_state) { return false; }
-
-    // change camera settings not normally used by autopilot
-    virtual bool change_setting(CameraSetting setting, float value) { return false; }
-#endif
 
 protected:
 
@@ -191,10 +179,6 @@ protected:
     // get mavlink gimbal device id which is normally mount_instance+1
     uint8_t get_gimbal_device_id() const;
 
-#if AP_CAMERA_INFO_FROM_SCRIPT_ENABLED
-    mavlink_camera_information_t _camera_info;
-    mavlink_video_stream_information_t _stream_info;
-#endif // AP_CAMERA_INFO_FROM_SCRIPT_ENABLED
 
     // internal members
     uint8_t _instance;      // this instance's number

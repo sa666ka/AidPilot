@@ -504,9 +504,6 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_GROUPINFO("LAND_ALT_LOW", 25, ParametersG2, land_alt_low_cm, 1000),
 
 
-
-    // 30 was AP_Scripting
-
 #if AP_RC_TRANSMITTER_TUNING_ENABLED
     // @Param: TUNE_MIN
     // @DisplayName: Tuning minimum

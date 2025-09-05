@@ -69,11 +69,6 @@ class Board:
             LUA_32BITS = 1,
         )
 
-        env.AP_LIBRARIES += [
-            'AP_Scripting',
-            'AP_Scripting/lua/src',
-        ]
-
         if cfg.options.enable_scripting:
             env.DEFINES.update(
                 AP_SCRIPTING_ENABLED = 1,

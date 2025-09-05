@@ -25,7 +25,6 @@
 #include "hwing_esc.h"
 #include <AP_CANManager/AP_CAN.h>
 #include <AP_CANManager/AP_SLCANIface.h>
-#include <AP_Scripting/AP_Scripting.h>
 #include <AP_HAL/CANIface.h>
 #include <AP_Stats/AP_Stats.h>
 #include <AP_RPM/AP_RPM.h>
@@ -422,15 +421,8 @@ public:
     // Handled under LUA script to control LEDs
     float get_yaw_earth() { return yaw_earth; }
     uint32_t get_vehicle_state() { return vehicle_state; }
-#elif defined(AP_SCRIPTING_ENABLED)
-    // create dummy methods for the case when the user doesn't want to use the notify object
-    float get_yaw_earth() { return 0.0; }
-    uint32_t get_vehicle_state() { return 0.0; }
 #endif
 
-#if AP_SCRIPTING_ENABLED
-    AP_Scripting scripting;
-#endif
 
 #if HAL_LOGGING_ENABLED
     static const struct LogStructure log_structure[];

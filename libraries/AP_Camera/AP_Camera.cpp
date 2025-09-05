@@ -14,7 +14,6 @@
 #include "AP_Camera_Mount.h"
 #include "AP_Camera_MAVLink.h"
 #include "AP_Camera_MAVLinkCamV2.h"
-#include "AP_Camera_Scripting.h"
 #include "AP_RunCam.h"
 
 const AP_Param::GroupInfo AP_Camera::var_info[] = {
@@ -249,12 +248,7 @@ void AP_Camera::init()
             _backends[instance] = NEW_NOTHROW AP_Camera_MAVLinkCamV2(*this, _params[instance], instance);
             break;
 #endif
-#if AP_CAMERA_SCRIPTING_ENABLED
-        // check for Scripting driver
-        case CameraType::SCRIPTING:
-            _backends[instance] = NEW_NOTHROW AP_Camera_Scripting(*this, _params[instance], instance);
-            break;
-#endif
+
 #if AP_CAMERA_RUNCAM_ENABLED
         // check for RunCam driver
         case CameraType::RUNCAM:
@@ -836,82 +830,7 @@ bool AP_Camera::set_camera_source(uint8_t instance, CameraSource primary_source,
 }
 #endif // AP_CAMERA_SET_CAMERA_SOURCE_ENABLED
 
-#if AP_CAMERA_SCRIPTING_ENABLED
-// accessor to allow scripting backend to retrieve state
-// returns true on success and cam_state is filled in
-bool AP_Camera::get_state(uint8_t instance, camera_state_t& cam_state)
-{
-    WITH_SEMAPHORE(_rsem);
 
-    auto *backend = get_instance(instance);
-    if (backend == nullptr) {
-        return false;
-    }
-    return backend->get_state(cam_state);
-}
-
-// change camera settings not normally used by autopilot
-bool AP_Camera::change_setting(uint8_t instance, CameraSetting setting, float value)
-{
-    WITH_SEMAPHORE(_rsem);
-
-    auto *backend = get_instance(instance);
-    if (backend == nullptr) {
-        return false;
-    }
-    return backend->change_setting(setting, value);
-}
-
-#endif // #if AP_CAMERA_SCRIPTING_ENABLED
-
-
-#if AP_CAMERA_INFO_FROM_SCRIPT_ENABLED
-void AP_Camera::set_camera_information(mavlink_camera_information_t camera_info)
-{
-    WITH_SEMAPHORE(_rsem);
-
-    if (primary == nullptr) {
-        return;
-    }
-    return primary->set_camera_information(camera_info);
-}
-
-void AP_Camera::set_camera_information(uint8_t instance, mavlink_camera_information_t camera_info)
-{
-    WITH_SEMAPHORE(_rsem);
-
-    auto *backend = get_instance(instance);
-    if (backend == nullptr) {
-        return;
-    }
-
-    // call instance
-    backend->set_camera_information(camera_info);
-}
-
-void AP_Camera::set_stream_information(mavlink_video_stream_information_t stream_info)
-{
-    WITH_SEMAPHORE(_rsem);
-
-    if (primary == nullptr) {
-        return;
-    }
-    return primary->set_stream_information(stream_info);
-}
-
-void AP_Camera::set_stream_information(uint8_t instance, mavlink_video_stream_information_t stream_info)
-{
-    WITH_SEMAPHORE(_rsem);
-
-    auto *backend = get_instance(instance);
-    if (backend == nullptr) {
-        return;
-    }
-
-    // call instance
-    backend->set_stream_information(stream_info);
-}
-#endif // AP_CAMERA_INFO_FROM_SCRIPT_ENABLED
 
 // return backend for instance number
 AP_Camera_Backend *AP_Camera::get_instance(uint8_t instance) const

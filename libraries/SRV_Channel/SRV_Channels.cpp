@@ -444,33 +444,6 @@ bool SRV_Channels::get_output_pwm_chan(uint8_t chan, uint16_t &value)
     return true;
 }
 
-#if AP_SCRIPTING_ENABLED && AP_SCHEDULER_ENABLED
-// set output value for a specific function channel as a pwm value with loop based timeout
-// timeout_ms of zero will clear override of the channel
-// minimum override is 1 MAIN_LOOP
-void SRV_Channels::set_output_pwm_chan_timeout(uint8_t chan, uint16_t value, uint16_t timeout_ms)
-{
-    WITH_SEMAPHORE(_singleton->override_counter_sem);
-
-    if (chan < NUM_SERVO_CHANNELS) {
-        const uint32_t loop_period_us = AP::scheduler().get_loop_period_us();
-        // round up so any non-zero requested value will result in at least one loop
-        const uint32_t loop_count = ((timeout_ms * 1000U) + (loop_period_us - 1U)) / loop_period_us;
-        override_counter[chan] = constrain_int32(loop_count, 0, UINT16_MAX);
-        channels[chan].set_override(true);
-        const bool had_pwm = SRV_Channel::have_pwm_mask & (1U<<chan);
-        channels[chan].set_output_pwm(value,true);
-        if (!had_pwm) {
-            // clear the have PWM mask so the channel will default back to the scaled value when timeout expires
-            // this is also cleared by set_output_scaled but that requires it to be re-called as some point
-            // after the timeout is applied
-            // note that we can't default back to a pre-override PWM value as it is not stored
-            // checking had_pwm means the PWM will not change after the timeout, this was the existing behaviour
-            SRV_Channel::have_pwm_mask &= ~(1U<<chan);
-        }
-    }
-}
-#endif  // AP_SCRIPTING_ENABLED
 
 /*
   wrapper around hal.rcout->cork()

@@ -14,7 +14,6 @@
 #include "AP_Mount_SToRM32_serial.h"
 #include "AP_Mount_Gremsy.h"
 #include "AP_Mount_Siyi.h"
-#include "AP_Mount_Scripting.h"
 #include "AP_Mount_Xacti.h"
 #include "AP_Mount_Viewpro.h"
 #include "AP_Mount_Topotek.h"
@@ -137,13 +136,6 @@ void AP_Mount::init()
             break;
 #endif // HAL_MOUNT_SIYI_ENABLED
 
-#if HAL_MOUNT_SCRIPTING_ENABLED
-        // check for Scripting gimbal
-        case Type::Scripting:
-            _backends[instance] = NEW_NOTHROW AP_Mount_Scripting(*this, _params[instance], instance);
-            _num_instances++;
-            break;
-#endif // HAL_MOUNT_SCRIPTING_ENABLED
 
 #if HAL_MOUNT_XACTI_ENABLED
         // check for Xacti gimbal

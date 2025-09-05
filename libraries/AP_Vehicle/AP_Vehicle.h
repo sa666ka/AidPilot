@@ -20,7 +20,6 @@
 #define AP_VEHICLE_ENABLED 1
 #endif
 
-
 #if AP_VEHICLE_ENABLED
 
 /*
@@ -76,9 +75,7 @@
 #include <Filter/AP_Filter.h>
 #include <AP_Stats/AP_Stats.h>              // statistics library
 #include <AP_DDS/AP_DDS_config.h>
-#if AP_SCRIPTING_ENABLED
-#include <AP_Scripting/AP_Scripting.h>
-#endif
+
 
 
 #include <AP_IBus_Telem/AP_IBus_Telem.h>
@@ -172,89 +169,14 @@ public:
     // returns true if the vehicle has crashed
     virtual bool is_crashed() const;
 
-#if AP_SCRIPTING_ENABLED || AP_EXTERNAL_CONTROL_ENABLED
+#if AP_EXTERNAL_CONTROL_ENABLED
     // Method to takeoff for use by external control
     virtual bool start_takeoff(const float alt_m) { return false; }
     // Method to control vehicle position for use by external control
     virtual bool set_target_location(const Location& target_loc) { return false; }
     // Get target location for use by external control
     virtual bool get_target_location(Location& target_loc) { return false; }
-#endif // AP_SCRIPTING_ENABLED || AP_EXTERNAL_CONTROL_ENABLED
-#if AP_SCRIPTING_ENABLED
-    /*
-      methods to control vehicle for use by scripting
-    */
-    virtual bool set_target_pos_NED(const Vector3f& target_pos, bool use_yaw, float yaw_deg, bool use_yaw_rate, float yaw_rate_degs, bool yaw_relative, bool is_terrain_alt) { return false; }
-    virtual bool set_target_posvel_NED(const Vector3f& target_pos, const Vector3f& target_vel) { return false; }
-    virtual bool set_target_posvelaccel_NED(const Vector3f& target_pos, const Vector3f& target_vel, const Vector3f& target_accel, bool use_yaw, float yaw_deg, bool use_yaw_rate, float yaw_rate_degs, bool yaw_relative) { return false; }
-    virtual bool set_target_velocity_NED(const Vector3f& vel_ned) { return false; }
-    virtual bool set_target_velaccel_NED(const Vector3f& target_vel, const Vector3f& target_accel, bool use_yaw, float yaw_deg, bool use_yaw_rate, float yaw_rate_degs, bool yaw_relative) { return false; }
-    virtual bool set_target_angle_and_climbrate(float roll_deg, float pitch_deg, float yaw_deg, float climb_rate_ms, bool use_yaw_rate, float yaw_rate_degs) { return false; }
-    virtual bool set_target_rate_and_throttle(float roll_rate_dps, float pitch_rate_dps, float yaw_rate_dps, float throttle) { return false; }
-
-    // command throttle percentage and roll, pitch, yaw target
-    // rates. For use with scripting controllers
-    virtual void set_target_throttle_rate_rpy(float throttle_pct, float roll_rate_dps, float pitch_rate_dps, float yaw_rate_dps) {}
-    virtual void set_rudder_offset(float rudder_pct, bool run_yaw_rate_controller) {}
-    virtual bool nav_scripting_enable(uint8_t mode) {return false;}
-
-    virtual bool update_target_location(const Location &old_loc, const Location &new_loc) { return false; }
-
-    // circle mode controls (only used by scripting with Copter)
-    virtual bool get_circle_radius(float &radius_m) { return false; }
-    virtual bool set_circle_rate(float rate_dps) { return false; }
-
-    // get or set steering and throttle (-1 to +1) (for use by scripting with Rover)
-    virtual bool set_steering_and_throttle(float steering, float throttle) { return false; }
-    virtual bool get_steering_and_throttle(float& steering, float& throttle) { return false; }
-
-    // set turn rate in deg/sec and speed in meters/sec (for use by scripting with Rover)
-    virtual bool set_desired_turn_rate_and_speed(float turn_rate, float speed) { return false; }
-
-   // set auto mode speed in meters/sec (for use by scripting with Copter/Rover)
-    virtual bool set_desired_speed(float speed) { return false; }
-
-    // support for NAV_SCRIPT_TIME mission command
-    virtual bool nav_script_time(uint16_t &id, uint8_t &cmd, float &arg1, float &arg2, int16_t &arg3, int16_t &arg4) { return false; }
-    virtual void nav_script_time_done(uint16_t id) {}
-
-    // allow for VTOL velocity matching of a target
-    virtual bool set_velocity_match(const Vector2f &velocity) { return false; }
-
-    // returns true if the EKF failsafe has triggered
-    virtual bool has_ekf_failsafed() const { return false; }
-
-    // allow for landing descent rate to be overridden by a script, may be -ve to climb
-    virtual bool set_land_descent_rate(float descent_rate) { return false; }
-
-    // Allow for scripting to have control over the crosstracking when exiting and resuming missions or guided flight
-    // It's up to the Lua script to ensure the provided location makes sense
-    virtual bool set_crosstrack_start(const Location &new_start_location) { return false; }
-
-    // control outputs enumeration
-    enum class ControlOutput {
-        Roll = 1,
-        Pitch = 2,
-        Throttle = 3,
-        Yaw = 4,
-        Lateral = 5,
-        MainSail = 6,
-        WingSail = 7,
-        Walking_Height = 8,
-        Last_ControlOutput  // place new values before this
-    };
-
-    // get control output (for use in scripting)
-    // returns true on success and control_value is set to a value in the range -1 to +1
-    virtual bool get_control_output(AP_Vehicle::ControlOutput control_output, float &control_value) { return false; }
-
-    // Register a custom mode with given number and names, return a structure which the script can edit
-    struct custom_mode_state {
-        bool allow_entry;
-    };
-    virtual custom_mode_state* register_custom_mode(const uint8_t number, const char* full_name, const char* short_name) { return nullptr; }
-
-#endif // AP_SCRIPTING_ENABLED
+#endif // AP_EXTERNAL_CONTROL_ENABLED
 
     // returns true if vehicle is in the process of landing
     virtual bool is_landing() const { return false; }
@@ -471,10 +393,6 @@ protected:
 
 #if AP_TEMPERATURE_SENSOR_ENABLED
     AP_TemperatureSensor temperature_sensor;
-#endif
-
-#if AP_SCRIPTING_ENABLED
-    AP_Scripting scripting;
 #endif
 
     static const struct AP_Param::GroupInfo var_info[];

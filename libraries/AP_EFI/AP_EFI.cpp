@@ -24,7 +24,6 @@
 #include "AP_EFI_Currawong_ECU.h"
 #include "AP_EFI_Serial_Hirth.h"
 #include "AP_EFI_Loweheiser.h"
-#include "AP_EFI_Scripting.h"
 #include "AP_EFI_MAV.h"
 
 #include <AP_Logger/AP_Logger.h>
@@ -127,11 +126,7 @@ void AP_EFI::init(void)
         backend = NEW_NOTHROW AP_EFI_Currawong_ECU(*this);
         break;
 #endif
-#if AP_EFI_SCRIPTING_ENABLED
-    case Type::SCRIPTING:
-        backend = NEW_NOTHROW AP_EFI_Scripting(*this);
-        break;
-#endif        
+   
 #if AP_EFI_SERIAL_HIRTH_ENABLED        
     case Type::Hirth:
         backend = NEW_NOTHROW AP_EFI_Serial_Hirth(*this);

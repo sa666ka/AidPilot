@@ -101,9 +101,7 @@ public:
 #if AP_EFI_CURRAWONG_ECU_ENABLED
         CurrawongECU = 6,
 #endif
-#if AP_EFI_SCRIPTING_ENABLED
-        SCRIPTING  = 7,
-#endif
+
 #if AP_EFI_SERIAL_HIRTH_ENABLED
         Hirth      = 8, 
 #endif
@@ -117,9 +115,6 @@ public:
     // send EFI_STATUS
     void send_mavlink_status(mavlink_channel_t chan);
 
-#if AP_SCRIPTING_ENABLED
-    AP_EFI_Backend* get_backend(uint8_t idx) { return idx==0?backend:nullptr; }
-#endif
 
     void handle_EFI_message(const mavlink_message_t &msg);
 

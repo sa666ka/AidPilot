@@ -60,7 +60,6 @@ extern const AP_HAL::HAL& hal;
 #include <AP_Torqeedo/AP_Torqeedo.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Parachute/AP_Parachute_config.h>
-#include <AP_Scripting/AP_Scripting.h>
 #define SWITCH_DEBOUNCE_TIME_MS  200
 
 const AP_Param::GroupInfo RC_Channel::var_info[] = {
@@ -702,25 +701,7 @@ void RC_Channel::init_aux_function(const AUX_FUNC ch_option, const AuxSwitchPos 
 #if HAL_TORQEEDO_ENABLED
     case AUX_FUNC::TORQEEDO_CLEAR_ERR:
 #endif
-#if AP_SCRIPTING_ENABLED
-    case AUX_FUNC::SCRIPTING_1:
-    case AUX_FUNC::SCRIPTING_2:
-    case AUX_FUNC::SCRIPTING_3:
-    case AUX_FUNC::SCRIPTING_4:
-    case AUX_FUNC::SCRIPTING_5:
-    case AUX_FUNC::SCRIPTING_6:
-    case AUX_FUNC::SCRIPTING_7:
-    case AUX_FUNC::SCRIPTING_8:
-    case AUX_FUNC::SCRIPTING_9:
-    case AUX_FUNC::SCRIPTING_10:
-    case AUX_FUNC::SCRIPTING_11:
-    case AUX_FUNC::SCRIPTING_12:
-    case AUX_FUNC::SCRIPTING_13:
-    case AUX_FUNC::SCRIPTING_14:
-    case AUX_FUNC::SCRIPTING_15:
-    case AUX_FUNC::SCRIPTING_16:
-    case AUX_FUNC::STOP_RESTART_SCRIPTING:
-#endif
+
 #if AP_VIDEOTX_ENABLED
     case AUX_FUNC::VTX_POWER:
 #endif
@@ -1432,9 +1413,7 @@ void RC_Channel::do_aux_function_retract_mount(const AuxSwitchPos ch_flag, const
 
 bool RC_Channel::run_aux_function(AUX_FUNC ch_option, AuxSwitchPos pos, AuxFuncTrigger::Source source, uint16_t source_index)
 {
-#if AP_SCRIPTING_ENABLED
-    rc().set_aux_cached(ch_option, pos);
-#endif
+
 
     const AuxFuncTrigger trigger {
         func: ch_option,
@@ -1899,25 +1878,6 @@ bool RC_Channel::do_aux_function(const AuxFuncTrigger &trigger)
     }
 #endif
 
-#if AP_SCRIPTING_ENABLED
-    case AUX_FUNC::STOP_RESTART_SCRIPTING: {
-        AP_Scripting *scr = AP::scripting();
-        if (scr != nullptr) {
-            switch (ch_flag) {
-            case AuxSwitchPos::HIGH:
-                scr->stop();
-                break;
-            case AuxSwitchPos::MIDDLE:
-                break;
-            case AuxSwitchPos::LOW:
-                scr->restart_all();
-                break;
-            }
-        }
-        break;
-    }
-#endif
-
 // do nothing for these functions
 #if HAL_MOUNT_ENABLED
     case AUX_FUNC::MOUNT1_ROLL:
@@ -1926,24 +1886,6 @@ bool RC_Channel::do_aux_function(const AuxFuncTrigger &trigger)
     case AUX_FUNC::MOUNT2_ROLL:
     case AUX_FUNC::MOUNT2_PITCH:
     case AUX_FUNC::MOUNT2_YAW:
-#endif
-#if AP_SCRIPTING_ENABLED
-    case AUX_FUNC::SCRIPTING_1:
-    case AUX_FUNC::SCRIPTING_2:
-    case AUX_FUNC::SCRIPTING_3:
-    case AUX_FUNC::SCRIPTING_4:
-    case AUX_FUNC::SCRIPTING_5:
-    case AUX_FUNC::SCRIPTING_6:
-    case AUX_FUNC::SCRIPTING_7:
-    case AUX_FUNC::SCRIPTING_8:
-    case AUX_FUNC::SCRIPTING_9:
-    case AUX_FUNC::SCRIPTING_10:
-    case AUX_FUNC::SCRIPTING_11:
-    case AUX_FUNC::SCRIPTING_12:
-    case AUX_FUNC::SCRIPTING_13:
-    case AUX_FUNC::SCRIPTING_14:
-    case AUX_FUNC::SCRIPTING_15:
-    case AUX_FUNC::SCRIPTING_16:
 #endif
         break;
 

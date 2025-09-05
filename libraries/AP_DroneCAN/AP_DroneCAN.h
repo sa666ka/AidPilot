@@ -181,9 +181,6 @@ public:
     Canard::Publisher<uavcan_equipment_hardpoint_Command> relay_hardpoint{canard_iface};
 #endif
 
-#if AP_SCRIPTING_ENABLED
-    bool get_FlexDebug(uint8_t node_id, uint16_t msg_id, uint32_t &timestamp_us, dronecan_protocol_FlexDebug &msg) const;
-#endif
 
 private:
     void loop(void);
@@ -377,11 +374,6 @@ private:
     Canard::ObjCallback<AP_DroneCAN, uavcan_protocol_GetNodeInfoRequest> node_info_req_cb{this, &AP_DroneCAN::handle_node_info_request};
     Canard::Server<uavcan_protocol_GetNodeInfoRequest> node_info_server{canard_iface, node_info_req_cb};
     uavcan_protocol_GetNodeInfoResponse node_info_rsp;
-
-#if AP_SCRIPTING_ENABLED
-    Canard::ObjCallback<AP_DroneCAN, dronecan_protocol_FlexDebug> FlexDebug_cb{this, &AP_DroneCAN::handle_FlexDebug};
-    Canard::Subscriber<dronecan_protocol_FlexDebug> FlexDebug_listener{FlexDebug_cb, _driver_index};
-#endif
     
 #if AP_DRONECAN_HOBBYWING_ESC_SUPPORT
     /*
@@ -434,15 +426,6 @@ private:
     void handle_param_save_response(const CanardRxTransfer& transfer, const uavcan_protocol_param_ExecuteOpcodeResponse& rsp);
     void handle_node_info_request(const CanardRxTransfer& transfer, const uavcan_protocol_GetNodeInfoRequest& req);
 
-#if AP_SCRIPTING_ENABLED
-    void handle_FlexDebug(const CanardRxTransfer& transfer, const dronecan_protocol_FlexDebug& msg);
-    struct FlexDebug {
-        struct FlexDebug *next;
-        uint32_t timestamp_us;
-        uint8_t node_id;
-        dronecan_protocol_FlexDebug msg;
-    } *flexDebug_list;
-#endif
 };
 
 #endif // #if HAL_ENABLE_DRONECAN_DRIVERS

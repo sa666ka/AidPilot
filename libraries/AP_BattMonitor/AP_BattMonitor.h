@@ -259,9 +259,6 @@ public:
 
     static const struct AP_Param::GroupInfo var_info[];
 
-#if AP_BATTERY_SCRIPTING_ENABLED
-    bool handle_scripting(uint8_t idx, const struct BattMonitorScript_State &state);
-#endif
 
 protected:
 

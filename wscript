@@ -127,18 +127,6 @@ def add_build_options(g):
                          default=False,
                          help=optparse.SUPPRESS_HELP)
 
-def add_script_options(g):
-    '''add any drivers or applets from libraries/AP_Scripting'''
-    driver_list = glob.glob(os.path.join(Context.run_dir, "libraries/AP_Scripting/drivers/*.lua"))
-    applet_list = glob.glob(os.path.join(Context.run_dir, "libraries/AP_Scripting/applets/*.lua"))
-    for d in driver_list + applet_list:
-        bname = os.path.basename(d)
-        embed_name = bname[:-4]
-        embed_option = "--embed-%s" % embed_name
-        g.add_option(embed_option,
-                     action='store_true',
-                     default=False,
-                     help="Embed %s in ROMFS" % bname)
 
 def options(opt):
     opt.load('compiler_cxx compiler_c waf_unit_test python')
@@ -456,9 +444,6 @@ configuration in order to save typing.
 
     # support enabling any option in build_options.py
     add_build_options(g)
-
-    # support embedding lua drivers and applets
-    add_script_options(g)
     
 def _collect_autoconfig_files(cfg):
     for m in sys.modules.values():
@@ -604,7 +589,6 @@ def configure(cfg):
         cfg.end_msg('enabled')
     else:
         cfg.end_msg('maybe')
-    cfg.recurse('libraries/AP_Scripting')
 
     cfg.recurse('libraries/AP_GPS')
     cfg.recurse('libraries/AP_HAL_SITL')
@@ -869,8 +853,6 @@ def _build_recursion(bld):
     if bld.env.PERIPH_FW is not None:
         if bld.env.PERIPH_FW:
             dirs_to_recurse.append('Tools/AP_Periph')
-
-    dirs_to_recurse.append('libraries/AP_Scripting')
 
     if bld.env.ENABLE_ONVIF:
         dirs_to_recurse.append('libraries/AP_ONVIF')

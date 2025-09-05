@@ -51,7 +51,6 @@
 #include <AP_Baro/AP_Baro.h>
 #include <AP_EFI/AP_EFI.h>
 #include <AP_Proximity/AP_Proximity.h>
-#include <AP_Scripting/AP_Scripting.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <AP_Winch/AP_Winch.h>
 #include <AP_Mission/AP_Mission.h>
@@ -1878,14 +1877,7 @@ void GCS_MAVLINK::packetReceived(const mavlink_status_t &status,
         handle_mount_message(msg);
 #endif
     }
-#if AP_SCRIPTING_ENABLED
-    {
-        AP_Scripting *scripting = AP_Scripting::get_singleton();
-        if (scripting != nullptr) {
-            scripting->handle_message(msg, chan);
-        }
-    }
-#endif // AP_SCRIPTING_ENABLED
+
 
 #if AP_MAVLINK_FOLLOW_HANDLING_ENABLED
     {
@@ -1959,15 +1951,7 @@ GCS_MAVLINK::update_receive(uint32_t max_time_us)
             hal.util->persistent_data.last_mavlink_msgid = 0;
 
         }
-#if AP_SCRIPTING_ENABLED
-        else if (framing == MAVLINK_FRAMING_BAD_CRC) {
-            // This may be a valid message that we don't know the crc extra for, pass it to scripting which might
-            AP_Scripting *scripting = AP_Scripting::get_singleton();
-            if (scripting != nullptr) {
-                scripting->handle_message(msg, chan);
-            }
-        }
-#endif // AP_SCRIPTING_ENABLED
+
 
         if (parsed_packet || i % 100 == 0) {
             // make sure we don't spend too much time parsing mavlink messages
@@ -5318,13 +5302,6 @@ void GCS_MAVLINK::handle_command_long(const mavlink_message_t &msg)
     mavlink_command_long_t packet;
     mavlink_msg_command_long_decode(&msg, &packet);
 
-#if AP_SCRIPTING_ENABLED
-    AP_Scripting *scripting = AP_Scripting::get_singleton();
-    if (scripting != nullptr && scripting->is_handling_command(packet.command)) {
-        // Scripting has registered to receive this command, do not procces it internaly
-        return;
-    }
-#endif
 
     hal.util->persistent_data.last_mavlink_cmd = packet.command;
 
@@ -5758,16 +5735,6 @@ MAV_RESULT GCS_MAVLINK::handle_command_int_packet(const mavlink_command_int_t &p
         return handle_command_run_prearm_checks(packet);
 #endif
 
-#if AP_SCRIPTING_ENABLED
-    case MAV_CMD_SCRIPTING:
-        {
-            AP_Scripting *scripting = AP_Scripting::get_singleton();
-            if (scripting == nullptr) {
-                return MAV_RESULT_UNSUPPORTED;
-            }
-            return scripting->handle_command_int_packet(packet);
-        }
-#endif // AP_SCRIPTING_ENABLED
 
 #if AP_AHRS_ENABLED
     case MAV_CMD_SET_EKF_SOURCE_SET:
@@ -5810,13 +5777,7 @@ void GCS_MAVLINK::handle_command_int(const mavlink_message_t &msg)
     mavlink_command_int_t packet;
     mavlink_msg_command_int_decode(&msg, &packet);
 
-#if AP_SCRIPTING_ENABLED
-    AP_Scripting *scripting = AP_Scripting::get_singleton();
-    if (scripting != nullptr && scripting->is_handling_command(packet.command)) {
-        // Scripting has registered to receive this command, do not procces it internaly
-        return;
-    }
-#endif
+
 
     hal.util->persistent_data.last_mavlink_cmd = packet.command;
 

@@ -2,7 +2,6 @@
 
 #include <AP_HAL/AP_HAL_Boards.h>
 #include <AP_CANManager/AP_CANSensor.h>
-#include <AP_Scripting/AP_Scripting_config.h>
 #include <AP_Generator/AP_Generator_config.h>
 
 #ifndef HAL_EFI_ENABLED
@@ -31,10 +30,6 @@
 
 #ifndef AP_EFI_NWPWU_ENABLED
 #define AP_EFI_NWPWU_ENABLED AP_EFI_BACKEND_DEFAULT_ENABLED && HAL_MAX_CAN_PROTOCOL_DRIVERS
-#endif
-
-#ifndef AP_EFI_SCRIPTING_ENABLED
-#define AP_EFI_SCRIPTING_ENABLED (AP_EFI_BACKEND_DEFAULT_ENABLED && AP_SCRIPTING_ENABLED)
 #endif
 
 #ifndef AP_EFI_SERIAL_MS_ENABLED

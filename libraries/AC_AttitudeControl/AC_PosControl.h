@@ -10,7 +10,6 @@
 #include <AC_PID/AC_PI_2D.h>        // PI library (2-axis)
 #include <AC_PID/AC_PID_Basic.h>    // PID library (1-axis)
 #include <AC_PID/AC_PID_2D.h>       // PID library (2-axis)
-#include <AP_Scripting/AP_Scripting_config.h>
 #include "AC_AttitudeControl.h"     // Attitude control library
 
 #include <AP_Logger/LogStructure.h>
@@ -554,26 +553,6 @@ public:
 
 
     /// Offset
-
-#if AP_SCRIPTING_ENABLED
-    // Sets additional position, velocity, and acceleration offsets in meters (NED frame) for scripting.
-    // Offsets are added to the controller’s internal target.
-    // Used in LUA
-    bool set_posvelaccel_offset(const Vector3f &pos_offset_NED_m, const Vector3f &vel_offset_NED_ms, const Vector3f &accel_offset_NED_mss);
-
-    // Retrieves current scripted offsets in meters (NED frame).
-    // Used in LUA
-
-    bool get_posvelaccel_offset(Vector3f &pos_offset_NED_m, Vector3f &vel_offset_NED_ms, Vector3f &accel_offset_NED_mss);
-
-    // Retrieves current target velocity (NED frame, m/s) including any scripted offset.
-    // Used in LUA
-    bool get_vel_target(Vector3f &vel_target_NED_ms);
-
-    // Retrieves current target acceleration (NED frame, m/s²) including any scripted offset.
-    // Used in LUA
-    bool get_accel_target(Vector3f &accel_target_NED_mss);
-#endif
 
     // Sets NE offset targets (position [cm], velocity [cm/s], acceleration [cm/s²]) from EKF origin.
     // Offsets must be refreshed at least every 3 seconds to remain active.

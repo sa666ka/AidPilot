@@ -1331,63 +1331,6 @@ void AC_PosControl::init_offsets_U()
     _accel_offset_neu_mss.z = _accel_offset_target_neu_mss.z;
 }
 
-#if AP_SCRIPTING_ENABLED
-// Sets additional position, velocity, and acceleration offsets in meters (NED frame) for scripting.
-// Offsets are added to the controller’s internal target.
-// Used in LUA
-bool AC_PosControl::set_posvelaccel_offset(const Vector3f &pos_offset_NED_m, const Vector3f &vel_offset_NED_ms, const Vector3f &accel_offset_NED_mss)
-{
-    // Convert NED inputs to NEU frame: Z is inverted
-    set_posvelaccel_offset_target_NE_m(pos_offset_NED_m.topostype().xy(), vel_offset_NED_ms.xy(), accel_offset_NED_mss.xy());
-    set_posvelaccel_offset_target_U_m(-pos_offset_NED_m.topostype().z, -vel_offset_NED_ms.z, -accel_offset_NED_mss.z);
-    return true;
-}
-
-// Retrieves current scripted offsets in meters (NED frame).
-// Used in LUA
-bool AC_PosControl::get_posvelaccel_offset(Vector3f &pos_offset_NED_m, Vector3f &vel_offset_NED_ms, Vector3f &accel_offset_NED_mss)
-{
-    // Convert from internal NEU to NED by inverting Z
-    pos_offset_NED_m.xy() = _pos_offset_target_neu_m.xy().tofloat();
-    pos_offset_NED_m.z = -_pos_offset_target_neu_m.z;
-
-    vel_offset_NED_ms.xy() = _vel_offset_target_neu_ms.xy();
-    vel_offset_NED_ms.z = -_vel_offset_target_neu_ms.z;
-
-    accel_offset_NED_mss.xy() = _accel_offset_target_neu_mss.xy();
-    accel_offset_NED_mss.z = -_accel_offset_target_neu_mss.z;
-    return true;
-}
-
-// Retrieves current target velocity (NED frame, m/s) including any scripted offset.
-// Used in LUA
-bool AC_PosControl::get_vel_target(Vector3f &vel_target_NED_ms)
-{
-    if (!is_active_NE() || !is_active_U()) {
-        return false;
-    }
-
-    // Convert NEU → NED by inverting Z
-    vel_target_NED_ms.xy() = _vel_target_neu_ms.xy();
-    vel_target_NED_ms.z = -_vel_target_neu_ms.z;
-    return true;
-}
-
-// Retrieves current target acceleration (NED frame, m/s²) including any scripted offset.
-// Used in LUA
-bool AC_PosControl::get_accel_target(Vector3f &accel_target_NED_mss)
-{
-    if (!is_active_NE() || !is_active_U()) {
-        return false;
-    }
-
-    // Convert NEU → NED by inverting Z
-    accel_target_NED_mss.xy() = _accel_target_neu_mss.xy();
-    accel_target_NED_mss.z = -_accel_target_neu_mss.z;
-    return true;
-}
-#endif
-
 // Sets NE offset targets (position [cm], velocity [cm/s], acceleration [cm/s²]) from EKF origin.
 // Offsets must be refreshed at least every 3 seconds to remain active.
 // See set_posvelaccel_offset_target_NE_m() for full details.

@@ -225,27 +225,6 @@ public:
         float p3;
     };
 
-#if AP_SCRIPTING_ENABLED
-    // Scripting NAV command old version of storage format
-    struct PACKED nav_script_time_Command_tag0 {
-        uint8_t command;
-        uint8_t timeout_s;
-        float arg1;
-        float arg2;
-    };
-
-    // Scripting NAV command, new version of storage format
-    struct PACKED nav_script_time_Command {
-        uint8_t command;
-        uint8_t timeout_s;
-        Float16_t arg1;
-        Float16_t arg2;
-        // last 2 arguments need to be integers due to MISSION_ITEM_INT encoding
-        int16_t arg3;
-        int16_t arg4;
-    };
-#endif
-
     // Scripting NAV command (with verify)
     struct PACKED nav_attitude_time_Command {
         uint16_t time_sec;
@@ -371,11 +350,6 @@ public:
 
         // do scripting
         scripting_Command scripting;
-
-#if AP_SCRIPTING_ENABLED
-        // nav scripting
-        nav_script_time_Command nav_script_time;
-#endif
 
         // nav attitude time
         nav_attitude_time_Command nav_attitude_time;
@@ -670,11 +644,6 @@ public:
     // jumps the mission to the closest landing abort that is planned, returns false if unable to find a valid abort
     bool jump_to_abort_landing_sequence(const Location &current_loc);
 
-    // Scripting helpers for the above functions to fill in the location
-#if AP_SCRIPTING_ENABLED
-    bool jump_to_landing_sequence(void);
-    bool jump_to_abort_landing_sequence(void);
-#endif
 
     // find the closest point on the mission after a DO_RETURN_PATH_START and before DO_LAND_START or landing
     bool jump_to_closest_mission_leg(const Location &current_loc);

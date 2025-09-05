@@ -54,7 +54,6 @@
 #include "AP_RangeFinder_MSP.h"
 #include "AP_RangeFinder_USD1_CAN.h"
 #include "AP_RangeFinder_Benewake_CAN.h"
-#include "AP_RangeFinder_Lua.h"
 #include "AP_RangeFinder_NoopLoop.h"
 #include "AP_RangeFinder_TOFSenseP_CAN.h"
 #include "AP_RangeFinder_NRA24_CAN.h"
@@ -556,11 +555,6 @@ __INITFUNC__ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial
         break;
 #endif
 
-#if AP_RANGEFINDER_LUA_ENABLED
-    case Type::Lua_Scripting:
-        _add_backend(NEW_NOTHROW AP_RangeFinder_Lua(state[instance], params[instance]), instance);
-        break;
-#endif
 
 #if AP_RANGEFINDER_NOOPLOOP_ENABLED
     case Type::NoopLoop_P:

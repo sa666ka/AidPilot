@@ -83,9 +83,7 @@ public:
 #if AP_PROXIMITY_DRONECAN_ENABLED
         DroneCAN = 14,
 #endif
-#if AP_PROXIMITY_SCRIPTING_ENABLED
-        Scripting = 15,
-#endif
+
 #if AP_PROXIMITY_LD06_ENABLED
         LD06 = 16,
 #endif

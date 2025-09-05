@@ -158,9 +158,7 @@ public:
 #if AP_RANGEFINDER_TERARANGER_SERIAL_ENABLED
         TeraRanger_Serial = 35,
 #endif
-#if AP_RANGEFINDER_LUA_ENABLED
-        Lua_Scripting = 36,
-#endif
+
 #if AP_RANGEFINDER_NOOPLOOP_ENABLED
         NoopLoop_P = 37,
 #endif
@@ -275,21 +273,6 @@ public:
     // methods to return a distance on a particular orientation from
     // any sensor which can current supply it
     int8_t signal_quality_pct_orient(enum Rotation orientation) const;
-#if AP_SCRIPTING_ENABLED
-    // centimetre accessors - do not use, reduce use where possible
-    uint16_t distance_cm_orient(enum Rotation orientation) const {
-        return distance_orient(orientation) * 100.0;
-    }
-    int32_t max_distance_cm_orient(enum Rotation orientation) const {
-        return max_distance_orient(orientation) * 100;
-    }
-    int32_t min_distance_cm_orient(enum Rotation orientation) const {
-        return min_distance_orient(orientation) * 100;
-    }
-    int32_t ground_clearance_cm_orient(enum Rotation orientation) const {
-        return ground_clearance_orient(orientation) * 100;
-    }
-#endif
     // metre accessors - use these in preference to the cm accessors
     float distance_orient(enum Rotation orientation) const;
     float max_distance_orient(enum Rotation orientation) const;
