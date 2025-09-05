@@ -20,6 +20,7 @@
 #define AP_VEHICLE_ENABLED 1
 #endif
 
+
 #if AP_VEHICLE_ENABLED
 
 /*
@@ -80,10 +81,6 @@
 #include <AP_Scripting/AP_Scripting.h>
 #endif
 
-#include <AP_Gripper/AP_Gripper_config.h>
-#if AP_GRIPPER_ENABLED
-#include <AP_Gripper/AP_Gripper.h>
-#endif
 
 #include <AP_RPM/AP_RPM_config.h>
 #if AP_RPM_ENABLED
@@ -368,10 +365,6 @@ protected:
     virtual const AP_Int32 &get_log_bitmask() { return bitmask_unused; }
     virtual const struct LogStructure *get_log_structures() const { return nullptr; }
     virtual uint8_t get_num_log_structures() const { return 0; }
-#endif
-
-#if AP_GRIPPER_ENABLED
-    AP_Gripper gripper;
 #endif
 
 #if AP_IBUS_TELEM_ENABLED
