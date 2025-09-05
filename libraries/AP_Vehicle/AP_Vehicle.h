@@ -469,17 +469,6 @@ protected:
     AP_KDECAN kdecan;
 #endif
 
-#if AP_FENCE_ENABLED
-    AC_Fence fence;
-    struct {
-        bool have_updates;      // true if new breache statuses have been captured but not actioned
-        uint8_t new_breaches;   // the new breaches that are available
-        uint32_t last_check_ms; // last time the fence check was run
-    } fence_breaches;
-
-    void fence_init();
-    virtual void fence_checks_async() {};
-#endif
 
 #if AP_TEMPERATURE_SENSOR_ENABLED
     AP_TemperatureSensor temperature_sensor;

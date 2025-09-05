@@ -109,11 +109,6 @@ const AP_Param::GroupInfo AP_Vehicle::var_info[] = {
     AP_SUBGROUPINFO(ais, "AIS_",  13, AP_Vehicle, AP_AIS),
 #endif
 
-#if AP_FENCE_ENABLED
-    // @Group: FENCE_
-    // @Path: ../AC_Fence/AC_Fence.cpp
-    AP_SUBGROUPINFO(fence, "FENCE_", 14, AP_Vehicle, AC_Fence),
-#endif
 
 #if AP_OPENDRONEID_ENABLED
     // @Group: DID_
@@ -493,11 +488,6 @@ void AP_Vehicle::setup()
     nmea.init();
 #endif
 
-#if AP_FENCE_ENABLED
-    fence.init();
-    fence_init();
-#endif
-
 #if AP_CUSTOMROTATIONS_ENABLED
     custom_rotations.init();
 #endif
@@ -647,9 +637,7 @@ const AP_Scheduler::Task AP_Vehicle::scheduler_tasks[] = {
 #if HAL_INS_ACCELCAL_ENABLED
     SCHED_TASK(accel_cal_update,                                                      10, 100, 245),
 #endif
-#if AP_FENCE_ENABLED
-    SCHED_TASK_CLASS(AC_Fence,     &vehicle.fence,          update,                   10, 100, 248),
-#endif
+
 #if AP_AIS_ENABLED
     SCHED_TASK_CLASS(AP_AIS,       &vehicle.ais,            update,                    5, 100, 249),
 #endif
@@ -1128,12 +1116,6 @@ bool AP_Vehicle::block_GCS_mode_change(uint8_t mode_num, const uint8_t *mode_lis
 }
 #endif
 
-#if AP_FENCE_ENABLED
-void AP_Vehicle::fence_init()
-{
-    hal.scheduler->register_io_process(FUNCTOR_BIND_MEMBER(&AP_Vehicle::fence_checks_async, void));
-}
-#endif  // AP_FENCE_ENABLED
 
 AP_Vehicle *AP_Vehicle::_singleton = nullptr;
 
