@@ -1,8 +1,8 @@
-#include "AP_Vehicle_config.h"
+
+#include "AP_Vehicle.h"
 
 #if AP_VEHICLE_ENABLED
 
-#include "AP_Vehicle.h"
 #include <AP_InertialSensor/AP_InertialSensor_rate_config.h>
 
 #include <AP_BLHeli/AP_BLHeli.h>

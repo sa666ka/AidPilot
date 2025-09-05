@@ -74,7 +74,6 @@
 #include "MissionItemProtocol_Fence.h"
 
 #include <AP_Notify/AP_Notify.h>
-#include <AP_Vehicle/AP_Vehicle_config.h>
 
 #include <stdio.h>
 
